@@ -14,12 +14,15 @@ import { IPC } from '@shared/ipc';
 
 const api = {
   files: {
-    pick: (): Promise<unknown[]> => ipcRenderer.invoke(IPC.filesPick),
+    pick: (accept?: string): Promise<unknown[]> => ipcRenderer.invoke(IPC.filesPick, { accept }),
     pickFolder: (): Promise<string | null> => ipcRenderer.invoke(IPC.filesPickFolder),
     stat: (paths: string[]): Promise<unknown[]> => ipcRenderer.invoke(IPC.filesStat, { paths }),
     readBytes: (path: string): Promise<unknown> => ipcRenderer.invoke(IPC.filesReadBytes, { path }),
     reveal: (path: string): Promise<void> => ipcRenderer.invoke(IPC.filesReveal, { path }),
     open: (path: string): Promise<string> => ipcRenderer.invoke(IPC.filesOpen, { path }),
+    imageInfo: (path: string): Promise<unknown> => ipcRenderer.invoke(IPC.filesImageInfo, { path }),
+    imageThumbnail: (path: string, rotation: number): Promise<string | null> =>
+      ipcRenderer.invoke(IPC.filesImageThumbnail, { path, rotation }),
     /**
      * Lấy đường dẫn thật của một tệp được kéo thả.
      *

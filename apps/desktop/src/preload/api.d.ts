@@ -1,4 +1,4 @@
-import type { AppInfo } from '@shared/ipc';
+import type { AppInfo, ImageInfo } from '@shared/ipc';
 import type { CompressionEstimate } from '@shared/tasks';
 import type { AppSettings, FileMeta, LicenseStatus, RecentFile } from '@shared/types';
 
@@ -10,12 +10,14 @@ import type { AppSettings, FileMeta, LicenseStatus, RecentFile } from '@shared/t
  */
 export interface OptbApi {
   files: {
-    pick(): Promise<FileMeta[]>;
+    pick(accept?: 'pdf' | 'image' | 'any'): Promise<FileMeta[]>;
     pickFolder(): Promise<string | null>;
     stat(paths: string[]): Promise<FileMeta[]>;
     readBytes(path: string): Promise<unknown>;
     reveal(path: string): Promise<void>;
     open(path: string): Promise<string>;
+    imageInfo(path: string): Promise<ImageInfo | null>;
+    imageThumbnail(path: string, rotation: number): Promise<string | null>;
     getPathForFile(file: File): string;
   };
   settings: {

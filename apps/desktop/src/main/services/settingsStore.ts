@@ -103,7 +103,7 @@ export class SettingsStore {
 }
 
 function isSupportedLanguage(value: string): value is SupportedLanguage {
-  return ['en', 'de', 'fr', 'es', 'vi'].includes(value);
+  return ['en', 'vi'].includes(value);
 }
 
 function isThemePreference(value: string): value is ThemePreference {

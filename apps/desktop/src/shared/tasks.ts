@@ -9,7 +9,7 @@ import type { CompressionLevel } from './types';
  */
 
 /** Loại tác vụ. */
-export type TaskKind = 'merge' | 'rotate' | 'split' | 'compress';
+export type TaskKind = 'merge' | 'rotate' | 'split' | 'compress' | 'pages' | 'images';
 
 /** Cách chọn trang cho thao tác xoay. */
 export type PageSelection =
@@ -62,6 +62,31 @@ export interface TaskDetails {
   imagesSkipped?: number;
   /** Mức nén thực sự đã dùng, khi người dùng chọn dung lượng đích. */
   levelUsed?: CompressionLevel;
+}
+
+/** Tham số tác vụ sắp xếp trang (F-05). */
+export interface PagesTaskPayload {
+  /** Các trang theo thứ tự người dùng đã sắp. */
+  pages: {
+    path: string;
+    pageNumber: number;
+    /** Góc xoay cộng thêm so với hướng sẵn có, tính bằng độ. */
+    rotationDelta: 0 | 90 | 180 | 270;
+  }[];
+  outputDirectory: string;
+  outputName: string;
+  /** Chỉ giữ lại các trang có mã này. */
+  selectedPageIds?: string[];
+}
+
+/** Tham số tác vụ ảnh sang PDF (F-06). */
+export interface ImagesTaskPayload {
+  images: { path: string; rotation: 0 | 90 | 180 | 270 }[];
+  paperSize: 'fit' | 'a4' | 'letter';
+  marginMm: 0 | 10 | 20;
+  quality: 'original' | 'compressed';
+  outputDirectory: string;
+  outputName: string;
 }
 
 /** Ước lượng mức giảm dung lượng trước khi nén. */

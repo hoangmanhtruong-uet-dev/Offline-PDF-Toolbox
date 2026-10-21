@@ -22,7 +22,7 @@ interface AppState {
 /** Ngôn ngữ hệ thống rút gọn về mã mà ứng dụng hỗ trợ. */
 function normalizeSystemLanguage(systemLanguage: string): SupportedLanguage {
   const base = systemLanguage.split('-')[0]?.toLowerCase() ?? 'en';
-  if (base === 'de' || base === 'fr' || base === 'es' || base === 'vi') return base;
+  if (base === 'vi') return 'vi';
   return 'en';
 }
 

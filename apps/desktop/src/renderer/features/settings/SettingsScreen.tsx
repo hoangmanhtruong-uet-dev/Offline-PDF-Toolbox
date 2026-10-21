@@ -128,6 +128,7 @@ export function SettingsScreen(): React.JSX.Element {
           <CardFooter>
             <Field>
               <Dropdown
+                aria-label={t('settings.language')}
                 value={LANGUAGE_NAMES[settings.language]}
                 selectedOptions={[settings.language]}
                 onOptionSelect={(_event, data) => {
@@ -151,6 +152,7 @@ export function SettingsScreen(): React.JSX.Element {
           <CardFooter>
             <Field>
               <Dropdown
+                aria-label={t('settings.theme')}
                 value={t(THEME_LABELS[settings.theme])}
                 selectedOptions={[settings.theme]}
                 onOptionSelect={(_event, data) => {

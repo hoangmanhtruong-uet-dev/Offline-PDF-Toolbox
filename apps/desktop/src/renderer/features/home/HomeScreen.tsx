@@ -14,6 +14,7 @@ import { useShortcuts } from '../../hooks/useShortcuts';
 import { useFilesStore } from '../../state/filesStore';
 import { appTokens } from '../../styles/tokens';
 import { TOOLS } from '../tools/tools';
+import type { ToolDefinition } from '../tools/tools';
 
 /**
  * Màn hình chính S-01.
@@ -143,9 +144,19 @@ const useStyles = makeStyles({
   },
 });
 
-/** Các công cụ gợi ý khi người dùng thả tệp vào màn hình chính. */
-function suggestTools(count: number): string[] {
-  return count > 1 ? ['merge'] : ['split', 'compress', 'rotate', 'pages'];
+/**
+ * Các công cụ gợi ý khi người dùng thả tệp vào màn hình chính.
+ *
+ * Chỉ những công cụ **đã triển khai** mới được gợi ý: công cụ chưa xong thì
+ * không dẫn người dùng tới một màn hình chỉ báo "sắp có".
+ */
+function suggestTools(count: number): ToolDefinition[] {
+  const candidates =
+    count > 1
+      ? TOOLS.filter((tool) => tool.id === 'merge')
+      : TOOLS.filter((tool) => ['split', 'compress', 'rotate', 'pages'].includes(tool.id));
+
+  return candidates.filter((tool) => tool.ready);
 }
 
 export function HomeScreen(): React.JSX.Element {
@@ -159,12 +170,14 @@ export function HomeScreen(): React.JSX.Element {
   const [dropped, setDropped] = useState<FileMeta[]>([]);
 
   useShortcuts({
-    onOpenFiles: () => void window.optb.files.pick().then((metas) => {
-      if (Array.isArray(metas) && metas.length > 0) {
-        addFiles(metas as FileMeta[]);
-        navigate('/tools/merge');
-      }
-    }),
+    onOpenFiles: () => {
+      // Ctrl+O dùng chung bảng chọn công cụ với việc thả tệp: người dùng
+      // chọn tệp rồi chọn công cụ, không đi thẳng sang Gộp.
+      void window.optb.files.pick().then((metas) => {
+        const list = metas as FileMeta[];
+        if (list.length > 0) setDropped(list);
+      });
+    },
     onOpenTool: (toolId) => navigate(`/tools/${toolId}`),
     onOpenSettings: () => navigate('/settings'),
   });
@@ -247,23 +260,18 @@ export function HomeScreen(): React.JSX.Element {
             {t('home.chooserHint', { count: dropped.length })}
           </Text>
           <div className={styles.chooserList}>
-            {suggestions.map((toolId) => {
-              const tool = TOOLS.find((item) => item.id === toolId);
-              if (!tool) return null;
-
-              return (
-                <button
-                  key={tool.id}
-                  type="button"
-                  className={styles.chooserButton}
-                  onClick={() => startWithTool(tool.id)}
-                  data-testid={`chooser-${tool.id}`}
-                >
-                  <tool.icon />
-                  {t(tool.nameKey)}
-                </button>
-              );
-            })}
+            {suggestions.map((tool) => (
+              <button
+                key={tool.id}
+                type="button"
+                className={styles.chooserButton}
+                onClick={() => startWithTool(tool.id)}
+                data-testid={`chooser-${tool.id}`}
+              >
+                <tool.icon />
+                {t(tool.nameKey)}
+              </button>
+            ))}
           </div>
         </section>
       ) : null}

@@ -223,6 +223,7 @@ export function SplitScreen(): React.JSX.Element {
             <span className={styles.label}>{t('split.mode')}</span>
             <Field>
               <Dropdown
+                aria-label={t('split.mode')}
                 value={t(MODE_LABELS[mode])}
                 selectedOptions={[mode]}
                 onOptionSelect={(_event, data) => {

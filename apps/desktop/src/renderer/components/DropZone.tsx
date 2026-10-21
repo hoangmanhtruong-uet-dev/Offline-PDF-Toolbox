@@ -56,7 +56,16 @@ export interface DropZoneProps {
   /** Cho phép thả nhiều tệp cùng lúc. */
   multiple?: boolean;
   compact?: boolean;
+  /** Định dạng được chấp nhận. */
+  accept?: 'pdf' | 'image' | 'any';
 }
+
+/** Phần mở rộng tệp theo định dạng được chấp nhận. */
+const EXTENSIONS: Record<'pdf' | 'image' | 'any', string[]> = {
+  pdf: ['pdf'],
+  image: ['jpg', 'jpeg', 'png', 'tif', 'tiff', 'bmp'],
+  any: [],
+};
 
 export function DropZone({
   onFiles,
@@ -65,15 +74,24 @@ export function DropZone({
   buttonLabel,
   multiple = true,
   compact = false,
+  accept = 'pdf',
 }: DropZoneProps): React.JSX.Element {
   const styles = useStyles();
   const { t } = useI18n();
   const [dragging, setDragging] = useState(false);
 
+  /** Chỉ giữ lại tệp đúng định dạng được chấp nhận. */
+  const filterByKind = (metas: FileMeta[]): FileMeta[] => {
+    const allowed = EXTENSIONS[accept];
+    if (allowed.length === 0) return metas;
+    return metas.filter((meta) => allowed.includes(meta.ext.toLowerCase()));
+  };
+
   const pickFiles = async (): Promise<void> => {
-    const metas = (await window.optb.files.pick()) as FileMeta[];
-    const selected = multiple ? metas : metas.slice(0, 1);
-    if (selected.length > 0) onFiles(selected);
+    const metas = (await window.optb.files.pick(accept)) as FileMeta[];
+    const selected = filterByKind(metas);
+    const limited = multiple ? selected : selected.slice(0, 1);
+    if (limited.length > 0) onFiles(limited);
   };
 
   const handleDrop = async (event: DragEvent<HTMLDivElement>): Promise<void> => {
@@ -93,7 +111,7 @@ export function DropZone({
 
     if (paths.length === 0) return;
 
-    const metas = (await window.optb.files.stat(paths)) as FileMeta[];
+    const metas = filterByKind((await window.optb.files.stat(paths)) as FileMeta[]);
     const selected = multiple ? metas : metas.slice(0, 1);
     if (selected.length > 0) onFiles(selected);
   };

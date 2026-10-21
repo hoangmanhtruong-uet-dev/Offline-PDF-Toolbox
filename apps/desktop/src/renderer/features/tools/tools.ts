@@ -74,7 +74,7 @@ export const TOOLS: ToolDefinition[] = [
     descriptionKey: 'home.tool.pagesDesc',
     icon: DocumentTableRegular,
     accepts: 'pdf',
-    ready: false,
+    ready: true,
   },
   {
     id: 'images',
@@ -83,7 +83,7 @@ export const TOOLS: ToolDefinition[] = [
     descriptionKey: 'home.tool.imagesDesc',
     icon: ImageRegular,
     accepts: 'image',
-    ready: false,
+    ready: true,
   },
 ];
 

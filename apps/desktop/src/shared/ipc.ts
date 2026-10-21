@@ -3,7 +3,9 @@ import type { CompressionLevel } from './types';
 import type {
   CompressionEstimate,
   CompressTaskPayload,
+  ImagesTaskPayload,
   MergeTaskPayload,
+  PagesTaskPayload,
   RotateTaskPayload,
   SplitTaskPayload,
 } from './tasks';
@@ -21,6 +23,8 @@ export const IPC = {
   filesReadBytes: 'files:readBytes',
   filesReveal: 'files:reveal',
   filesOpen: 'files:open',
+  filesImageInfo: 'files:imageInfo',
+  filesImageThumbnail: 'files:imageThumbnail',
   settingsGet: 'settings:get',
   settingsUpdate: 'settings:update',
   recentGet: 'recent:get',
@@ -50,6 +54,16 @@ export interface AppInfo {
   isPackaged: boolean;
 }
 
+/** Loại tệp mà công cụ nhận. */
+export type FileKind = 'pdf' | 'image' | 'any';
+
+/** Kích thước và định dạng của một ảnh. */
+export interface ImageInfo {
+  width: number;
+  height: number;
+  format: string;
+}
+
 /** Kết quả đọc nội dung tệp. */
 export type ReadBytesResult =
   | { ok: true; bytes: Uint8Array }
@@ -57,12 +71,17 @@ export type ReadBytesResult =
 
 /** Kiểu các lệnh được preload lộ ra. */
 export interface IpcInvokeMap {
-  [IPC.filesPick]: { request: void; response: FileMeta[] };
+  [IPC.filesPick]: { request: { accept?: FileKind }; response: FileMeta[] };
   [IPC.filesPickFolder]: { request: void; response: string | null };
   [IPC.filesStat]: { request: { paths: string[] }; response: FileMeta[] };
   [IPC.filesReadBytes]: { request: { path: string }; response: ReadBytesResult };
   [IPC.filesReveal]: { request: { path: string }; response: void };
   [IPC.filesOpen]: { request: { path: string }; response: string };
+  [IPC.filesImageInfo]: { request: { path: string }; response: ImageInfo | null };
+  [IPC.filesImageThumbnail]: {
+    request: { path: string; rotation: number };
+    response: string | null;
+  };
   [IPC.settingsGet]: { request: void; response: AppSettings };
   [IPC.settingsUpdate]: { request: { patch: Partial<AppSettings> }; response: AppSettings };
   [IPC.recentGet]: { request: void; response: RecentFile[] };
@@ -76,7 +95,9 @@ export interface IpcInvokeMap {
       | { kind: 'merge'; payload: MergeTaskPayload }
       | { kind: 'rotate'; payload: RotateTaskPayload }
       | { kind: 'split'; payload: SplitTaskPayload }
-      | { kind: 'compress'; payload: CompressTaskPayload };
+      | { kind: 'compress'; payload: CompressTaskPayload }
+      | { kind: 'pages'; payload: PagesTaskPayload }
+      | { kind: 'images'; payload: ImagesTaskPayload };
     response: string;
   };
   [IPC.taskCancel]: { request: { taskId: string }; response: boolean };

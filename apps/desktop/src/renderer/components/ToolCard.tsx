@@ -80,7 +80,7 @@ const useStyles = makeStyles({
 
 export interface ToolCardProps {
   /** Icon của công cụ. */
-  icon: React.ComponentType<{ className?: string }>;
+  icon: React.ComponentType<{ className?: string; focusable?: 'false' | 'true' }>;
   /** Tên công cụ. */
   name: string;
   /** Mô tả một dòng. */
@@ -109,7 +109,7 @@ export const ToolCard = forwardRef<HTMLButtonElement, ToolCardProps>(function To
       data-tool-id={testId}
     >
       <span className={styles.iconBox} aria-hidden="true">
-        <Icon className={styles.icon} />
+        <Icon className={styles.icon} focusable="false" />
       </span>
       <span className={styles.name}>{name}</span>
       <span className={styles.description}>{description}</span>

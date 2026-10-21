@@ -14,7 +14,7 @@ export type TaskState = 'queued' | 'running' | 'succeeded' | 'failed' | 'cancell
 export type TaskPhase = 'reading' | 'processing' | 'writing' | 'verifying';
 
 /** Ngôn ngữ giao diện được hỗ trợ. */
-export type SupportedLanguage = 'en' | 'de' | 'fr' | 'es' | 'vi';
+export type SupportedLanguage = 'en' | 'vi';
 
 /** Chủ đề hiển thị. */
 export type ThemePreference = 'system' | 'light' | 'dark';

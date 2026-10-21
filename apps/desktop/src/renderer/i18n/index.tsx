@@ -4,10 +4,7 @@ import type { ReactNode } from 'react';
 import { errorMessageKey } from '@shared/errors';
 import type { ErrorCode } from '@shared/types';
 
-import de from './de.json';
 import en from './en.json';
-import es from './es.json';
-import fr from './fr.json';
 import vi from './vi.json';
 import type { SupportedLanguage } from '@shared/types';
 
@@ -31,7 +28,7 @@ export type MessageValue = string | { one: string; other: string };
 
 type MessageTable = Record<MessageKey, MessageValue>;
 
-const MESSAGES = { en, de, fr, es, vi } satisfies Record<SupportedLanguage, MessageTable>;
+const MESSAGES = { en, vi } satisfies Record<SupportedLanguage, MessageTable>;
 
 /**
  * Kiểm tra lúc biên dịch rằng mọi khoá thông báo lỗi đều có trong bảng dịch.
@@ -55,14 +52,11 @@ void _errorKeysAreTranslatable;
 export const DEFAULT_LOCALE: SupportedLanguage = 'en';
 
 /** Danh sách ngôn ngữ có thể chọn. */
-export const SUPPORTED_LANGUAGES: SupportedLanguage[] = ['en', 'de', 'fr', 'es', 'vi'];
+export const SUPPORTED_LANGUAGES: SupportedLanguage[] = ['en', 'vi'];
 
 /** Tên hiển thị của từng ngôn ngữ, dùng trong Cài đặt. */
 export const LANGUAGE_NAMES: Record<SupportedLanguage, string> = {
   en: 'English',
-  de: 'Deutsch',
-  fr: 'Français',
-  es: 'Español',
   vi: 'Tiếng Việt',
 };
 

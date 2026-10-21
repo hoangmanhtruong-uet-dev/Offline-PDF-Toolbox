@@ -35,6 +35,9 @@ const useStyles = makeStyles({
     ...shorthands.borderColor(tokens.colorBrandStroke1),
     backgroundColor: tokens.colorNeutralBackground3,
   },
+  over: {
+    ...shorthands.borderColor(tokens.colorBrandStroke2),
+  },
   thumb: {
     width: '100%',
     aspectRatio: '3 / 4',
@@ -91,6 +94,10 @@ export interface PageGridProps {
   onPageVisible?: (pageNumber: number) => void;
   /** Chiều rộng hình thu nhổ tính bằng pixel. */
   thumbnailWidth?: number;
+  /** Kéo thả để đổi thứ tự. */
+  onReorder?: (from: number, to: number) => void;
+  /** Hành động riêng cho từng ô. */
+  renderActions?: (index: number) => React.ReactNode;
 }
 
 export function PageGrid({
@@ -99,9 +106,13 @@ export function PageGrid({
   onSelectionChange,
   onPageVisible,
   thumbnailWidth = 120,
+  onReorder,
+  renderActions,
 }: PageGridProps): React.JSX.Element {
   const styles = useStyles();
   const [lastClicked, setLastClicked] = useState<number | null>(null);
+  const [dragFrom, setDragFrom] = useState<number | null>(null);
+  const [overIndex, setOverIndex] = useState<number | null>(null);
   const observer = useRef<IntersectionObserver | null>(null);
   const cellRefs = useRef(new Map<number, HTMLDivElement>());
 
@@ -161,22 +172,50 @@ export function PageGrid({
 
   return (
     <div className={styles.grid} data-testid="page-grid">
-      {pages.map((page) => {
+      {pages.map((page, index) => {
         const isSelected = selected.includes(page.pageNumber);
 
         return (
           <div
             key={page.pageNumber}
             ref={(element) => {
-              if (element) cellRefs.current.set(page.pageNumber, element);
-              else cellRefs.current.delete(page.pageNumber);
+              if (element) cellRefs.current.set(index, element);
+              else cellRefs.current.delete(index);
             }}
-            data-page={page.pageNumber}
+            className={`${styles.cell} ${isSelected ? styles.selected : ''} ${
+              overIndex === index ? styles.over : ''
+            }`}
             data-testid={`page-cell-${page.pageNumber}`}
-            className={`${styles.cell} ${isSelected ? styles.selected : ''}`}
+            data-page={page.pageNumber}
+            data-index={index}
             role="option"
             aria-selected={isSelected}
             tabIndex={0}
+            draggable={Boolean(onReorder)}
+            onDragStart={(event) => {
+              setDragFrom(index);
+              event.dataTransfer.effectAllowed = 'move';
+              // Firefox cần dữ liệu để bắt đầu kéo thả.
+              event.dataTransfer.setData('text/plain', String(index));
+            }}
+            onDragEnd={() => {
+              setDragFrom(null);
+              setOverIndex(null);
+            }}
+            onDragOver={(event) => {
+              if (!onReorder) return;
+              event.preventDefault();
+              event.dataTransfer.dropEffect = 'move';
+              setOverIndex(index);
+            }}
+            onDrop={(event) => {
+              if (!onReorder) return;
+              event.preventDefault();
+              const from = dragFrom ?? Number.parseInt(event.dataTransfer.getData('text/plain'), 10);
+              if (Number.isInteger(from) && from !== index) onReorder(from, index);
+              setDragFrom(null);
+              setOverIndex(null);
+            }}
             onClick={(event) => handleClick(page.pageNumber, event)}
             onKeyDown={(event) => {
               if (event.key === 'Enter' || event.key === ' ') {
@@ -197,7 +236,11 @@ export function PageGrid({
                 {page.pageNumber}
               </span>
             )}
+
             <span className={styles.number}>{page.pageNumber}</span>
+
+            {renderActions ? renderActions(index) : null}
+
             {isSelected ? <span className={styles.badge}>{selected.length}</span> : null}
           </div>
         );

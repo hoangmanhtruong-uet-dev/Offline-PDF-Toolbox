@@ -251,6 +251,7 @@ export function CompressScreen(): React.JSX.Element {
             <span className={styles.label}>{t('compress.level')}</span>
             <Field>
               <Dropdown
+                aria-label={t('compress.level')}
                 value={t(LEVEL_LABELS[level])}
                 selectedOptions={[level]}
                 disabled={useTarget}

@@ -5,13 +5,17 @@ import type { CompressionLevel } from '@shared/types';
 import type {
   CompressionEstimate,
   CompressTaskPayload,
+  ImagesTaskPayload,
   MergeTaskPayload,
+  PagesTaskPayload,
   RotateTaskPayload,
   SplitTaskPayload,
 } from '@shared/tasks';
 
 import { estimateCompression, runCompress } from '../services/compressionTask';
+import { runImages } from '../services/imagesTask';
 import { runMerge, runRotate } from '../services/pdfTasks';
+import { runPages } from '../services/pagesTask';
 import type { QpdfRunner } from '../services/qpdfRunner';
 import { runSplit } from '../services/splitTask';
 import type { TaskQueue } from '../services/taskQueue';
@@ -31,7 +35,9 @@ export function registerTaskHandlers(queue: TaskQueue, qpdf: QpdfRunner): void {
         | { kind: 'merge'; payload: MergeTaskPayload }
         | { kind: 'rotate'; payload: RotateTaskPayload }
         | { kind: 'split'; payload: SplitTaskPayload }
-        | { kind: 'compress'; payload: CompressTaskPayload },
+        | { kind: 'compress'; payload: CompressTaskPayload }
+        | { kind: 'pages'; payload: PagesTaskPayload }
+        | { kind: 'images'; payload: ImagesTaskPayload },
     ): Promise<string> => {
       switch (request.kind) {
         case 'merge':
@@ -42,6 +48,10 @@ export function registerTaskHandlers(queue: TaskQueue, qpdf: QpdfRunner): void {
           return queue.enqueue((context) => runSplit(context, request.payload, qpdf));
         case 'compress':
           return queue.enqueue((context) => runCompress(context, request.payload, qpdf));
+        case 'pages':
+          return queue.enqueue((context) => runPages(context, request.payload, qpdf));
+        case 'images':
+          return queue.enqueue((context) => runImages(context, request.payload, qpdf));
         default:
           throw new Error('Loai tac vu khong duoc ho tro');
       }

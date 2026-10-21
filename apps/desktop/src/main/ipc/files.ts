@@ -4,7 +4,10 @@ import { basename } from 'node:path';
 import { BrowserWindow, dialog, ipcMain, shell } from 'electron';
 
 import { IPC } from '@shared/ipc';
+import type { FileKind, ImageInfo } from '@shared/ipc';
 import { extensionOf } from '@shared/naming';
+
+import { makeThumbnail, readImageInfo } from '../services/imageTools';
 import type { FileMeta } from '@shared/types';
 
 /**
@@ -48,12 +51,20 @@ export interface FileHandlerDeps {
 }
 
 export function registerFileHandlers(deps: FileHandlerDeps = {}): void {
-  ipcMain.handle(IPC.filesPick, async (event): Promise<FileMeta[]> => {
+  ipcMain.handle(
+    IPC.filesPick,
+    async (event, request: { accept?: FileKind } = {}): Promise<FileMeta[]> => {
     const window = BrowserWindow.fromWebContents(event.sender);
+    const accept = request.accept ?? 'pdf';
     const options: Electron.OpenDialogOptions = {
-      title: 'Select PDF files',
+      title: accept === 'image' ? 'Select images' : 'Select PDF files',
       properties: ['openFile', 'multiSelections'],
-      filters: [{ name: 'PDF', extensions: ['pdf'] }],
+      filters:
+        accept === 'image'
+          ? [{ name: 'Images', extensions: ['jpg', 'jpeg', 'png', 'tif', 'tiff', 'bmp'] }]
+          : accept === 'any'
+            ? []
+            : [{ name: 'PDF', extensions: ['pdf'] }],
     };
 
     const result = window
@@ -65,7 +76,8 @@ export function registerFileHandlers(deps: FileHandlerDeps = {}): void {
     const metas = await describeMany(result.filePaths);
     for (const meta of metas) deps.onFileUsed?.(meta);
     return metas;
-  });
+    },
+  );
 
   ipcMain.handle(IPC.filesPickFolder, async (event): Promise<string | null> => {
     const window = BrowserWindow.fromWebContents(event.sender);
@@ -110,6 +122,20 @@ export function registerFileHandlers(deps: FileHandlerDeps = {}): void {
     // trong he thong, nen khong co rui ro chay ma lenh.
     return shell.openPath(payload.path);
   });
+
+  ipcMain.handle(
+    IPC.filesImageInfo,
+    async (_event, payload: { path: string }): Promise<ImageInfo | null> => {
+      return readImageInfo(payload.path);
+    },
+  );
+
+  ipcMain.handle(
+    IPC.filesImageThumbnail,
+    async (_event, payload: { path: string; rotation: number }): Promise<string | null> => {
+      return makeThumbnail(payload.path, payload.rotation);
+    },
+  );
 
   ipcMain.handle(IPC.recentRemove, async (_event, payload: { path: string }): Promise<void> => {
     await deps.removeRecentFile?.(payload.path);

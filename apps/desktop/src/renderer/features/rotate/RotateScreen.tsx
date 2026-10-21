@@ -153,6 +153,7 @@ export function RotateScreen(): React.JSX.Element {
             <span className={styles.label}>{t('rotate.selection')}</span>
             <Field>
               <Dropdown
+                aria-label={t('rotate.selection')}
                 value={t(SELECTION_LABELS[selectionKind])}
                 selectedOptions={[selectionKind]}
                 onOptionSelect={(_event, data) => {
@@ -184,6 +185,7 @@ export function RotateScreen(): React.JSX.Element {
             <span className={styles.label}>{t('rotate.angle')}</span>
             <Field>
               <Dropdown
+                aria-label={t('rotate.angle')}
                 value={String(angle)}
                 selectedOptions={[String(angle)]}
                 onOptionSelect={(_event, data) => {
