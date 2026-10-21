@@ -1,4 +1,5 @@
 import type { AppInfo } from '@shared/ipc';
+import type { CompressionEstimate } from '@shared/tasks';
 import type { AppSettings, FileMeta, LicenseStatus, RecentFile } from '@shared/types';
 
 /**
@@ -31,6 +32,9 @@ export interface OptbApi {
   tasks: {
     start(request: unknown): Promise<string>;
     cancel(taskId: string): Promise<boolean>;
+  };
+  compress: {
+    estimate(path: string, level: string): Promise<CompressionEstimate | null>;
   };
   onTaskProgress(callback: (progress: unknown) => void): () => void;
   onTaskState(callback: (result: unknown) => void): () => void;

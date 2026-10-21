@@ -130,5 +130,18 @@
   "password.title": "Mot de passe requis",
   "password.description": "Ce fichier est protégé. Saisissez le mot de passe de {file}.",
   "password.label": "Mot de passe",
-  "password.hint": "Le mot de passe reste en mémoire et n'est jamais enregistré."
+  "password.hint": "Le mot de passe reste en mémoire et n'est jamais enregistré.",
+  "compress.level": "Niveau de compression",
+  "compress.levelLight": "Léger",
+  "compress.levelMedium": "Moyen",
+  "compress.levelStrong": "Fort",
+  "compress.hintLight": "Conserve la résolution. Sûr pour les fichiers déjà optimisés.",
+  "compress.hintMedium": "Environ 150 ppp, qualité JPEG 70. Parfait pour l'e-mail.",
+  "compress.hintStrong": "Environ 100 ppp, qualité JPEG 50, niveaux de gris. Fichier le plus petit.",
+  "compress.run": "Compresser",
+  "compress.estimate": "Gain estimé : {ratio}%",
+  "compress.estimateDetail": {
+    "one": "Images : {before} à environ {after} ({count} image)",
+    "other": "Images : {before} à environ {after} ({count} images)"
+  }
 }

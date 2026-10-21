@@ -85,6 +85,117 @@ export function buildTruncatedPdf(): Buffer {
   return full.subarray(0, Math.floor(full.length * 0.6));
 }
 
+/**
+ * Tạo ảnh JPEG giả lập trang scan.
+ *
+ * Ảnh có nhiều mảng sáng tối để nén JPEG thực sự làm nhỏ đi.
+ */
+async function buildScanJpeg(width: number, height: number): Promise<Buffer> {
+  const { default: sharp } = await import('sharp');
+
+  const raw = Buffer.alloc(width * height * 3);
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) {
+      const offset = (y * width + x) * 3;
+      const band = ((x >> 5) + (y >> 5)) % 2 === 0;
+      const noise = ((x * 7 + y * 13) % 17) - 8;
+      raw[offset] = band ? 235 + noise : 60 + noise;
+      raw[offset + 1] = band ? 238 + noise : 64 + noise;
+      raw[offset + 2] = band ? 240 + noise : 70 + noise;
+    }
+  }
+
+  return sharp(raw, { raw: { width, height, channels: 3 } })
+    .jpeg({ quality: 92 })
+    .toBuffer();
+}
+
+/**
+ * Dựng PDF có nhúng ảnh JPEG phủ trọn trang.
+ *
+ * @param images Mỗi phần tử: ảnh JPEG, kích thước ảnh (pixel) và khổ trang.
+ */
+export function buildPdfWithJpegImages(
+  images: { jpeg: Buffer; jpegWidth: number; jpegHeight: number; pageWidth: number; pageHeight: number }[],
+): Buffer {
+  const objects: Buffer[] = [];
+  const pageCount = images.length;
+  const firstPageObject = 3;
+  const contentStart = firstPageObject + pageCount;
+  const imageStart = contentStart + pageCount;
+  const fontObject = imageStart + pageCount;
+
+  const kids = images.map((_, index) => `${firstPageObject + index} 0 R`).join(' ');
+  objects.push(Buffer.from('<< /Type /Catalog /Pages 2 0 R >>', 'latin1'));
+  objects.push(Buffer.from(`<< /Type /Pages /Kids [${kids}] /Count ${pageCount} >>`, 'latin1'));
+
+  images.forEach((image, index) => {
+    objects.push(
+      Buffer.from(
+        `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${image.pageWidth} ${image.pageHeight}] ` +
+          `/Resources << /XObject << /Im0 ${imageStart + index} 0 R >> ` +
+          `/Font << /F1 ${fontObject} 0 R >> >> ` +
+          `/Contents ${contentStart + index} 0 R >>`,
+        'latin1',
+      ),
+    );
+  });
+
+  images.forEach((image) => {
+    const content = `q ${image.pageWidth} 0 0 ${image.pageHeight} 0 0 cm /Im0 Do Q`;
+    objects.push(
+      Buffer.from(
+        `<< /Length ${Buffer.byteLength(content, 'latin1')} >>\nstream\n${content}\nendstream`,
+        'latin1',
+      ),
+    );
+  });
+
+  images.forEach((image) => {
+    const header =
+      `<< /Type /XObject /Subtype /Image /Width ${image.jpegWidth} /Height ${image.jpegHeight} ` +
+      `/ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode ` +
+      `/Length ${image.jpeg.length} >>\nstream\n`;
+    objects.push(
+      Buffer.concat([
+        Buffer.from(header, 'latin1'),
+        image.jpeg,
+        Buffer.from('\nendstream', 'latin1'),
+      ]),
+    );
+  });
+
+  objects.push(
+    Buffer.from(
+      '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>',
+      'latin1',
+    ),
+  );
+
+  let result = Buffer.from('%PDF-1.7\n%\xE2\xE3\xCF\xD3\n', 'latin1');
+  const offsets: number[] = [];
+
+  objects.forEach((body, index) => {
+    offsets.push(result.length);
+    result = Buffer.concat([
+      result,
+      Buffer.from(`${index + 1} 0 obj\n`, 'latin1'),
+      body,
+      Buffer.from('\nendobj\n', 'latin1'),
+    ]);
+  });
+
+  const xref = [`xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`];
+  for (const offset of offsets) {
+    xref.push(`${String(offset).padStart(10, '0')} 00000 n \n`);
+  }
+  xref.push(
+    `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${result.length}\n%%EOF\n`,
+  );
+
+  return Buffer.concat([result, Buffer.from(xref.join(''), 'latin1')]);
+}
+
 /** Danh sách tệp sẽ sinh. */
 const files: { name: string; data: Buffer }[] = [
   { name: 'text-1page.pdf', data: buildPdf([{ text: 'Page one' }]) },
@@ -124,9 +235,42 @@ async function main(): Promise<void> {
     console.log(`da tao ${file.name} (${file.data.length} byte)`);
   }
 
+  await createScanFixtures();
   await createEncryptedFixture();
 
-  console.log(`\n${files.length + 1} tep da tao trong ${fixturesDir}`);
+  console.log(`\n${files.length + 3} tep da tao trong ${fixturesDir}`);
+}
+
+/**
+ * Sinh các tệp mô phỏng trang scan: có ảnh JPEG nhúng phủ trọn trang.
+ *
+ * Dùng để kiểm thử việc nén ảnh (F-03). Ảnh có 300 dpi để nén thật sự
+ * cho ra kết quả đo được.
+ */
+async function createScanFixtures(): Promise<void> {
+  // Trang Letter 612 x 792 điểm ở 300 dpi -> 2550 x 3300 pixel.
+  const letter = { pageWidth: 612, pageHeight: 792, dpi: 300 };
+  const jpegWidth = Math.round((letter.pageWidth / 72) * letter.dpi);
+  const jpegHeight = Math.round((letter.pageHeight / 72) * letter.dpi);
+
+  try {
+    const jpeg = await buildScanJpeg(jpegWidth, jpegHeight);
+
+    const onePage = buildPdfWithJpegImages([
+      { jpeg, jpegWidth, jpegHeight, pageWidth: letter.pageWidth, pageHeight: letter.pageHeight },
+    ]);
+    await writeFile(join(fixturesDir, 'scan-jpeg-1page.pdf'), onePage);
+    console.log('da tao scan-jpeg-1page.pdf');
+
+    const twoPages = buildPdfWithJpegImages([
+      { jpeg, jpegWidth, jpegHeight, pageWidth: letter.pageWidth, pageHeight: letter.pageHeight },
+      { jpeg, jpegWidth, jpegHeight, pageWidth: letter.pageWidth, pageHeight: letter.pageHeight },
+    ]);
+    await writeFile(join(fixturesDir, 'scan-jpeg-2pages.pdf'), twoPages);
+    console.log('da tao scan-jpeg-2pages.pdf');
+  } catch (error) {
+    console.log('bo qua tep scan (khong tao duoc anh JPEG):', error instanceof Error ? error.message : error);
+  }
 }
 
 /**

@@ -130,5 +130,18 @@
   "password.title": "Se requiere contraseña",
   "password.description": "Este archivo está protegido. Introduce la contraseña de {file}.",
   "password.label": "Contraseña",
-  "password.hint": "La contraseña solo se mantiene en memoria y nunca se guarda."
+  "password.hint": "La contraseña solo se mantiene en memoria y nunca se guarda.",
+  "compress.level": "Nivel de compresión",
+  "compress.levelLight": "Ligero",
+  "compress.levelMedium": "Medio",
+  "compress.levelStrong": "Fuerte",
+  "compress.hintLight": "Mantiene la resolución. Seguro para archivos ya optimizados.",
+  "compress.hintMedium": "Unos 150 ppp, calidad JPEG 70. Ideal para correo.",
+  "compress.hintStrong": "Unos 100 ppp, calidad JPEG 50, escala de grises. Archivo más pequeño.",
+  "compress.run": "Comprimir",
+  "compress.estimate": "Ahorro estimado: {ratio}%",
+  "compress.estimateDetail": {
+    "one": "Imágenes: {before} a unos {after} ({count} imagen)",
+    "other": "Imágenes: {before} a unos {after} ({count} imágenes)"
+  }
 }

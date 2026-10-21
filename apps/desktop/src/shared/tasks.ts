@@ -1,4 +1,5 @@
 import type { ErrorCode } from './types';
+import type { CompressionLevel } from './types';
 
 /**
  * Kiểu dữ liệu của các tác vụ xử lý tài liệu.
@@ -8,7 +9,7 @@ import type { ErrorCode } from './types';
  */
 
 /** Loại tác vụ. */
-export type TaskKind = 'merge' | 'rotate' | 'split';
+export type TaskKind = 'merge' | 'rotate' | 'split' | 'compress';
 
 /** Cách chọn trang cho thao tác xoay. */
 export type PageSelection =
@@ -29,8 +30,32 @@ export type SplitMode =
   | 'maxSize'
   | 'extract';
 
-/** Tham số tác vụ tách. */
-export interface SplitTaskPayload {
+/** Tham số tác vụ nén PDF. */
+export interface CompressTaskPayload {
+  path: string;
+  level: CompressionLevel;
+  /** Thư mục đích. */
+  outputDirectory: string;
+  /** Tên tệp đầu ra, chưa kèm phần mở rộng. */
+  outputName: string;
+  password?: string;
+}
+
+/** Ước lượng mức giảm dung lượng trước khi nén. */
+export interface CompressionEstimate {
+  /** Dung lượng ảnh nhúng hiện tại, tính bằng byte. */
+  imageBytes: number;
+  /** Dung lượng ảnh sau khi nén, ước lượng. */
+  estimatedImageBytes: number;
+  /** Tỉ lệ giữa phần ảnh, 0-1. */
+  imageRatio: number;
+  /** Số ảnh sẽ được xử lý. */
+  processableImages: number;
+  /** Số ảnh bị bỏ qua. */
+  skippedImages: number;
+}
+
+/** Tham số tác vụ tách. */export interface SplitTaskPayload {
   path: string;
   mode: SplitMode;
   /** Chế độ `ranges`: chuỗi dải trang, ví dụ `1-3, 5, 8-10`. */

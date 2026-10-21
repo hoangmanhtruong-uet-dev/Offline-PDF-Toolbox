@@ -130,5 +130,18 @@
   "password.title": "Cần mật khẩu",
   "password.description": "Tệp này được bảo vệ. Nhập mật khẩu cho {file}.",
   "password.label": "Mật khẩu",
-  "password.hint": "Mật khẩu chỉ nằm trong bộ nhớ và không bao giờ được lưu."
+  "password.hint": "Mật khẩu chỉ nằm trong bộ nhớ và không bao giờ được lưu.",
+  "compress.level": "Mức nén",
+  "compress.levelLight": "Nhẹ",
+  "compress.levelMedium": "Vừa",
+  "compress.levelStrong": "Mạnh",
+  "compress.hintLight": "Giữ nguyên độ phân giải. An toàn với tệp đã tối ưu.",
+  "compress.hintMedium": "Khoảng 150 dpi, chất lượng JPEG 70. Hợp với gửi email.",
+  "compress.hintStrong": "Khoảng 100 dpi, chất lượng JPEG 50, ảnh xám. Tệp nhỏ nhất.",
+  "compress.run": "Nén",
+  "compress.estimate": "Ước lượng giảm: {ratio}%",
+  "compress.estimateDetail": {
+    "one": "Ảnh: {before} xuống khoảng {after} ({count} ảnh)",
+    "other": "Ảnh: {before} xuống khoảng {after} ({count} ảnh)"
+  }
 }

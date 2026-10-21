@@ -130,5 +130,18 @@
   "password.title": "Password required",
   "password.description": "This file is protected. Enter the password for {file}.",
   "password.label": "Password",
-  "password.hint": "The password is kept in memory only and is never saved."
+  "password.hint": "The password is kept in memory only and is never saved.",
+  "compress.level": "Compression level",
+  "compress.levelLight": "Light",
+  "compress.levelMedium": "Medium",
+  "compress.levelStrong": "Strong",
+  "compress.hintLight": "Keeps the resolution. Safe for already-optimized files.",
+  "compress.hintMedium": "About 150 dpi, JPEG quality 70. Good for email.",
+  "compress.hintStrong": "About 100 dpi, JPEG quality 50, grayscale. Smallest file.",
+  "compress.run": "Compress",
+  "compress.estimate": "Estimated saving: {ratio}%",
+  "compress.estimateDetail": {
+    "one": "Images: {before} to about {after} ({count} image)",
+    "other": "Images: {before} to about {after} ({count} images)"
+  }
 }

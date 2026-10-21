@@ -101,11 +101,18 @@ Danh sách công việc đã rã nhỏ đủ để giao cho một lượt làm v
 
 | ID | P | Việc | E | Cổng | Trạng thái |
 | --- | --- | --- | --- | --- | --- |
-| T5-01 | M | Quét ảnh nhúng: bộ lọc, kích thước điểm ảnh, không gian màu, có mặt nạ không | 6h | T5 | Chưa |
-| T5-02 | M | Tính độ phân giải hiệu dụng (ảnh phủ trọn trang vs ảnh nhỏ trong trang) — có kiểm thử đơn vị | 4h | T5 | Chưa |
-| T5-03 | M | Nén lại ảnh JPEG và Flate 8 bit màu/thang xám bằng sharp; giữ nguyên mặt nạ SMask và vị trí | 10h | T5 | Chưa |
-| T5-04 | M | Ghi lại ảnh đã thay vào bản sao tệp, giữ nguyên văn bản và vector | 6h | T5 | Chưa |
-| T5-05 | M | Tối ưu cấu trúc bằng qpdf (gom đối tượng, nén lại luồng Flate) | 3h | T5 | Chưa |
+| T5-01 | M | Quét ảnh nhúng: bộ lọc, kích thước điểm ảnh, không gian màu, có mặt nạ không | 6h | T5 | Xong |
+| T5-02 | M | Tính độ phân giải hiệu dụng (ảnh phủ trọn trang vs ảnh nhỏ trong trang) — có kiểm thử đơn vị | 4h | T5 | Xong |
+| T5-03 | M | Nén lại ảnh JPEG và Flate 8 bit màu/thang xám bằng sharp; giữ nguyên mặt nạ SMask và vị trí | 10h | T5 | Xong |
+| T5-04 | M | Ghi lại ảnh đã thay vào bản sao tệp, giữ nguyên văn bản và vector | 6h | T5 | Xong |
+| T5-05 | M | Tối ưu cấu trúc bằng qpdf (gom đối tượng, nén lại luồng Flate) | 3h | T5 | Xong |
+
+
+**Ghi chú mục 5 (T5-01, T5-02):** độ phân giải hiệu dụng được tính từ **ma trận `cm` trong luồng nội dung trang**, không dùng giả định "ảnh phủ trọn trang". Nhờ vậy cả ảnh nhỏ nằm giữa trang cũng được tính đúng, và ảnh dùng chung cho nhiều trang lấy theo lần đặt có kích thước vật lý lớn nhất.
+
+**Ghi chú mục 5 (T5-03):** ảnh có mặt nạ mền (SMask) chỉ được nén lại **cùng kích thước** vì mặt nạ phải khớp kích thước ảnh nền — nếu giảm kích thước ảnh nền thì mặt nạ sẽ lệch. Các bộ lọc chưa hỗ trợ (JBIG2, CCITT, JPEG 2000) và ảnh 1 bit được bỏ qua, đúng như đặc tả.
+
+**Ghi chú mục 5 (T5-04):** việc thay ảnh dùng pdf-lib ở mức đối tượng thô: chỉ nội dung luồng ảnh và các khóa `/Width`, `/Height`, `/Filter`, `/ColorSpace` bị đổi; **luồng nội dung trang không bị đụng tới**, nên văn bản và hình vector giữ nguyên.
 
 ## 8. Tuần 6 — Nén phần 2
 

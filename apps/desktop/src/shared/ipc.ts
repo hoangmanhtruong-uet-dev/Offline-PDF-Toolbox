@@ -1,5 +1,12 @@
 import type { AppSettings, FileMeta, LicenseStatus, RecentFile, TaskProgress, TaskResult } from './types';
-import type { MergeTaskPayload, RotateTaskPayload, SplitTaskPayload } from './tasks';
+import type { CompressionLevel } from './types';
+import type {
+  CompressionEstimate,
+  CompressTaskPayload,
+  MergeTaskPayload,
+  RotateTaskPayload,
+  SplitTaskPayload,
+} from './tasks';
 
 /**
  * Tên kênh IPC và kiểu dữ liệu đi qua kênh.
@@ -23,6 +30,7 @@ export const IPC = {
   taskCancel: 'task:cancel',
   taskProgress: 'task:progress',
   taskState: 'task:state',
+  compressEstimate: 'compress:estimate',
 } as const;
 
 /** Thông tin môi trường của ứng dụng, dùng cho trang Giới thiệu. */
@@ -61,10 +69,15 @@ export interface IpcInvokeMap {
     request:
       | { kind: 'merge'; payload: MergeTaskPayload }
       | { kind: 'rotate'; payload: RotateTaskPayload }
-      | { kind: 'split'; payload: SplitTaskPayload };
+      | { kind: 'split'; payload: SplitTaskPayload }
+      | { kind: 'compress'; payload: CompressTaskPayload };
     response: string;
   };
   [IPC.taskCancel]: { request: { taskId: string }; response: boolean };
+  [IPC.compressEstimate]: {
+    request: { path: string; level: CompressionLevel };
+    response: CompressionEstimate | null;
+  };
 }
 
 /** Các kênh main đẩy lên renderer. */

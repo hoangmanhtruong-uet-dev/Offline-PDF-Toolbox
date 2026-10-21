@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 import { AppShell } from '../../components/AppShell';
 import { useI18n } from '../../i18n';
+import { CompressScreen } from '../compress/CompressScreen';
 import { MergeScreen } from '../merge/MergeScreen';
 import { RotateScreen } from '../rotate/RotateScreen';
 import { SplitScreen } from '../split/SplitScreen';
@@ -37,6 +38,8 @@ export function ToolScreen(): React.JSX.Element {
       return <RotateScreen />;
     case 'split':
       return <SplitScreen />;
+    case 'compress':
+      return <CompressScreen />;
     default:
       return (
         <AppShell title={t(tool.nameKey)} onBack={() => navigate('/')}>

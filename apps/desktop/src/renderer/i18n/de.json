@@ -130,5 +130,18 @@
   "password.title": "Passwort erforderlich",
   "password.description": "Diese Datei ist geschützt. Gib das Passwort für {file} ein.",
   "password.label": "Passwort",
-  "password.hint": "Das Passwort bleibt nur im Speicher und wird nie gespeichert."
+  "password.hint": "Das Passwort bleibt nur im Speicher und wird nie gespeichert.",
+  "compress.level": "Komprimierungsstufe",
+  "compress.levelLight": "Leicht",
+  "compress.levelMedium": "Mittel",
+  "compress.levelStrong": "Stark",
+  "compress.hintLight": "Behält die Auflösung. Sicher für bereits optimierte Dateien.",
+  "compress.hintMedium": "Etwa 150 dpi, JPEG-Qualität 70. Gut für E-Mail.",
+  "compress.hintStrong": "Etwa 100 dpi, JPEG-Qualität 50, Graustufen. Kleinste Datei.",
+  "compress.run": "Komprimieren",
+  "compress.estimate": "Geschätzte Einsparung: {ratio}%",
+  "compress.estimateDetail": {
+    "one": "Bilder: {before} auf etwa {after} ({count} Bild)",
+    "other": "Bilder: {before} auf etwa {after} ({count} Bilder)"
+  }
 }

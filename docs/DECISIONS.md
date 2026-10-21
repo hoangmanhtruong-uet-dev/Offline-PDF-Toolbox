@@ -166,6 +166,18 @@ Giữ danh sách này để tra cứu khi cần giải thích hoặc đổi hư�
   - Bất tiện: thêm một store riêng và một đường đọc tệp dùng chung (`services/fileReader.ts`).
 - **Phương án đã cân nhắc:** giữ danh sách chung và ghi rõ "chỉ tệp đầu tiên được xoay" — dễ nhầm, đã bị bỏ.
 
+## ADR-015: Nén ảnh nhúng bằng cách thay luồng ảnh, không vẽ lại trang
+
+- **Trạng thái:** Đã chấp nhận
+- **Ngày:** 2026-10-21
+- **Bối cảnh:** Nén PDF theo đặc tả phải **không** chuyển văn bản và hình vector thành ảnh, để văn bản vẫn chọn và tìm kiếm được. Có ba cách: (a) vẽ lại trang thành ảnh rồi chèn lớp văn bản vô hình; (b) thay riêng từng luồng ảnh; (c) dùng PDF.js để dựng lại tài liệu.
+- **Quyết định:** Thay riêng luồng ảnh ở mức đối tượng thô bằng pdf-lib, giải mã và nén lại bằng sharp, rồi tối ưu cấu trúc bằng qpdf. Luồng nội dung trang không bị đụng tới.
+- **Hệ quả:**
+  - Tốt: văn bản và vector giữ nguyên hoàn toàn; tệp đầu ra nhỏ hơn nhờ chỉ nén phần ảnh; độ phân giải hiệu dụng tính chính xác từ ma trận `cm` nên ảnh nhỏ trong trang cũng được xử lý đúng.
+  - Bất tiện: phải tự phân tích luồng nội dung để tìm vị trí ảnh; ảnh có mặt nạ mền không thể giảm kích thước (mặt nạ phải khớp).
+  - Rủi ro: pdf-lib ghi lại toàn bộ cấu trúc tệp. Giảm thiểu bằng bước kiểm tra đầu ra bắt buộc (qpdf --check và đối chiếu số trang) — nếu tệp hỏng, tác vụ báo lỗi và không xuất tệp.
+- **Phương án đã cân nhắc:** vẽ lại trang thành ảnh (nhanh hơn nhưng phá vỡ yêu cầu văn bản chọn được, và tăng dung lượng cho tài liệu nhiều chữ); dùng PDF.js để dựng lại tài liệu (PDF.js không sinh lại tệp PDF, chỉ hiển thị).
+
 ---
 
 ## Mục lục ADR
@@ -186,6 +198,7 @@ Giữ danh sách này để tra cứu khi cần giải thích hoặc đổi hư�
 | ADR-012 | PDF.js trong worker riêng kèm bộ shim | Đã chấp nhận |
 | ADR-013 | Mật khẩu qua `--password-file` + giải mã tạm | Đã chấp nhận |
 | ADR-014 | Công cụ xoay giữ một tệp riêng | Đã chấp nhận |
+| ADR-015 | Nén bằng cách thay luồng ảnh, không vẽ lại trang | Đã chấp nhận |
 
 ## Rủi ro đã biết (theo dõi)
 

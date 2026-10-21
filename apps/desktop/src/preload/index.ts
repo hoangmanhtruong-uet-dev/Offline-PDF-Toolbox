@@ -44,6 +44,10 @@ const api = {
     start: (request: unknown): Promise<string> => ipcRenderer.invoke(IPC.taskStart, request),
     cancel: (taskId: string): Promise<boolean> => ipcRenderer.invoke(IPC.taskCancel, { taskId }),
   },
+  compress: {
+    estimate: (path: string, level: string): Promise<unknown> =>
+      ipcRenderer.invoke(IPC.compressEstimate, { path, level }),
+  },
   onTaskProgress: (callback: (progress: unknown) => void): (() => void) => {
     const listener = (_event: Electron.IpcRendererEvent, payload: unknown): void => callback(payload);
     ipcRenderer.on(IPC.taskProgress, listener);

@@ -327,6 +327,29 @@ Dấu trang cấp 1 được đọc trong worker PDF.js (`document.getOutline()`
 
 Tất cả kết quả tách nằm trong **thư mục con** đặt trong thư mục đích, để không lẫn với các tệp khác của người dùng.
 
+### 7.2. Cách triển khai trong bản 1.0
+
+Ba công cụ làm việc trên **cấu trúc tệp PDF**, không vẽ lại trang:
+
+| Việc | Công cụ | Ghi chú |
+| --- | --- | --- |
+| Đọc và ghi luồng ảnh | pdf-lib | Ở mức đối tượng thô: chỉ nội dung luồng ảnh và `/Width`, `/Height`, `/Filter`, `/ColorSpace` bị đổi |
+| Giải mã và nén lại ảnh | sharp (libvips) | Ảnh JPEG (DCTDecode) giải mã trực tiếp; ảnh Flate 8 bit được giải nén rồi đưa vào sharp dạng raw |
+| Tối ưu cấu trúc | qpdf | `--object-streams=generate --compress-streams=y --recompress-flate` |
+| Tìm vị trí ảnh trên trang | Bộ phân tích luồng nội dung của ứng dụng | Theo dõi toán tử `q`/`Q`/`cm`/`Do` để biết ảnh được đặt rộng bao nhiêu |
+
+**Độ phân giải hiệu dụng** được tính từ ma trận `cm` của lần đặt ảnh:
+
+```
+dpi = pixelWidth / (chiều rộng vật lý trên trang / 72)
+```
+
+Nhờ vậy không cần giả định "ảnh phủ trọn trang": ảnh nhỏ giữa trang cũng được tính đúng, và khi giảm kích thước ảnh thì luồng nội dung trang **không cần sửa** — ảnh vẫn chiếm đúng diện tích cũ, chỉ có số pixel giảm.
+
+**Ảnh có mặt nạ mền (SMask)** chỉ được nén lại cùng kích thước, vì mặt nạ phải khớp kích thước ảnh nền.
+
+**Quy tắc thay ảnh:** chỉ thay khi bản mới nhỏ hơn ít nhất 5%, và bỏ qua ảnh dưới 50 KB, ảnh 1 bit, bộ lọc chưa hỗ trợ (JBIG2, CCITT, JPEG 2000) và không gian màu lạ (Indexed, Separation).
+
 ## 8. Bộ nhớ và tệp lớn
 
 | Tình huống | Cách xử lý |

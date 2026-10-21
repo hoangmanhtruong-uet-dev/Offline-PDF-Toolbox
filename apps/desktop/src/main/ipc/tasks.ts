@@ -1,8 +1,16 @@
 import { ipcMain } from 'electron';
 
 import { IPC } from '@shared/ipc';
-import type { MergeTaskPayload, RotateTaskPayload, SplitTaskPayload } from '@shared/tasks';
+import type { CompressionLevel } from '@shared/types';
+import type {
+  CompressionEstimate,
+  CompressTaskPayload,
+  MergeTaskPayload,
+  RotateTaskPayload,
+  SplitTaskPayload,
+} from '@shared/tasks';
 
+import { estimateCompression, runCompress } from '../services/compressionTask';
 import { runMerge, runRotate } from '../services/pdfTasks';
 import type { QpdfRunner } from '../services/qpdfRunner';
 import { runSplit } from '../services/splitTask';
@@ -22,7 +30,8 @@ export function registerTaskHandlers(queue: TaskQueue, qpdf: QpdfRunner): void {
       request:
         | { kind: 'merge'; payload: MergeTaskPayload }
         | { kind: 'rotate'; payload: RotateTaskPayload }
-        | { kind: 'split'; payload: SplitTaskPayload },
+        | { kind: 'split'; payload: SplitTaskPayload }
+        | { kind: 'compress'; payload: CompressTaskPayload },
     ): Promise<string> => {
       switch (request.kind) {
         case 'merge':
@@ -31,8 +40,10 @@ export function registerTaskHandlers(queue: TaskQueue, qpdf: QpdfRunner): void {
           return queue.enqueue((context) => runRotate(context, request.payload, qpdf));
         case 'split':
           return queue.enqueue((context) => runSplit(context, request.payload, qpdf));
+        case 'compress':
+          return queue.enqueue((context) => runCompress(context, request.payload, qpdf));
         default:
-          throw new Error(`Loai tac vu khong duoc ho tro`);
+          throw new Error('Loai tac vu khong duoc ho tro');
       }
     },
   );
@@ -40,4 +51,16 @@ export function registerTaskHandlers(queue: TaskQueue, qpdf: QpdfRunner): void {
   ipcMain.handle(IPC.taskCancel, (_event, payload: { taskId: string }): boolean => {
     return queue.cancel(payload.taskId);
   });
+
+  // Ước lượng mức giảm trước khi nén, để hiện cho người dùng.
+  ipcMain.handle(
+    IPC.compressEstimate,
+    async (_event, payload: { path: string; level: CompressionLevel }): Promise<CompressionEstimate | null> => {
+      try {
+        return await estimateCompression(payload.path, payload.level);
+      } catch {
+        return null;
+      }
+    },
+  );
 }
