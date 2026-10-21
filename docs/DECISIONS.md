@@ -191,6 +191,18 @@ Giữ danh sách này để tra cứu khi cần giải thích hoặc đổi hư�
 - **Lý do không chọn phương án (a) "chọn công cụ trước":** nó loại bỏ hoàn toàn đường thả tệp nhanh nhất, đánh đổi lấy một màn hình chính sạch sẽ; đặc tả coi kéo thả là điểm khác biệt so với web tool.
 - **Lý do không dùng hộp thoại bật lên cho bảng chọn:** UX.md mục 4 cấm cửa sổ bật lên giữa lúc người dùng đang làm việc; bảng chọn nằm trong trang, tự tắt khi người dùng chọn xong.
 
+## ADR-017: Bản 1.0 chỉ hỗ trợ hai ngôn ngữ: tiếng Anh và tiếng Việt
+
+- **Trạng thái:** Đã chấp nhận
+- **Ngày:** 2026-10-21
+- **Bối cảnh:** Đặc tả ban đầu dự kiến bản 1.0 có tiếng Anh, Đức, Pháp, Tây Ban Nha, và thêm tiếng Việt ở bản 1.1. Khi triển khai, ba bản dịch Đức/Pháp/Tây Ban Nha đã được dịch bằng máy và **chưa có người kiểm duyệt**.
+- **Quyết định:** Bản 1.0 chỉ có **tiếng Anh (en)** và **tiếng Việt (vi)**. Ba file `de.json`, `fr.json`, `es.json` bị xóa khỏi kho mã. Ngôn ngữ mặc định theo ngôn ngữ hệ thống, fallback về tiếng Anh.
+- **Hệ quả:**
+  - Tốt: mọi chuỗi người dùng thấy đều do người thật viết và kiểm tra; không có giao diện nửa Anh nửa Đức mà không ai chịu trách nhiệm.
+  - Tốt: giao diện phục vụ đúng hai nhóm khách hàng đầu tiên — người dùng quốc tế và cộng đồng trong nước.
+  - Bất tiện: mất một phần thị trường châu Âu ở bản 1.0. Khi có người kiểm dịch, thêm lại rất dễ: dựng file JSON theo mẫu `en.json` và thêm mã vào `SupportedLanguage`.
+- **Điều kiện thêm lại:** khi có người bản ngữ kiểm duyệt bản dịch cho một ngôn ngữ mới, thêm file JSON tương ứng, mở rộng `SupportedLanguage`, `LANGUAGE_NAMES` và `isSupportedLanguage` trong `settingsStore.ts`, rồi chạy lại kiểm tra khóa dịch.
+
 ---
 
 ## Mục lục ADR
@@ -213,6 +225,7 @@ Giữ danh sách này để tra cứu khi cần giải thích hoặc đổi hư�
 | ADR-014 | Công cụ xoay giữ một tệp riêng | Đã chấp nhận |
 | ADR-015 | Nén bằng cách thay luồng ảnh, không vẽ lại trang | Đã chấp nhận |
 | ADR-016 | Màn hình chính: chọn công cụ trước, thả tệp sau | Đã chấp nhận |
+| ADR-017 | Bản 1.0 chỉ hỗ trợ tiếng Anh và tiếng Việt | Đã chấp nhận |
 
 ## Rủi ro đã biết (theo dõi)
 

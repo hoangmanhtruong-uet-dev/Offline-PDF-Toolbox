@@ -52,7 +52,7 @@ Không để các việc này dồn vào cuối, vì chúng là phần hay bị 
 | Tuần | Trạng thái | Ghi chú |
 | --- | --- | --- |
 | 1 | Chưa bắt đầu | Việc phụ thuộc bên thứ ba (tài khoản nhà phát triển, giữ chỗ tên) chưa làm |
-| 2 | **Xong** | Khung ứng dụng, bốn ràng buộc bảo mật, hàng đợi tác vụ, i18n 5 ngôn ngữ |
+| 2 | **Xong** | Khung ứng dụng, bốn ràng buộc bảo mật, hàng đợi tác vụ, i18n EN + VI |
 | 3 | **Xong** | Tích hợp qpdf 12.4.2, gộp (F-01), xoay (F-04), ghi an toàn, phát hiện chữ ký số |
 | 4 | **Xong** | Tách (F-02) đủ 6 chế độ, lưới trang dùng chung, bộ kiểm tra kết quả, bản 0.5.0 nội bộ |
 | 5 | **Xong** | Nén ảnh nhúng bằng pdf-lib + sharp, độ phân giải hiệu dụng tính từ ma trận cm, ước lượng trước khi chạy |

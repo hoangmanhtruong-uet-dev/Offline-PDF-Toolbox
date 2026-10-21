@@ -42,6 +42,10 @@ jobs:
       - name: Kiểm thử đơn vị
         run: npm test --workspace @optb/desktop
 
+      - name: Kiểm tra tương phản WCAG AA (design token)
+        run: npx vite-node --config vite.scripts.config.ts tests/scripts/contrast-check.mjs
+        working-directory: apps/desktop
+
       - name: Dựng gói
         run: npm run package --workspace @optb/desktop
 

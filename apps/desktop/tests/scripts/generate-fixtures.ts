@@ -227,6 +227,42 @@ const files: { name: string; data: Buffer }[] = [
   { name: 'unicode-tiếng-việt.pdf', data: buildPdf([{ text: 'Hop dong hop nhat' }]) },
 ];
 
+/**
+ * Sinh các tệp ảnh dùng cho công cụ Ảnh sang PDF.
+ */
+async function createImageFixtures(): Promise<void> {
+  try {
+    const { default: sharp } = await import('sharp');
+
+    const make = (width: number, height: number, background: { r: number; g: number; b: number }) =>
+      sharp({ create: { width, height, channels: 3, background } })
+        .composite([
+          {
+            input: Buffer.from(
+              `<svg width="${width}" height="${height}"><rect x="10" y="10" width="${
+                width - 20
+              }" height="${height - 20}" fill="none" stroke="black" stroke-width="6"/></svg>`,
+            ),
+            top: 0,
+            left: 0,
+          },
+        ])
+        .png()
+        .toBuffer();
+
+    await writeFile(join(fixturesDir, 'photo-1.png'), await make(400, 300, { r: 220, g: 120, b: 60 }));
+    await writeFile(join(fixturesDir, 'photo-2.png'), await make(300, 400, { r: 60, g: 120, b: 220 }));
+    await writeFile(
+      join(fixturesDir, 'photo-3.jpg'),
+      await sharp(await make(360, 480, { r: 40, g: 160, b: 90 })).jpeg({ quality: 90 }).toBuffer(),
+    );
+
+    console.log('da tao photo-1.png, photo-2.png, photo-3.jpg');
+  } catch (error) {
+    console.log('bo qua tep anh:', error instanceof Error ? error.message : error);
+  }
+}
+
 async function main(): Promise<void> {
   await mkdir(fixturesDir, { recursive: true });
 
@@ -236,9 +272,10 @@ async function main(): Promise<void> {
   }
 
   await createScanFixtures();
+  await createImageFixtures();
   await createEncryptedFixture();
 
-  console.log(`\n${files.length + 3} tep da tao trong ${fixturesDir}`);
+  console.log(`\n${files.length + 3} tep PDF va 3 tep anh da tao trong ${fixturesDir}`);
 }
 
 /**

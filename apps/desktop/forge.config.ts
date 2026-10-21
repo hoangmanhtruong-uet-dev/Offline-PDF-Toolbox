@@ -1,7 +1,8 @@
 import type { ForgeConfig } from '@electron-forge/shared-types';
 import { MakerMSIX } from '@electron-forge/maker-msix';
-import { MakerZIP } from '@electron-forge/maker-zip';
 import { VitePlugin } from '@electron-forge/plugin-vite';
+
+import { MakerWindowsZip } from './forge/MakerWindowsZip';
 
 const config: ForgeConfig = {
   packagerConfig: {
@@ -20,7 +21,9 @@ const config: ForgeConfig = {
   },
   rebuildConfig: {},
   makers: [
-    new MakerZIP({}, ['win32']),
+    // Maker riêng: bản `maker-zip` của Forge lỗi với Node 26 (xem
+    // `forge/MakerWindowsZip.ts`).
+    new MakerWindowsZip({}, ['win32']),
     // MSIX maker cần Windows SDK; chỉ bật khi dựng gói phát hành.
     ...(process.env.OPTB_BUILD_MSIX === '1'
       ? [

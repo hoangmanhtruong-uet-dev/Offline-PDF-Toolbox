@@ -53,10 +53,12 @@ Danh sách công việc đã rã nhỏ đủ để giao cho một lượt làm v
 | T2-07 | M | Hộp thoại chọn tệp (kể cả chọn nhiều tệp và thư mục) | 2h | T2 | Xong |
 | T2-08 | M | Vẽ hình thu nhổ bằng PDF.js trong worker; bộ đệm tối đa 200 ảnh; hủy vẽ ngoài vùng nhìn | 8h | T2 | Xong (mục 5) |
 | T2-09 | M | Khung giao diện: màn hình chính S-01 + bố cục chuẩn màn hình công cụ | 8h | T2 | Xong |
-| T2-10 | M | i18n: khoá chuỗi, nạp 5 ngôn ngữ, cơ chế định dạng ngày/số theo vùng | 4h | T2 | Xong |
+| T2-10 | M | i18n: khoá chuỗi, nạp 5 ngôn ngữ, cơ chế định dạng ngày/số theo vùng | 4h | T2 | Xong (mục 5) |
 | T2-11 | M | Bài kiểm thử offline: chạy app với mạng bị chặn, xác nhận mọi tính năng xử lý vẫn chạy | 4h | T2 | Xong |
 
 **Ghi chú mục 5 (T2-06):** hàng đợi tác vụ, thư mục tạm theo tác vụ và quét dọn khi khởi động đã có đủ kiểm thử đơn vị. Phần "nhóm luồng nền" của tiến trình chính chưa cần ở tuần 2 (chưa có tác vụ PDF nào chạy ở main): việc phân tích PDF chạy trong worker của renderer, còn tác vụ xử lý PDF sẽ chạy ở tiến trình con `qpdf` khi tới tuần 3.
+
+**Ghi chú mục 5 (T2-10):** bản 1.0 chỉ giữ **tiếng Anh và tiếng Việt**; ba bản dịch máy dịch không có người kiểm duyệt đã bị xóa kèm lý do trong [`DECISIONS.md`](DECISIONS.md) (ADR-017).
 
 **Ghi chú mục 5 (T2-08):** bộ đệm 200 ảnh và hủy vẽ ngoài vùng nhìn dành cho lưới trang ở bản 1.2 (F-05). Ở tuần 2 chỉ dựng hình thu nhổ trang đầu của từng tệp, nên bộ đệm và cơ chế hủy vẽ chưa có nơi dùng.
 

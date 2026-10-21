@@ -26,6 +26,10 @@ apps/desktop/tests/fixtures/Merged_*.pdf
 apps/desktop/tests/fixtures/*_rotated*.pdf
 apps/desktop/tests/fixtures/*_compressed*.pdf
 apps/desktop/tests/fixtures/*_split/
+apps/desktop/tests/fixtures/anh-cua-toi*.pdf
+apps/desktop/tests/fixtures/letter-khong-le*.pdf
+apps/desktop/tests/fixtures/sap-xep*.pdf
+apps/desktop/tests/fixtures/xoay-trang*.pdf
 
 # Ảnh chụp tạm khi kiểm thử
 apps/desktop/shot-*.png

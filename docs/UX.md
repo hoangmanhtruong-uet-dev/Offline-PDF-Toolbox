@@ -57,7 +57,7 @@ Dòng trạng thái "Xử lý trên máy bạn" ở thanh trên là **bằng ch�
 | Trạng thái trống | Câu hướng dẫn ngắn và biểu tượng, không dùng ảnh minh họa nặng |
 | Phản hồi | Mọi thao tác chạy trên 1 giây phải có phản hồi thị giác ngay lập tức |
 | Khả năng tiếp cận | Mọi điều khiển dùng được bằng bàn phím; tên điều khiển đọc được bởi Narrator; tương phản tối thiểu 4,5:1; hỗ trợ phóng to chữ 200% |
-| Ngôn ngữ | Mọi chuỗi chữ nằm trong tệp ngôn ngữ, không viết cứng trong mã; chuỗi ngắn gọn để không vỡ bố cục khi dịch sang tiếng Đức |
+| Ngôn ngữ | Mọi chuỗi chữ nằm trong tệp ngôn ngữ, không viết cứng trong mã; chuỗi ngắn gọn để không vỡ bố cục khi dịch |
 
 ## 5. Trạng thái cần thiết kế cho mỗi màn hình
 
@@ -122,9 +122,9 @@ Nguyên tắc màu:
 
 - Khoá chuỗi: `i18n/<lang>.json`, cấu trúc phẳng theo màn hình, ví dụ `screens.merge.title`, `errors.needsPassword`.
 - Chuỗi có tham số: `"Đã lưu {count} trang, {size}"` — định dạng số theo vùng qua `Intl.NumberFormat`.
-- Cảm giác độ dài chuỗi: thiết kế để chịu được tiếng Đức dài hơn tiếng Anh ~30%. Không cắt chuỗi bằng CSS `text-overflow`.
+- Cảm giác độ dài chuỗi: thiết kế để chịu được bản dịch dài hơn tiếng Anh ~30%. Không cắt chuỗi bằng CSS `text-overflow`.
 - Ngôn ngữ khởi động: theo ngôn ngữ hệ thống, sau đó theo lựa chọn đã lưu.
-- Bản 1.0: `en`, `de`, `fr`, `es`. Thêm `vi` ở bản 1.1 (ưu tiên cộng đồng trong nước).
+- Bản 1.0: `en` và `vi`. Mặc định theo ngôn ngữ hệ thống, fallback `en`. Xem ADR-017.
 
 ## 10. Văn phong thông báo
 
