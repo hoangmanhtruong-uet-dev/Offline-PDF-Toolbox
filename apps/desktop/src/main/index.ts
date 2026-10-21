@@ -7,6 +7,7 @@ import type { AppSettings, LicenseStatus } from '@shared/types';
 import { registerFileHandlers } from './ipc/files';
 import { registerTaskHandlers } from './ipc/tasks';
 import { ErrorLog } from './services/errorLog';
+import { LicenseService } from './services/licenseService';
 import { installNetworkGuard } from './services/networkGuard';
 import { QpdfRunner } from './services/qpdfRunner';
 import { SettingsStore } from './services/settingsStore';
@@ -27,6 +28,11 @@ const tempManager = new TempManager();
 const taskQueue = new TaskQueue({ tempManager });
 const errorLog = new ErrorLog(app.getPath('userData'));
 const qpdf = new QpdfRunner(QpdfRunner.resolveBinaryPath(app.getAppPath()));
+const licenseService = new LicenseService({
+  userDataDir: app.getPath('userData'),
+  storeBridgePath: LicenseService.resolveBinaryPath(app.getAppPath()),
+  isPackaged: app.isPackaged,
+});
 
 let mainWindow: Electron.BrowserWindow | null = null;
 
@@ -70,20 +76,20 @@ function registerSettingsHandlers(): void {
 }
 
 function registerLicenseHandlers(): void {
-  // Bản 1.0 chưa nối StoreBridge (tuần 8). Trạng thái luôn là Free và
-  // người dùng vẫn dùng được đầy đủ các tính năng trong giới hạn Free.
-  //
-  // Cờ môi trường `OPTB_TEST_PRO` chỉ dùng cho kiểm thử tự động: bật ở
-  // bản chạy thử để kiểm tra các luồng chỉ Pro mới cho phép. Nó bị bỏ qua
-  // hoàn toàn trong bản đóng gói.
-  const testPro = !app.isPackaged && process.env.OPTB_TEST_PRO === '1';
-
   ipcMain.handle(IPC.licenseGet, async (): Promise<LicenseStatus> => {
-    return {
-      isPro: testPro,
-      lastVerifiedAt: testPro ? Date.now() : null,
-      state: testPro ? 'active' : 'unknown',
-    };
+    return licenseService.getStatus();
+  });
+
+  ipcMain.handle(IPC.licensePurchase, async () => {
+    return licenseService.purchase();
+  });
+
+  ipcMain.handle(IPC.licenseRestore, async (): Promise<LicenseStatus> => {
+    return licenseService.restore();
+  });
+
+  licenseService.on('change', (status: LicenseStatus) => {
+    mainWindow?.webContents.send(IPC.licenseChanged, status);
   });
 }
 
@@ -134,6 +140,9 @@ async function bootstrap(): Promise<void> {
   registerLicenseHandlers();
   registerTaskHandlers(taskQueue, qpdf);
   forwardTaskEvents();
+
+  await licenseService.init();
+  await errorLog.milestone('da khoi tao license service');
 
   mainWindow = createMainWindow();
   await errorLog.milestone('da tao cua so');

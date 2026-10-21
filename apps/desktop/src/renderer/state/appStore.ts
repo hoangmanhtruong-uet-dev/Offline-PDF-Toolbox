@@ -17,6 +17,8 @@ interface AppState {
   init: () => Promise<void>;
   updateSettings: (patch: Partial<AppSettings>) => Promise<void>;
   refreshLicense: () => Promise<void>;
+  purchase: () => Promise<{ success: boolean; status: string; message?: string }>;
+  restore: () => Promise<LicenseStatus>;
 }
 
 /** Ngôn ngữ hệ thống rút gọn về mã mà ứng dụng hỗ trợ. */
@@ -58,6 +60,10 @@ export const useAppStore = create<AppState>((set) => ({
     // (giá trị mặc định 'en') thì lấy theo ngôn ngữ hệ thống.
     const locale = settings.language === 'en' ? systemLocale : settings.language;
 
+    window.optb.onLicenseChanged?.((license: unknown) => {
+      set({ license: license as LicenseStatus });
+    });
+
     set({ settings, appInfo, license, locale, initialized: true });
   },
 
@@ -69,6 +75,21 @@ export const useAppStore = create<AppState>((set) => ({
   refreshLicense: async () => {
     const license = await window.optb.app.license();
     set({ license });
+  },
+
+  purchase: async () => {
+    const res = await window.optb.app.purchase();
+    if (res.success) {
+      const license = await window.optb.app.license();
+      set({ license });
+    }
+    return res;
+  },
+
+  restore: async () => {
+    const license = await window.optb.app.restore();
+    set({ license });
+    return license;
   },
 }));
 

@@ -100,7 +100,9 @@ export function SettingsScreen(): React.JSX.Element {
   const navigate = useNavigate();
   const settings = useAppStore((state) => state.settings);
   const appInfo = useAppStore((state) => state.appInfo);
+  const license = useAppStore((state) => state.license);
   const updateSettings = useAppStore((state) => state.updateSettings);
+  const restore = useAppStore((state) => state.restore);
 
   const clearRecent = useRecentStore((state) => state.clear);
   const recentCount = useRecentStore((state) => state.files.length);
@@ -216,6 +218,51 @@ export function SettingsScreen(): React.JSX.Element {
                   <MessageBarBody>{t('settings.clearHistoryDone')}</MessageBarBody>
                 </MessageBar>
               ) : null}
+            </div>
+          </CardFooter>
+        </Card>
+
+        <Card>
+          <CardHeader
+            header={
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Text weight="semibold">{t('pro.title')}</Text>
+                {license.isPro ? (
+                  <Text size={200} weight="semibold" style={{ color: tokens.colorPaletteGreenForeground1 }}>
+                    [PRO ACTIVE]
+                  </Text>
+                ) : (
+                  <Text size={200} weight="semibold" style={{ color: tokens.colorNeutralForeground3 }}>
+                    [FREE TIER]
+                  </Text>
+                )}
+              </div>
+            }
+          />
+          <CardFooter>
+            <div className={styles.field}>
+              <span className={styles.hint}>
+                {license.isPro ? t('pro.ownedSubtitle') : t('pro.comingSoon')}
+              </span>
+              <div className={styles.row}>
+                {!license.isPro ? (
+                  <Button
+                    size="small"
+                    appearance="primary"
+                    onClick={() => navigate('/pro')}
+                  >
+                    {t('pro.buyCta')}
+                  </Button>
+                ) : null}
+                <Button
+                  size="small"
+                  onClick={() => {
+                    void restore();
+                  }}
+                >
+                  {t('pro.restoreCta')}
+                </Button>
+              </div>
             </div>
           </CardFooter>
         </Card>

@@ -17,6 +17,11 @@ apps/desktop/.vite/
 
 # qpdf được tải về bằng scripts/fetch-qpdf.mjs, không đưa vào git
 apps/desktop/resources/qpdf/
+apps/desktop/resources/store-bridge/
+
+# .NET build outputs
+tools/StoreBridge/bin/
+tools/StoreBridge/obj/
 
 # Tài nguyên PDF.js được sinh ra lúc build
 apps/desktop/src/renderer/public/

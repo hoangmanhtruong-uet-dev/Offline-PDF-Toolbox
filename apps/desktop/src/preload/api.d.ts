@@ -33,6 +33,8 @@ export interface OptbApi {
   app: {
     info(): Promise<AppInfo>;
     license(): Promise<LicenseStatus>;
+    purchase(): Promise<{ success: boolean; status: string; message?: string }>;
+    restore(): Promise<LicenseStatus>;
   };
   tasks: {
     start(request: unknown): Promise<string>;
@@ -43,6 +45,7 @@ export interface OptbApi {
   };
   onTaskProgress(callback: (progress: unknown) => void): () => void;
   onTaskState(callback: (result: unknown) => void): () => void;
+  onLicenseChanged(callback: (status: LicenseStatus) => void): () => void;
 }
 
 declare global {

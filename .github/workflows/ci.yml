@@ -24,6 +24,10 @@ jobs:
           node-version: 22
           cache: npm
 
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0'
+
       - name: Cài phụ thuộc
         run: npm ci
 
@@ -51,6 +55,21 @@ jobs:
 
       - name: Kiểm thử đầu-cuối
         run: npm run test:e2e --workspace @optb/desktop
+
+      - name: Đóng gói MSIX cho Microsoft Store
+        run: npm run make --workspace @optb/desktop
+        env:
+          OPTB_BUILD_MSIX: '1'
+          MSIX_IDENTITY_NAME: 'MTDStudio.OfflinePDFToolbox'
+          MSIX_PUBLISHER: 'CN=F6CFEAEE-C755-4C7E-BDC5-FD89DA169656'
+          MSIX_PUBLISHER_DISPLAY_NAME: 'MTD Studio'
+
+      - name: Lưu gói phát hành MSIX
+        uses: actions/upload-artifact@v4
+        with:
+          name: offline-pdf-toolbox-msix
+          path: apps/desktop/out/make/**/*.msix
+          if-no-files-found: ignore
 
       - name: Tải báo cáo kiểm thử
         if: always()

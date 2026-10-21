@@ -46,6 +46,9 @@ const api = {
   app: {
     info: (): Promise<unknown> => ipcRenderer.invoke(IPC.appInfo),
     license: (): Promise<unknown> => ipcRenderer.invoke(IPC.licenseGet),
+    purchase: (): Promise<{ success: boolean; status: string; message?: string }> =>
+      ipcRenderer.invoke(IPC.licensePurchase),
+    restore: (): Promise<unknown> => ipcRenderer.invoke(IPC.licenseRestore),
   },
   tasks: {
     start: (request: unknown): Promise<string> => ipcRenderer.invoke(IPC.taskStart, request),
@@ -64,6 +67,11 @@ const api = {
     const listener = (_event: Electron.IpcRendererEvent, payload: unknown): void => callback(payload);
     ipcRenderer.on(IPC.taskState, listener);
     return () => ipcRenderer.removeListener(IPC.taskState, listener);
+  },
+  onLicenseChanged: (callback: (status: unknown) => void): (() => void) => {
+    const listener = (_event: Electron.IpcRendererEvent, payload: unknown): void => callback(payload);
+    ipcRenderer.on(IPC.licenseChanged, listener);
+    return () => ipcRenderer.removeListener(IPC.licenseChanged, listener);
   },
 };
 

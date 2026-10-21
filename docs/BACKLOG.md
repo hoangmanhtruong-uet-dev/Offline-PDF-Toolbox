@@ -163,14 +163,14 @@ Danh sách công việc đã rã nhỏ đủ để giao cho một lượt làm v
 
 | ID | P | Việc | E | Cổng | Trạng thái |
 | --- | --- | --- | --- | --- | --- |
-| T8-01 | M | `FeatureGate`: bảng giới hạn Free ở một nơi duy nhất, có kiểm thử đơn vị cho **mọi** giới hạn | 5h | T8 | Chưa |
-| T8-02 | M | `LicenseService`: hỏi StoreBridge lúc khởi động và sau khi mua; giữ trạng thái 14 ngày khi không kiểm tra được | 5h | T8 | Chưa |
-| T8-03 | M | Luồng mua: mở hộp thoại Store, mở khóa **ngay** không cần khởi động lại | 6h | T8 | Chưa |
-| T8-04 | M | Khôi phục giao dịch (dùng khi cài lại hoặc đổi máy) | 3h | T8 | Chưa |
-| T8-05 | M | Mua thử trong môi trường thử (sandbox) | 4h | T8 | Chưa |
-| T8-06 | M | Dải nhắc nâng cấp ở thanh dưới, tối đa một lần mỗi phiên cho mỗi giới hạn, không mất dữ liệu đang làm | 4h | T8 | Chưa |
-| T8-07 | S | Dịch giao diện de/fr/es; kiểm tra không vỡ bố cục khi dịch dài | 10h | T8 | Chưa |
-| T8-08 | M | Kiểm thử T-10, T-11 | 4h | T8 | Chưa |
+| T8-01 | M | `FeatureGate`: bảng giới hạn Free ở một nơi duy nhất, có kiểm thử đơn vị cho **mọi** giới hạn | 5h | T8 | Xong |
+| T8-02 | M | `LicenseService`: hỏi StoreBridge lúc khởi động và sau khi mua; giữ trạng thái 14 ngày khi không kiểm tra được | 5h | T8 | Xong |
+| T8-03 | M | Luồng mua: mở hộp thoại Store, mở khóa **ngay** không cần khởi động lại | 6h | T8 | Xong |
+| T8-04 | M | Khôi phục giao dịch (dùng khi cài lại hoặc đổi máy) | 3h | T8 | Xong |
+| T8-05 | M | Mua thử trong môi trường thử (sandbox) | 4h | T8 | Đang làm |
+| T8-06 | M | Dải nhắc nâng cấp ở thanh dưới, tối đa một lần mỗi phiên cho mỗi giới hạn, không mất dữ liệu đang làm | 4h | T8 | Xong |
+| T8-07 | S | Dịch giao diện de/fr/es; kiểm tra không vỡ bố cục khi dịch dài | 10h | T8 | Cắt (ADR-017) |
+| T8-08 | M | Kiểm thử T-10, T-11 | 4h | T8 | Xong |
 
 ## 11. Tuần 9 — Ổn định và hồ sơ Store
 
