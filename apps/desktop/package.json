@@ -8,8 +8,9 @@
   "private": true,
   "scripts": {
     "assets:pdfjs": "node scripts/copy-pdfjs-assets.mjs",
+    "assets:icons": "node scripts/generate-assets.mjs",
     "qpdf": "node scripts/fetch-qpdf.mjs",
-    "assets": "npm run assets:pdfjs && npm run qpdf",
+    "assets": "npm run assets:icons && npm run assets:pdfjs && npm run qpdf",
     "start": "npm run assets && electron-forge start",
     "dev": "npm run assets && electron-forge start",
     "package": "npm run assets && electron-forge package",

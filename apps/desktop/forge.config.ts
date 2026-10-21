@@ -10,12 +10,14 @@ const config: ForgeConfig = {
     executableName: 'OfflinePdfToolbox',
     appBundleId: 'com.offlinepdftoolbox.app',
     appCategoryType: 'public.app-category.productivity',
+    icon: 'assets/icon',
     // The Vite plugin sets this automatically to keep only the built output.
-    // We extend it to also ship the bundled `resources/` folder (qpdf binary).
+    // We extend it to also ship the bundled `resources/` (qpdf binary) and `assets/`.
     ignore: (file: string) => {
       if (!file) return false;
       if (file.startsWith('/.vite')) return false;
       if (file.startsWith('/resources')) return false;
+      if (file.startsWith('/assets')) return false;
       return true;
     },
   },
@@ -29,8 +31,13 @@ const config: ForgeConfig = {
       ? [
           new MakerMSIX(
             {
+              packageAssets: 'assets',
               manifestVariables: {
-                publisher: 'CN=Offline PDF Toolbox',
+                packageIdentity: process.env.MSIX_IDENTITY_NAME || 'OfflinePDFToolbox',
+                publisher: process.env.MSIX_PUBLISHER || 'CN=Offline PDF Toolbox',
+                publisherDisplayName: process.env.MSIX_PUBLISHER_DISPLAY_NAME || 'Offline PDF Toolbox',
+                packageDisplayName: 'Offline PDF Toolbox',
+                packageDescription: 'Merge, split, compress and rotate PDFs entirely on your PC',
               },
             },
             ['win32'],
