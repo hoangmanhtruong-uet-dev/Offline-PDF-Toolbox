@@ -1,0 +1,7 @@
+packages:
+  - 'apps/*'
+  - 'tools/*'
+
+# Electron và các module native (sharp, qpdf) hoạt động ổn định hơn với
+# layout phẳng. npm dùng layout này mặc định.
+nodeLinker: hoisted

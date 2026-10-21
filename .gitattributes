@@ -1,0 +1,20 @@
+* text=auto eol=lf
+
+*.ts text
+*.tsx text
+*.js text
+*.mjs text
+*.json text
+*.css text
+*.html text
+*.md text
+*.yml text
+*.ps1 text eol=crlf
+
+# Tệp nhị phân
+*.pdf binary
+*.png binary
+*.jpg binary
+*.ico binary
+*.exe binary
+*.node binary

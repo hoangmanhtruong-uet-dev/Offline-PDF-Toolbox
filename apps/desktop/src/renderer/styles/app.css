@@ -1,0 +1,61 @@
+/*
+ * Kiểu dữ liệu toàn cục của ứng dụng giao diện.
+ *
+ * Chỉ khai báo ở đây các biến CSS mà ứng dụng tự định nghĩa; phần còn lại
+ * dùng token của Fluent UI để bảo đảm giao diện đồng nhất với Windows 11.
+ */
+
+:root {
+  --app-font: "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+  --app-scrollbar-size: 10px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--app-font);
+  overflow: hidden;
+  /* Chặn chọn chữ khi kéo thả để trải nghiệm gọn gàng hơn. */
+  user-select: none;
+}
+
+/* Vùng nhập liệu vẫn được chọn và sao chép bình thường. */
+input,
+textarea,
+[contenteditable="true"] {
+  user-select: text;
+}
+
+::-webkit-scrollbar {
+  width: var(--app-scrollbar-size);
+  height: var(--app-scrollbar-size);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.25);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.35);
+}
+
+/* Tôn trọng thiết lập giảm chuyển động của hệ thống. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

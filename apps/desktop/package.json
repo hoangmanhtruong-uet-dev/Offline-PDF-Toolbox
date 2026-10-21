@@ -1,0 +1,51 @@
+{
+  "name": "@optb/desktop",
+  "productName": "Offline PDF Toolbox",
+  "version": "0.5.0",
+  "description": "Merge, split, compress and rotate PDFs entirely on your PC. No uploads, no account.",
+  "main": ".vite/build/main.cjs",
+  "license": "UNLICENSED",
+  "private": true,
+  "scripts": {
+    "assets:pdfjs": "node scripts/copy-pdfjs-assets.mjs",
+    "start": "npm run assets:pdfjs && electron-forge start",
+    "dev": "npm run assets:pdfjs && electron-forge start",
+    "package": "npm run assets:pdfjs && electron-forge package",
+    "make": "npm run assets:pdfjs && electron-forge make",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "test:offline": "playwright test tests/e2e/offline.spec.ts",
+    "fixtures": "node tests/scripts/generate-fixtures.ts"
+  },
+  "dependencies": {
+    "@fluentui/react-components": "^9.74.10",
+    "@fluentui/react-icons": "^2.0.344",
+    "pdfjs-dist": "^6.4.299",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "react-router-dom": "^7.18.4",
+    "zustand": "^5.0.15"
+  },
+  "devDependencies": {
+    "@electron-forge/cli": "^8.0.1",
+    "@electron-forge/maker-msix": "^8.0.1",
+    "@electron-forge/maker-zip": "^8.0.1",
+    "@electron-forge/plugin-vite": "^8.0.1",
+    "@eslint/js": "^9.39.5",
+    "@playwright/test": "^1.64.1",
+    "@types/node": "^26.6.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^5.2.0",
+    "electron": "^45.0.0",
+    "eslint": "^9.39.5",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.72.0",
+    "vite": "^7.3.7",
+    "vitest": "^5.0.5"
+  }
+}

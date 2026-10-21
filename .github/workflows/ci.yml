@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Kiểm tra trên Windows
+    runs-on: windows-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Cài phụ thuộc
+        run: npm ci
+
+      - name: Sinh bộ tệp kiểm thử
+        run: npm run fixtures --workspace @optb/desktop
+
+      - name: Kiểm tra kiểu
+        run: npm run typecheck --workspace @optb/desktop
+
+      - name: Lint
+        run: npm run lint --workspace @optb/desktop
+
+      - name: Kiểm thử đơn vị
+        run: npm test --workspace @optb/desktop
+
+      - name: Dựng gói
+        run: npm run package --workspace @optb/desktop
+
+      - name: Kiểm thử đầu-cuối
+        run: npm run test:e2e --workspace @optb/desktop
+
+      - name: Tải báo cáo kiểm thử
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: apps/desktop/playwright-report/
+          retention-days: 7
+          if-no-files-found: ignore

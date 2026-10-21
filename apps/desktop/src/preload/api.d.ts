@@ -1,0 +1,39 @@
+import type { AppInfo } from '@shared/ipc';
+import type { AppSettings, FileMeta, LicenseStatus, RecentFile } from '@shared/types';
+
+/**
+ * Kiểu của API được preload lộ ra trên `window.optb`.
+ *
+ * Renderer chỉ dùng đúng các hàm ở đây — không có đường nào khác để điều
+ * khiển tiến trình chính.
+ */
+export interface OptbApi {
+  files: {
+    pick(): Promise<FileMeta[]>;
+    pickFolder(): Promise<string | null>;
+    stat(paths: string[]): Promise<FileMeta[]>;
+    readBytes(path: string): Promise<unknown>;
+    reveal(path: string): Promise<void>;
+    getPathForFile(file: File): string;
+  };
+  settings: {
+    get(): Promise<AppSettings>;
+    update(patch: Partial<AppSettings>): Promise<AppSettings>;
+  };
+  recent: {
+    get(): Promise<RecentFile[]>;
+    clear(): Promise<void>;
+  };
+  app: {
+    info(): Promise<AppInfo>;
+    license(): Promise<LicenseStatus>;
+  };
+  onTaskProgress(callback: (progress: unknown) => void): () => void;
+  onTaskState(callback: (result: unknown) => void): () => void;
+}
+
+declare global {
+  interface Window {
+    optb: OptbApi;
+  }
+}

@@ -1,0 +1,27 @@
+node_modules/
+dist/
+out/
+.vite/
+*.log
+.DS_Store
+Thumbs.db
+.env
+.env.local
+coverage/
+test-results/
+playwright-report/
+
+# Gói đóng gói
+apps/desktop/out/
+apps/desktop/.vite/
+
+# qpdf được tải về ở tuần 3, không đưa vào git
+apps/desktop/resources/qpdf/*.exe
+
+# Tài nguyên PDF.js được sinh ra lúc build
+apps/desktop/src/renderer/public/
+
+# Ảnh chụp tạm khi kiểm thử
+apps/desktop/shot-*.png
+apps/desktop/thumb-*.png
+apps/desktop/row.png

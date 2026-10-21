@@ -1,0 +1,24 @@
+{
+  "name": "offline-pdf-toolbox",
+  "version": "0.5.0",
+  "private": true,
+  "description": "Offline PDF Toolbox - merge, split, compress and rotate PDFs entirely on your PC",
+  "license": "UNLICENSED",
+  "workspaces": [
+    "apps/*",
+    "tools/*"
+  ],
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "dev": "npm run start --workspace @optb/desktop",
+    "build": "npm run package --workspace @optb/desktop",
+    "make": "npm run make --workspace @optb/desktop",
+    "typecheck": "npm run typecheck --workspace @optb/desktop",
+    "lint": "npm run lint --workspace @optb/desktop",
+    "test": "npm run test --workspace @optb/desktop",
+    "test:e2e": "npm run test:e2e --workspace @optb/desktop",
+    "fixtures": "npm run fixtures --workspace @optb/desktop"
+  }
+}
