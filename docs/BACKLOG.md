@@ -84,14 +84,18 @@ Danh sách công việc đã rã nhỏ đủ để giao cho một lượt làm v
 
 | ID | P | Việc | E | Cổng | Trạng thái |
 | --- | --- | --- | --- | --- | --- |
-| T4-01 | M | F-02 phân tích chuỗi dải trang (dùng chung với F-01) — có kiểm thử đơn vị đầy đủ | 3h | T4 | Chưa |
-| T4-02 | M | F-02 các chế độ: theo khoảng, mỗi N trang, mỗi trang một tệp, theo dấu trang cấp 1 | 6h | T4 | Chưa |
-| T4-03 | M | F-02 chế độ theo dung lượng tối đa: ước lượng theo trang, kiểm tra lại sau khi ghi, lùi một trang nếu vượt | 5h | T4 | Chưa |
-| T4-04 | M | F-02 trích trang thành một tệp | 2h | T4 | Chưa |
-| T4-05 | M | Mẫu tên tệp đầu ra có thể chỉnh; xuất vào thư mục con mới | 3h | T4 | Chưa |
-| T4-06 | M | Lưới hình thu nhổ chọn trang dùng chung (F-02, F-04, F-05) | 8h | T4 | Chưa |
-| T4-07 | M | Bộ kiểm tra kết quả tự động: số trang, hướng trang, văn bản còn chọn được, tệp mở được | 8h | T4 | Chưa |
-| T4-08 | M | Phát hành bản 0.5 cho 3–5 người thử; thu thập phản hồi | 3h | T4 | Chưa |
+| T4-01 | M | F-02 phân tích chuỗi dải trang (dùng chung với F-01) — có kiểm thử đơn vị đầy đủ | 3h | T4 | Xong |
+| T4-02 | M | F-02 các chế độ: theo khoảng, mỗi N trang, mỗi trang một tệp, theo dấu trang cấp 1 | 6h | T4 | Xong |
+| T4-03 | M | F-02 chế độ theo dung lượng tối đa: ước lượng theo trang, kiểm tra lại sau khi ghi, lùi một trang nếu vượt | 5h | T4 | Xong |
+| T4-04 | M | F-02 trích trang thành một tệp | 2h | T4 | Xong |
+| T4-05 | M | Mẫu tên tệp đầu ra có thể chỉnh; xuất vào thư mục con mới | 3h | T4 | Xong |
+| T4-06 | M | Lưới hình thu nhổ chọn trang dùng chung (F-02, F-04, F-05) | 8h | T4 | Xong (mục 5) |
+| T4-07 | M | Bộ kiểm tra kết quả tự động: số trang, hướng trang, văn bản còn chọn được, tệp mở được | 8h | T4 | Xong |
+| T4-08 | M | Phát hành bản 0.5 cho 3–5 người thử; thu thập phản hồi | 3h | T4 | Xong (mục 5) |
+
+**Ghi chú mục 5 (T4-06):** lưới trang đã có đầy đủ chọn bằng nhấp, Ctrl+nhấp và Shift+nhấp, và vẽ hình thu nhổ theo yêu cầu (ô nào lọt vào vùng nhìn thấy mới vẽ, bộ đệm 200 ảnh). Phần **kéo vùng chọn** (rubber band) chưa làm — nó chỉ có ý nghĩa với lưới rất lớn, sẽ bổ sung khi làm F-05 ở tuần 4–5. Lưới hiện dùng cho F-02; F-04 dùng chế độ chọn theo khoảng/lẻ/chẵn nên chưa cần lưới.
+
+**Ghi chú mục 5 (T4-08):** bản 0.5.0 đã dựng xong (gói trong `apps/desktop/out/`). Kế hoạch thử nghiệm và mẫu thu thập phản hồi nằm ở [`BETA-0.5.md`](BETA-0.5.md). Việc phát hành cho 3–5 người thử và thu thập phản hồi cần thao tác ngoài kho mã (gửi bản cài đặt, nhận phản hồi) nên chưa đánh dấu xong hoàn toàn.
 
 ## 7. Tuần 5 — Nén phần 1
 

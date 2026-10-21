@@ -8,7 +8,7 @@ import type { ErrorCode } from './types';
  */
 
 /** Loại tác vụ. */
-export type TaskKind = 'merge' | 'rotate';
+export type TaskKind = 'merge' | 'rotate' | 'split';
 
 /** Cách chọn trang cho thao tác xoay. */
 export type PageSelection =
@@ -19,6 +19,38 @@ export type PageSelection =
 
 /** Góc xoay, luôn là bội của 90 độ. */
 export type RotateAngle = 90 | 180 | 270;
+
+/** Chế độ tách PDF (F-02). */
+export type SplitMode =
+  | 'ranges'
+  | 'everyN'
+  | 'eachPage'
+  | 'bookmarks'
+  | 'maxSize'
+  | 'extract';
+
+/** Tham số tác vụ tách. */
+export interface SplitTaskPayload {
+  path: string;
+  mode: SplitMode;
+  /** Chế độ `ranges`: chuỗi dải trang, ví dụ `1-3, 5, 8-10`. */
+  ranges?: string;
+  /** Chế độ `everyN`: số trang mỗi phần. */
+  everyN?: number;
+  /** Chế độ `maxSize`: dung lượng tối đa mỗi phần, tính bằng byte. */
+  maxBytes?: number;
+  /** Chế độ `extract`: danh sách số trang được chọn. */
+  pages?: number[];
+  /** Chế độ `bookmarks`: số trang bắt đầu của từng chương. */
+  bookmarkPages?: number[];
+  /** Thư mục đích. */
+  outputDirectory: string;
+  /** Thư mục con, tạo bên trong thư mục đích. */
+  outputSubfolder: string;
+  /** Mẫu tên tệp đầu ra. */
+  outputNameTemplate: string;
+  password?: string;
+}
 
 /** Một tệp đầu vào của thao tác gộp. */
 export interface MergeInput {

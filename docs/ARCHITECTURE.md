@@ -65,21 +65,35 @@ offline-pdf-toolbox/
         App.tsx
         features/
           home/HomeScreen.tsx       # S-01
-          tools/ToolScreen.tsx      # S-02 … S-08
+          merge/MergeScreen.tsx     # F-01
+          split/SplitScreen.tsx     # F-02
+          rotate/RotateScreen.tsx   # F-04
+          tools/ToolScreen.tsx      # điều hướng tới từng công cụ
           tools/tools.ts            # danh mục sáu công cụ
           settings/SettingsScreen.tsx
+          pro/ProScreen.tsx         # S-09 (giấy phép, tạm thời)
         components/
           AppShell.tsx              # thanh trên, bảng bên phải, thanh dưới
           DropZone.tsx
           FileList.tsx
+          PageGrid.tsx              # lưới trang dùng chung (F-02, F-05)
           OptionsPanel.tsx
           ActionBar.tsx              # nút hành động chính + tiến độ + Hủy
           OfflineBadge.tsx           # dấu hiệu "Xử lý trên máy bạn"
+          PasswordPrompt.tsx         # hộp thoại nhập mật khẩu
+          ResultSummary.tsx
+          UpsellBanner.tsx
+        hooks/
+          usePageThumbnails.ts       # vẽ hình thu nhổ theo yêu cầu
         services/
           pdfWorkerClient.ts        # khách hàng của worker hình thu nhổ
+          fileReader.ts             # đọc một tệp: số trang, dấu trang, chữ ký
         state/
           appStore.ts               # cài đặt, thông tin môi trường, giấy phép
-          filesStore.ts             # danh sách tệp của công cụ
+          filesStore.ts             # danh sách tệp của công cụ gộp
+          rotateStore.ts            # tệp đang xoay (một tệp)
+          splitStore.ts             # tệp đang tách (một tệp)
+          taskStore.ts              # tác vụ đang chạy, tiến độ, kết quả
         i18n/
           index.tsx                 # dịch, số ít/số nhiều, định dạng theo vùng
           en.json  de.json  fr.json  es.json  vi.json
@@ -93,8 +107,10 @@ offline-pdf-toolbox/
         pageRange.ts                # phân tích "1-3, 7, 10-"
         naming.ts                   # làm sạch và dựng tên tệp đầu ra
         ipc.ts                      # tên kênh IPC
+        tasks.ts                    # kiểu tham số của từng tác vụ
     scripts/
       copy-pdfjs-assets.mjs         # chép bộ phông chuẩn của PDF.js vào public
+      fetch-qpdf.mjs               # tải qpdf, kiểm SHA-256, giải nén
   tools/StoreBridge/
     StoreBridge.csproj
     Program.cs                     # JSON trên stdin/stdout
@@ -107,6 +123,8 @@ offline-pdf-toolbox/
   tests/
     fixtures/                      # bộ tệp PDF kiểm thử (mục 2 TESTING.md)
     scripts/generate-fixtures.ts   # tự sinh bộ tệp kiểm thử
+    scripts/verify-output.ts       # kiểm tra kết quả đầu ra bằng tay
+    helpers/pdfCheck.ts            # bộ kiểm tra kết quả dùng chung
     unit/                          # Vitest
     e2e/                           # Playwright cho Electron
   docs/
@@ -289,6 +307,25 @@ Phiên bản dùng: **qpdf 12.4.2**, bản `msvc64` (tự chứa, không cần D
 Bản 1.0 **không** chuyển văn bản và hình vector thành ảnh — chỉ xử lý ảnh nhúng, để văn bản vẫn chọn và tìm kiếm được.
 
 > Bước 2–5 cần thử nghiệm nhiều vì PDF lưu ảnh rất đa dạng (Flate có dự đoán, ảnh đảo màu, ICC, CMYK). Chấp nhận bản 1.0 chỉ hỗ trợ các trường hợp phổ biến; ghi nhận trường hợp bỏ qua vào báo cáo.
+
+### 7.1. Sáu chế độ tách (F-02)
+
+Mỗi chế độ dựng ra một danh sách "phần" (mỗi phần là một tệp đầu ra) rồi ghi từng phần bằng cùng một lệnh qpdf.
+
+| Chế độ | Cách dựng danh sách phần |
+| --- | --- |
+| Theo khoảng trang | Mỗi khoảng trong chuỗi `1-3, 5, 8-10` là một phần |
+| Mỗi N trang | `chunkRanges(totalPages, N)` |
+| Mỗi trang một tệp | Mỗi trang là một phần |
+| Theo dấu trang cấp 1 | Trang bắt đầu của mừng chương; phần kéo dài tới trang trước chương sau |
+| Theo dung lượng tối đa | Ước lượng số trang mỗi phần từ dung lượng tệp nguồn, rồi **đo lại** tệp đã ghi; nếu vượt giới hạn thì lùi một trang và ghi lại |
+| Trích trang | Các trang đã chọn trong lưới trang thành một tệp duy nhất |
+
+Dấu trang cấp 1 được đọc trong worker PDF.js (`document.getOutline()`), nên không cần qpdf đọc outline.
+
+**Giới hạn của chế độ theo dung lượng:** nếu một trang đơn lẻ đã vượt giới hạn thì không thể lùi thêm — tệp đó vẫn được tạo, vì đây là kích thước nhỏ nhất có thể.
+
+Tất cả kết quả tách nằm trong **thư mục con** đặt trong thư mục đích, để không lẫn với các tệp khác của người dùng.
 
 ## 8. Bộ nhớ và tệp lớn
 

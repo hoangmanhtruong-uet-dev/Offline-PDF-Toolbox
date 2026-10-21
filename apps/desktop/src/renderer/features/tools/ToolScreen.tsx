@@ -5,6 +5,7 @@ import { AppShell } from '../../components/AppShell';
 import { useI18n } from '../../i18n';
 import { MergeScreen } from '../merge/MergeScreen';
 import { RotateScreen } from '../rotate/RotateScreen';
+import { SplitScreen } from '../split/SplitScreen';
 import { findTool } from './tools';
 
 /**
@@ -34,6 +35,8 @@ export function ToolScreen(): React.JSX.Element {
       return <MergeScreen />;
     case 'rotate':
       return <RotateScreen />;
+    case 'split':
+      return <SplitScreen />;
     default:
       return (
         <AppShell title={t(tool.nameKey)} onBack={() => navigate('/')}>

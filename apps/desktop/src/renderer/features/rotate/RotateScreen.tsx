@@ -13,6 +13,7 @@ import { OptionsPanel } from '../../components/OptionsPanel';
 import { ResultSummary, TaskErrorBanner } from '../../components/ResultSummary';
 import { UpsellBanner } from '../../components/UpsellBanner';
 import { useI18n } from '../../i18n';
+import type { MessageKey } from '../../i18n';
 import { useAppStore } from '../../state/appStore';
 import { useRotateStore } from '../../state/rotateStore';
 import { useTaskStore } from '../../state/taskStore';
@@ -58,6 +59,14 @@ const useStyles = makeStyles({
 
 /** Các kiểu chọn trang. */
 type SelectionKind = PageSelection['kind'];
+
+/** Nhãn hiển thị của từng kiểu chọn trang. */
+const SELECTION_LABELS: Record<SelectionKind, MessageKey> = {
+  all: 'rotate.all',
+  odd: 'rotate.odd',
+  even: 'rotate.even',
+  range: 'rotate.range',
+};
 
 export function RotateScreen(): React.JSX.Element {
   const styles = useStyles();
@@ -144,7 +153,7 @@ export function RotateScreen(): React.JSX.Element {
             <span className={styles.label}>{t('rotate.selection')}</span>
             <Field>
               <Dropdown
-                value={selectionKind}
+                value={t(SELECTION_LABELS[selectionKind])}
                 selectedOptions={[selectionKind]}
                 onOptionSelect={(_event, data) => {
                   if (data.optionValue) setSelectionKind(data.optionValue as SelectionKind);

@@ -1,5 +1,5 @@
 import type { AppSettings, FileMeta, LicenseStatus, RecentFile, TaskProgress, TaskResult } from './types';
-import type { MergeTaskPayload, RotateTaskPayload } from './tasks';
+import type { MergeTaskPayload, RotateTaskPayload, SplitTaskPayload } from './tasks';
 
 /**
  * Tên kênh IPC và kiểu dữ liệu đi qua kênh.
@@ -58,7 +58,10 @@ export interface IpcInvokeMap {
   [IPC.appInfo]: { request: void; response: AppInfo };
   [IPC.licenseGet]: { request: void; response: LicenseStatus };
   [IPC.taskStart]: {
-    request: { kind: 'merge'; payload: MergeTaskPayload } | { kind: 'rotate'; payload: RotateTaskPayload };
+    request:
+      | { kind: 'merge'; payload: MergeTaskPayload }
+      | { kind: 'rotate'; payload: RotateTaskPayload }
+      | { kind: 'split'; payload: SplitTaskPayload };
     response: string;
   };
   [IPC.taskCancel]: { request: { taskId: string }; response: boolean };

@@ -43,6 +43,7 @@ Mọi quyết định kỹ thuật và giao diện đều phải phục vụ nă
 | --- | --- | --- |
 | [`docs/ROADMAP.md`](docs/ROADMAP.md) | Tuần này làm gì, xong là gì, cổng kiểm tra ra sao? | Mỗi tuần bắt đầu |
 | [`docs/BACKLOG.md`](docs/BACKLOG.md) | Việc cụ thể nào đang chờ, ưu tiên ra sao? | Hằng ngày |
+| [`docs/BETA-0.5.md`](docs/BETA-0.5.md) | Bản 0.5 nội bộ: cần thử gì, phản hồi ra sao? | Khi gửi bản cho người thử |
 | [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Code nằm ở đâu, chạy thế nào, đổi thư viện thì sao? | Khi viết code lần đầu |
 | [`docs/FEATURES.md`](docs/FEATURES.md) | Tính năng này hành xử thế nào, xong là gì? | Trước khi làm một tính năng |
 | [`docs/UX.md`](docs/UX.md) | Màn hình, trạng thái, bàn phím, ngôn ngữ thế nào? | Khi làm giao diện |
@@ -121,10 +122,13 @@ $env:OPTB_BUILD_MSIX='1'; npm run make   # dựng gói phát hành kèm MSIX
 | Giao diện S-01 + khung màn hình công cụ | **Xong** |
 | i18n 5 ngôn ngữ, sáng/tối | **Xong** |
 | Gộp PDF (F-01) | **Xong** — dải trang, thứ tự, ghi an toàn, bỏ qua tệp hỏng |
+| Tách PDF (F-02) | **Xong** — 6 chế độ, lưới trang, thư mục con |
 | Xoay PDF (F-04) | **Xong** — chọn trang, góc 90/180/270, cộng modulo 360 |
-| Tách PDF (F-02) | Tuần 4 |
+| Sắp xếp trang (F-05) | Tuần 4–5, dùng lại lưới trang |
 | Nén PDF (F-03) | Tuần 5–6, cần sharp |
 | Giấy phép Store (F-08 tuần 8) | Tuần 8, cần `StoreBridge` |
+
+Bản **0.5.0 nội bộ** đã dựng xong. Kế hoạch thử nghiệm: [`docs/BETA-0.5.md`](docs/BETA-0.5.md).
 
 ## 6. Quy trình làm việc
 

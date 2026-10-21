@@ -1,10 +1,9 @@
-import { readFile } from 'node:fs/promises';
-import { join } from 'node:path';
-import { pathToFileURL } from 'node:url';
-
-import { getDocument } from 'pdfjs-dist/legacy/build/pdf.mjs';
 import { _electron as electron } from 'playwright';
 import type { ElectronApplication, Page } from 'playwright';
+
+import { readPdfPages } from '../helpers/pdfCheck';
+
+export { readPdfPages };
 
 /**
  * Tiện ích dùng chung cho kiểm thử đầu-cuối.
@@ -87,36 +86,7 @@ export interface PageInfo {
  * Đọc thông tin từng trang của một tệp PDF bằng PDF.js.
  *
  * Dùng để kiểm tra kết quả đầu ra: số trang, khổ giấy, góc xoay và văn bản
- * còn trích xuất được hay không.
+ * còn trích xuất được hay không. Phần hiện thực nằm ở `tests/helpers/pdfCheck.ts`
+ * để dùng chung cho cả kiểm thử và script kiểm tra thủ công.
  */
-export async function readPdfPages(path: string): Promise<PageInfo[]> {
-  const data = new Uint8Array(await readFile(path));
-  const document = await getDocument({
-    data,
-    useSystemFonts: false,
-    // Bộ phông chuẩn của PDF.js, cần để trích xuất được văn bản.
-    standardFontDataUrl: pathToFileURL(
-      join(APP_ROOT, 'node_modules', 'pdfjs-dist', 'standard_fonts'),
-    ).href + '/',
-  }).promise;
 
-  const pages: PageInfo[] = [];
-  for (let index = 1; index <= document.numPages; index += 1) {
-    const page = await document.getPage(index);
-    const viewport = page.getViewport({ scale: 1 });
-    const content = await page.getTextContent();
-
-    pages.push({
-      width: Math.round(viewport.width),
-      height: Math.round(viewport.height),
-      rotate: page.rotate,
-      text: content.items
-        .map((item) => ('str' in item ? item.str : ''))
-        .join(' ')
-        .trim(),
-    });
-  }
-
-  await document.cleanup();
-  return pages;
-}

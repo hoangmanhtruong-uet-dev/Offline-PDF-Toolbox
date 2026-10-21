@@ -1,10 +1,11 @@
 import { ipcMain } from 'electron';
 
 import { IPC } from '@shared/ipc';
-import type { MergeTaskPayload, RotateTaskPayload } from '@shared/tasks';
+import type { MergeTaskPayload, RotateTaskPayload, SplitTaskPayload } from '@shared/tasks';
 
 import { runMerge, runRotate } from '../services/pdfTasks';
 import type { QpdfRunner } from '../services/qpdfRunner';
+import { runSplit } from '../services/splitTask';
 import type { TaskQueue } from '../services/taskQueue';
 
 /**
@@ -18,12 +19,21 @@ export function registerTaskHandlers(queue: TaskQueue, qpdf: QpdfRunner): void {
     IPC.taskStart,
     async (
       _event,
-      request: { kind: 'merge'; payload: MergeTaskPayload } | { kind: 'rotate'; payload: RotateTaskPayload },
+      request:
+        | { kind: 'merge'; payload: MergeTaskPayload }
+        | { kind: 'rotate'; payload: RotateTaskPayload }
+        | { kind: 'split'; payload: SplitTaskPayload },
     ): Promise<string> => {
-      if (request.kind === 'merge') {
-        return queue.enqueue((context) => runMerge(context, request.payload, qpdf));
+      switch (request.kind) {
+        case 'merge':
+          return queue.enqueue((context) => runMerge(context, request.payload, qpdf));
+        case 'rotate':
+          return queue.enqueue((context) => runRotate(context, request.payload, qpdf));
+        case 'split':
+          return queue.enqueue((context) => runSplit(context, request.payload, qpdf));
+        default:
+          throw new Error(`Loai tac vu khong duoc ho tro`);
       }
-      return queue.enqueue((context) => runRotate(context, request.payload, qpdf));
     },
   );
 

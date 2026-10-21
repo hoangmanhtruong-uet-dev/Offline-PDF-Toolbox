@@ -70,6 +70,8 @@ export interface FileEntry extends FileMeta {
   pageRange?: string;
   /** Tệp có chữ ký số hay không. */
   hasSignature?: boolean;
+  /** Các mục dấu trang cấp 1, dùng cho chế độ tách theo dấu trang. */
+  outline?: { title: string; page: number }[];
 }
 
 /** Tiến độ tác vụ, phát từ main sang renderer. */

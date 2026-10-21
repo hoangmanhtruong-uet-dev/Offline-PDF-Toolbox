@@ -2,8 +2,15 @@ import type { FileEntry, FileMeta } from '@shared/types';
 
 import { pdfWorkerClient } from './pdfWorkerClient';
 
+/** Một mục dấu trang cấp 1. */
+export interface OutlineEntry {
+  title: string;
+  page: number;
+}
+
 /**
- * Đọc thông tin của một tệp PDF: số trang, hình thu nhổ và cờ chữ ký số.
+ * Đọc thông tin của một tệp PDF: số trang, hình thu nhổ, dấu trang và cờ
+ * chữ ký số.
  *
  * Việc đọc chạy trong worker, nên giao diện không bị chặn.
  */
@@ -42,6 +49,7 @@ export async function readFileEntry(meta: FileMeta, id: string): Promise<FileEnt
       state: 'ready',
       pageCount: opened.pageCount,
       hasSignature: opened.hasSignature,
+      outline: opened.outline,
       ...(thumbnail ? { thumbnail } : {}),
     };
   } catch {

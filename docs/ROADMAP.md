@@ -47,7 +47,18 @@ Không để các việc này dồn vào cuối, vì chúng là phần hay bị 
 | Ghi nhật ký hằng tuần (điểm yếu, đo được gì) | Cuối tuần | Xem mục 5 |
 | Cập nhật `docs/DECISIONS.md` | Khi có thay đổi hướng | Ngay khi quyết định |
 
-## 4. Thứ tự cắt giảm khi trễ tiến độ
+## 4. Tiến độ thực tế
+
+| Tuần | Trạng thái | Ghi chú |
+| --- | --- | --- |
+| 1 | Chưa bắt đầu | Việc phụ thuộc bên thứ ba (tài khoản nhà phát triển, giữ chỗ tên) chưa làm |
+| 2 | **Xong** | Khung ứng dụng, bốn ràng buộc bảo mật, hàng đợi tác vụ, i18n 5 ngôn ngữ |
+| 3 | **Xong** | Tích hợp qpdf 12.4.2, gộp (F-01), xoay (F-04), ghi an toàn, phát hiện chữ ký số |
+| 4 | **Xong** | Tách (F-02) đủ 6 chế độ, lưới trang dùng chung, bộ kiểm tra kết quả, bản 0.5.0 nội bộ |
+
+Kiểm thử ở thời điểm hiện tại: **114 ca đơn vị + 29 ca đầu-cuối**, tất cả đều đạt.
+
+## 5. Thứ tự cắt giảm khi trễ tiến độ
 
 Cắt theo thứ tự sau. **Không bao giờ** cắt kiểm thử, kiểm tra đầu ra tệp, hoặc các bảo đảm "không ghi đè / không làm hỏng tệp".
 
@@ -59,7 +70,7 @@ Cắt theo thứ tự sau. **Không bao giờ** cắt kiểm thử, kiểm tra �
 
 Cắt được nghĩa là: hạ mục sang backlog của bản 1.1/1.2, ghi rõ lý do cắt, và thông báo cho người thử beta biết tính năng đó chưa có.
 
-## 5. Nhật ký cuối tuần
+## 6. Nhật ký cuối tuần
 
 Mỗi cuối tuần, dựng gói → cài trên máy sạch → chạy bộ kiểm thử chấp nhận → ghi lại. Mẫu:
 
@@ -73,7 +84,7 @@ Mỗi cuối tuần, dựng gói → cài trên máy sạch → chạy bộ ki�
 - Việc tuần sau: <3 việc quan trọng nhất>
 ```
 
-## 6. Ngoài lộ trình này
+## 7. Ngoài lộ trình này
 
 | Sự kiện | Mốc |
 | --- | --- |

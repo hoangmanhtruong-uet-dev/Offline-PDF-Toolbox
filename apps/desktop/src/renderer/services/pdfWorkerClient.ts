@@ -25,7 +25,13 @@ type Pending = {
 };
 
 export type OpenResult =
-  | { ok: true; pageCount: number; hasSignature: boolean }
+  | {
+      ok: true;
+      pageCount: number;
+      hasSignature: boolean;
+      /** Các mục dấu trang cấp 1 của tài liệu. */
+      outline: { title: string; page: number }[];
+    }
   | { ok: false; code: ErrorCode };
 
 export class PdfWorkerClient {
@@ -99,7 +105,12 @@ export class PdfWorkerClient {
     }
 
     if (response.type === 'open') {
-      return { ok: true, pageCount: response.pageCount, hasSignature: response.hasSignature };
+      return {
+        ok: true,
+        pageCount: response.pageCount,
+        hasSignature: response.hasSignature,
+        outline: response.outline ?? [],
+      };
     }
 
     return { ok: false, code: 'E_UNKNOWN' };

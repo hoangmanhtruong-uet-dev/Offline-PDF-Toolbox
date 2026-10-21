@@ -37,6 +37,8 @@ const useStyles = makeStyles({
 export interface ResultSummaryProps {
   /** Đường dẫn tệp đầu ra đầu tiên. */
   outputPath: string;
+  /** Tất cả đường dẫn tệp đầu ra, dùng cho tách nhiều tệp. */
+  outputPaths?: string[];
   /** Thư mục chứa tệp đầu ra. */
   outputDirectory: string;
   /** Số trang của tệp đầu ra. */
@@ -48,6 +50,7 @@ export interface ResultSummaryProps {
 
 export function ResultSummary({
   outputPath,
+  outputPaths,
   outputDirectory,
   pageCount,
   note,
@@ -57,7 +60,12 @@ export function ResultSummary({
   const { t } = useI18n();
 
   return (
-    <div className={styles.bar} data-testid="result-summary" data-output-path={outputPath}>
+    <div
+      className={styles.bar}
+      data-testid="result-summary"
+      data-output-path={outputPath}
+      data-output-paths={JSON.stringify(outputPaths ?? [outputPath])}
+    >
       <CheckmarkCircleRegular className={styles.icon} />
       <span className={styles.summary}>
         {t('tasks.saved', { pages: pageCount ?? 0 })}

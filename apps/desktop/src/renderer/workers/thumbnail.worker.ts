@@ -53,8 +53,23 @@ export type ThumbnailRequest =
     }
   | { id: string; type: 'close' };
 
+/** Một mục dấu trang cấp 1 của tài liệu. */
+export interface OutlineEntry {
+  title: string;
+  /** Số trang, bắt đầu từ 1. */
+  page: number;
+}
+
 export type ThumbnailResponse =
-  | { id: string; type: 'open'; ok: true; pageCount: number; hasSignature: boolean }
+  | {
+      id: string;
+      type: 'open';
+      ok: true;
+      pageCount: number;
+      hasSignature: boolean;
+      /** Các mục dấu trang cấp 1, dùng cho chế độ tách theo dấu trang. */
+      outline: OutlineEntry[];
+    }
   | { id: string; type: 'render'; ok: true; blob: Blob }
   | { id: string; type: 'close'; ok: true }
   | {
@@ -115,6 +130,37 @@ function describe(error: unknown): string {
   return String(error);
 }
 
+/**
+ * Đọc các mục dấu trang cấp 1 của tài liệu.
+ *
+ * Dùng cho chế độ tách theo dấu trang: mỗi chương của tài liệu trở thành
+ * một tệp riêng.
+ */
+async function readOutline(document: pdfjsLib.PDFDocumentProxy): Promise<OutlineEntry[]> {
+  const entries: OutlineEntry[] = [];
+
+  try {
+    const outline = await document.getOutline();
+    if (!outline) return entries;
+
+    for (const item of outline) {
+      const destination =
+        typeof item.dest === 'string' ? await document.getDestination(item.dest) : item.dest;
+
+      if (!destination || !destination[0]) continue;
+
+      const pageRef = destination[0] as { num?: number };
+      if (typeof pageRef.num !== 'number') continue;
+
+      entries.push({ title: item.title, page: pageRef.num + 1 });
+    }
+  } catch {
+    // Tài liệu không có dấu trang, hoặc dấu trang lỗi: coi như không có.
+  }
+
+  return entries;
+}
+
 async function openDocument(
   id: string,
   bytes: ArrayBuffer,
@@ -152,7 +198,16 @@ async function openDocument(
       hasSignature = false;
     }
 
-    return { id, type: 'open', ok: true, pageCount: document.numPages, hasSignature };
+    const outline = await readOutline(document);
+
+    return {
+      id,
+      type: 'open',
+      ok: true,
+      pageCount: document.numPages,
+      hasSignature,
+      outline,
+    };
   } catch (error) {
     return { id, ok: false, code: classify(error), detail: describe(error) };
   }
