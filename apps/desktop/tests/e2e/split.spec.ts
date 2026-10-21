@@ -6,7 +6,7 @@ import { expect, test } from '@playwright/test';
 import type { ElectronApplication, Page } from 'playwright';
 
 import { checkPdf } from '../helpers/pdfCheck';
-import { fixturePath, launchApp } from './helpers';
+import { fixturePath, launchApp, stubFolderDialog } from './helpers';
 
 /**
  * Kiểm thử đầu-cuối cho công cụ Tách PDF (F-02).
@@ -30,6 +30,7 @@ async function openSplitTool(
   app: ElectronApplication,
   page: Page,
   paths: string[],
+  outputFolder?: string,
 ): Promise<void> {
   await stubFileDialog(app, paths);
   await page.getByTestId('tool-split').click();
@@ -39,6 +40,11 @@ async function openSplitTool(
     .getByRole('button', { name: /Browse files|Select files/i })
     .click();
   await expect(page.getByTestId('split-file')).toBeVisible();
+
+  if (outputFolder) {
+    await stubFolderDialog(app, outputFolder);
+    await page.getByRole('button', { name: /Choose folder/i }).click();
+  }
 }
 
 /** Chọn một chế độ tách trong bảng tùy chọn. */
@@ -59,7 +65,7 @@ test.describe('Tách PDF (F-02)', () => {
     const dir = await mkdtemp(join(tmpdir(), 'optb-split-e2e-'));
 
     try {
-      await openSplitTool(app, page, [fixturePath('text-5pages.pdf')]);
+      await openSplitTool(app, page, [fixturePath('text-5pages.pdf')], dir);
 
       await selectMode(page, /By page ranges/i);
       await page.getByTestId('split-ranges').fill('1-2, 3-4, 5');
@@ -89,7 +95,7 @@ test.describe('Tách PDF (F-02)', () => {
     const dir = await mkdtemp(join(tmpdir(), 'optb-split-e2e-'));
 
     try {
-      await openSplitTool(app, page, [fixturePath('mixed-3pages.pdf')]);
+      await openSplitTool(app, page, [fixturePath('mixed-3pages.pdf')], dir);
 
       await selectMode(page, /One page per file/i);
       await page.getByTestId('primary-action').click();
@@ -113,7 +119,7 @@ test.describe('Tách PDF (F-02)', () => {
     const dir = await mkdtemp(join(tmpdir(), 'optb-split-e2e-'));
 
     try {
-      await openSplitTool(app, page, [fixturePath('text-5pages.pdf')]);
+      await openSplitTool(app, page, [fixturePath('text-5pages.pdf')], dir);
 
       await selectMode(page, /Every N pages/i);
       await page.getByTestId('split-every-n').fill('2');
@@ -133,7 +139,7 @@ test.describe('Tách PDF (F-02)', () => {
     const dir = await mkdtemp(join(tmpdir(), 'optb-split-e2e-'));
 
     try {
-      await openSplitTool(app, page, [fixturePath('mixed-3pages.pdf')]);
+      await openSplitTool(app, page, [fixturePath('mixed-3pages.pdf')], dir);
 
       await selectMode(page, /Extract selected pages/i);
       await expect(page.getByTestId('page-grid')).toBeVisible();
@@ -161,7 +167,7 @@ test.describe('Tách PDF (F-02)', () => {
     const dir = await mkdtemp(join(tmpdir(), 'optb-split-e2e-'));
 
     try {
-      await openSplitTool(app, page, [fixturePath('mixed-3pages.pdf')]);
+      await openSplitTool(app, page, [fixturePath('mixed-3pages.pdf')], dir);
 
       await selectMode(page, /Extract selected pages/i);
       await expect(page.getByTestId('page-grid')).toBeVisible();
@@ -181,7 +187,7 @@ test.describe('Tách PDF (F-02)', () => {
     const dir = await mkdtemp(join(tmpdir(), 'optb-split-e2e-'));
 
     try {
-      await openSplitTool(app, page, [fixturePath('text-5pages.pdf')]);
+      await openSplitTool(app, page, [fixturePath('text-5pages.pdf')], dir);
 
       await selectMode(page, /By page ranges/i);
       await page.getByTestId('split-ranges').fill('1-99');

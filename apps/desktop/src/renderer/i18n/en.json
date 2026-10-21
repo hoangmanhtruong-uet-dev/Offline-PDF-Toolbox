@@ -143,5 +143,17 @@
   "compress.estimateDetail": {
     "one": "Images: {before} to about {after} ({count} image)",
     "other": "Images: {before} to about {after} ({count} images)"
-  }
+  },
+  "compress.targetSize": "Target size (MB)",
+  "compress.targetSizeHint": "Try each level from light to strong until the file fits.",
+  "compress.targetOn": "Use target size",
+  "compress.targetOff": "Use the level above",
+  "compress.tableMetric": "Metric",
+  "compress.tableBefore": "Before",
+  "compress.tableAfter": "After",
+  "compress.tableSize": "File size",
+  "compress.tablePages": "Pages",
+  "compress.tableImages": "Images compressed",
+  "compress.tableImagesTotal": "Total",
+  "compress.tableSaving": "Saving"
 }

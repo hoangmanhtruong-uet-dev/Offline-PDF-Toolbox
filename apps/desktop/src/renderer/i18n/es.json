@@ -143,5 +143,17 @@
   "compress.estimateDetail": {
     "one": "Imágenes: {before} a unos {after} ({count} imagen)",
     "other": "Imágenes: {before} a unos {after} ({count} imágenes)"
-  }
+  },
+  "compress.targetSize": "Tamaño objetivo (MB)",
+  "compress.targetSizeHint": "Prueba cada nivel, de ligero a fuerte, hasta que el archivo encaje.",
+  "compress.targetOn": "Usar tamaño objetivo",
+  "compress.targetOff": "Usar el nivel de arriba",
+  "compress.tableMetric": "Métrica",
+  "compress.tableBefore": "Antes",
+  "compress.tableAfter": "Después",
+  "compress.tableSize": "Tamaño del archivo",
+  "compress.tablePages": "Páginas",
+  "compress.tableImages": "Imágenes comprimidas",
+  "compress.tableImagesTotal": "Total",
+  "compress.tableSaving": "Ahorro"
 }

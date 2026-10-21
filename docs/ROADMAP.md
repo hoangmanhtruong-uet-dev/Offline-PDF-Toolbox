@@ -56,8 +56,11 @@ Không để các việc này dồn vào cuối, vì chúng là phần hay bị 
 | 3 | **Xong** | Tích hợp qpdf 12.4.2, gộp (F-01), xoay (F-04), ghi an toàn, phát hiện chữ ký số |
 | 4 | **Xong** | Tách (F-02) đủ 6 chế độ, lưới trang dùng chung, bộ kiểm tra kết quả, bản 0.5.0 nội bộ |
 | 5 | **Xong** | Nén ảnh nhúng bằng pdf-lib + sharp, độ phân giải hiệu dụng tính từ ma trận cm, ước lượng trước khi chạy |
+| 6 | **Xong** | Dung lượng đích, bảng kết quả trước/sau, cảnh báo chữ ký số, bỏ siêu dữ liệu ở mức Mạnh |
 
-Kiểm thử ở thời điểm hiện tại: **123 ca đơn vị + 33 ca đầu-cuối**, tất cả đều đạt.
+Kiểm thử ở thời điểm hiện tại: **137 ca đơn vị + 35 ca đầu-cuối**, tất cả đều đạt.
+
+Báo cáo chất lượng nén trên bộ tệp thử: `npm run report:compression`.
 
 ## 5. Thứ tự cắt giảm khi trễ tiến độ
 

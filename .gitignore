@@ -24,6 +24,8 @@ apps/desktop/src/renderer/public/
 # Tệp kết quả sinh ra khi chạy kiểm thử cục bộ
 apps/desktop/tests/fixtures/Merged_*.pdf
 apps/desktop/tests/fixtures/*_rotated*.pdf
+apps/desktop/tests/fixtures/*_compressed*.pdf
+apps/desktop/tests/fixtures/*_split/
 
 # Ảnh chụp tạm khi kiểm thử
 apps/desktop/shot-*.png

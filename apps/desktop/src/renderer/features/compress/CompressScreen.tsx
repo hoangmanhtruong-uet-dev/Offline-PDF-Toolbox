@@ -4,6 +4,7 @@ import {
   Button,
   Dropdown,
   Field,
+  Input,
   Option,
   Text,
   makeStyles,
@@ -25,14 +26,16 @@ import { UpsellBanner } from '../../components/UpsellBanner';
 import { useI18n } from '../../i18n';
 import type { MessageKey } from '../../i18n';
 import { useAppStore } from '../../state/appStore';
-import { useTaskStore } from '../../state/taskStore';
 import { useCompressStore } from '../../state/compressStore';
+import { useTaskStore } from '../../state/taskStore';
 
 /**
  * Công cụ Nén PDF (F-03).
  *
- * Ba mức nén theo đặc tả: Nhẹ, Vừa (mặc định) và Mạnh. Trước khi chạy, ứng
- * dụng ước lượng mức giảm để người dùng biết trước kết quả.
+ * Ba mức nén theo đặc tả: Nhẹ, Vừa (mặc định) và Mạnh; thêm chế độ
+ * **dung lượng đích** — ứng dụng thử lần lượt các mức cho tới khi đạt.
+ *
+ * Trước khi chạy, ứng dụng ước lượng mức giảm để người dùng biết trước kết quả.
  */
 const useStyles = makeStyles({
   stack: {
@@ -84,16 +87,36 @@ const useStyles = makeStyles({
     fontWeight: tokens.fontWeightSemibold,
     color: tokens.colorPaletteGreenForeground2,
   },
+  table: {
+    display: 'grid',
+    gridTemplateColumns: 'auto auto auto',
+    gap: `${tokens.spacingVerticalXXS} ${tokens.spacingHorizontalL}`,
+    padding: tokens.spacingVerticalM,
+    paddingInline: tokens.spacingHorizontalM,
+    borderRadius: tokens.borderRadiusMedium,
+    backgroundColor: tokens.colorNeutralBackground2,
+  },
+  cell: {
+    fontSize: tokens.fontSizeBase300,
+  },
+  header: {
+    fontWeight: tokens.fontWeightSemibold,
+    color: tokens.colorNeutralForeground2,
+  },
+  saving: {
+    fontWeight: tokens.fontWeightSemibold,
+    color: tokens.colorPaletteGreenForeground2,
+  },
 });
 
-/** Nhan hien thi cua tung muc nen. */
+/** Nhãn hiển thị của từng mức nén. */
 const LEVEL_LABELS: Record<CompressionLevel, MessageKey> = {
   light: 'compress.levelLight',
   medium: 'compress.levelMedium',
   strong: 'compress.levelStrong',
 };
 
-/** Goi y ngan cua tung muc nen. */
+/** Gợi ý ngắn của từng mức nén. */
 const LEVEL_HINTS: Record<CompressionLevel, MessageKey> = {
   light: 'compress.hintLight',
   medium: 'compress.hintMedium',
@@ -118,12 +141,15 @@ export function CompressScreen(): React.JSX.Element {
   const clearResult = useTaskStore((state) => state.clear);
 
   const [level, setLevel] = useState<CompressionLevel>('medium');
+  const [useTarget, setUseTarget] = useState(false);
+  const [targetMegabytes, setTargetMegabytes] = useState(1);
   const [outputDirectory, setOutputDirectory] = useState<string | null>(null);
   const [estimateState, setEstimateState] = useState<{
     key: string;
     value: CompressionEstimate | null;
   } | null>(null);
   const [limitMessage, setLimitMessage] = useState<string | null>(null);
+  const [signatureWarning, setSignatureWarning] = useState(false);
 
   const isRunning = running?.kind === 'compress';
 
@@ -174,11 +200,18 @@ export function CompressScreen(): React.JSX.Element {
       return;
     }
 
+    // Tệp có chữ ký số: hỏi trước khi ghi tệp mới.
+    if (file.hasSignature && !signatureWarning) {
+      setSignatureWarning(true);
+      return;
+    }
+
     const baseName = file.name.replace(/\.pdf$/i, '');
 
     await start('compress', {
       path: file.path,
       level,
+      ...(useTarget ? { targetBytes: Math.max(1, targetMegabytes) * 1024 * 1024 } : {}),
       outputDirectory: effectiveDirectory,
       outputName: OUTPUT_TEMPLATES.compressed.replace('{name}', baseName),
     });
@@ -188,9 +221,16 @@ export function CompressScreen(): React.JSX.Element {
     ? `${file.name} · ${t('files.pages', { count: file.pageCount ?? 0 })}`
     : undefined;
 
+  const details = result?.details;
+  const saving =
+    details?.originalBytes && details.newBytes
+      ? Math.round((1 - details.newBytes / details.originalBytes) * 100)
+      : null;
+
   const footer = result ? (
     <ResultSummary
       outputPath={result.outputPaths[0] ?? ''}
+      outputPaths={result.outputPaths}
       outputDirectory={effectiveDirectory}
       pageCount={file?.pageCount ?? 0}
       onDismiss={clearResult}
@@ -213,6 +253,7 @@ export function CompressScreen(): React.JSX.Element {
               <Dropdown
                 value={t(LEVEL_LABELS[level])}
                 selectedOptions={[level]}
+                disabled={useTarget}
                 onOptionSelect={(_event, data) => {
                   if (data.optionValue) setLevel(data.optionValue as CompressionLevel);
                 }}
@@ -223,6 +264,27 @@ export function CompressScreen(): React.JSX.Element {
               </Dropdown>
             </Field>
             <span className={styles.hint}>{t(LEVEL_HINTS[level])}</span>
+          </div>
+
+          <div className={styles.field}>
+            <span className={styles.label}>{t('compress.targetSize')}</span>
+            <Input
+              type="number"
+              value={String(targetMegabytes)}
+              min={1}
+              disabled={!useTarget}
+              onChange={(_event, data) => setTargetMegabytes(Math.max(1, Number(data.value) || 1))}
+              data-testid="compress-target-size"
+            />
+            <span className={styles.hint}>{t('compress.targetSizeHint')}</span>
+            <Button
+              size="small"
+              appearance={useTarget ? 'primary' : 'subtle'}
+              onClick={() => setUseTarget((value) => !value)}
+              data-testid="compress-target-toggle"
+            >
+              {useTarget ? t('compress.targetOn') : t('compress.targetOff')}
+            </Button>
           </div>
 
           <div className={styles.field}>
@@ -257,6 +319,18 @@ export function CompressScreen(): React.JSX.Element {
           />
         ) : null}
 
+        {signatureWarning ? (
+          <div className={styles.stack}>
+            <TaskErrorBanner
+              messageKey="signature.warning"
+              onDismiss={() => setSignatureWarning(false)}
+            />
+            <Button appearance="primary" onClick={() => void runCompress()}>
+              {t('signature.continue')}
+            </Button>
+          </div>
+        ) : null}
+
         {file ? (
           <div className={styles.current} data-testid="compress-file">
             {file.thumbnail ? (
@@ -282,7 +356,7 @@ export function CompressScreen(): React.JSX.Element {
           />
         )}
 
-        {estimate ? (
+        {estimate && !result ? (
           <div className={styles.estimate} data-testid="compress-estimate">
             <Text className={styles.estimateValue}>
               {t('compress.estimate', {
@@ -296,6 +370,34 @@ export function CompressScreen(): React.JSX.Element {
                 count: estimate.processableImages,
               })}
             </Text>
+          </div>
+        ) : null}
+
+        {details ? (
+          <div className={styles.table} data-testid="compress-result-table">
+            <span className={`${styles.cell} ${styles.header}`}>{t('compress.tableMetric')}</span>
+            <span className={`${styles.cell} ${styles.header}`}>{t('compress.tableBefore')}</span>
+            <span className={`${styles.cell} ${styles.header}`}>{t('compress.tableAfter')}</span>
+
+            <span className={styles.cell}>{t('compress.tableSize')}</span>
+            <span className={styles.cell}>{formatBytes(details.originalBytes ?? 0)}</span>
+            <span className={styles.cell}>{formatBytes(details.newBytes ?? 0)}</span>
+
+            <span className={styles.cell}>{t('compress.tablePages')}</span>
+            <span className={styles.cell}>{file?.pageCount ?? details.pageCount ?? 0}</span>
+            <span className={styles.cell}>{details.pageCount ?? 0}</span>
+
+            <span className={styles.cell}>{t('compress.tableImages')}</span>
+            <span className={styles.cell}>{t('compress.tableImagesTotal')}</span>
+            <span className={styles.cell}>{details.imagesProcessed ?? 0}</span>
+
+            {saving !== null ? (
+              <>
+                <span className={styles.cell}>{t('compress.tableSaving')}</span>
+                <span className={styles.cell} />
+                <span className={`${styles.cell} ${styles.saving}`}>{saving}%</span>
+              </>
+            ) : null}
           </div>
         ) : null}
       </div>

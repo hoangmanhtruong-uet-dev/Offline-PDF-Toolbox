@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { cpus } from 'node:os';
 
 import { toErrorPayload } from '@shared/errors';
+import type { TaskDetails } from '@shared/tasks';
 import type { TaskPhase, TaskResult, TaskState } from '@shared/types';
 
 import type { TempManager } from './tempManager';
@@ -31,7 +32,11 @@ export interface TaskContext {
 }
 
 /** Handler của một tác vụ. */
-export type TaskHandler = (context: TaskContext) => Promise<{ outputPaths?: string[] }>;
+export type TaskHandler = (context: TaskContext) => Promise<{
+  outputPaths?: string[];
+  /** Chi tiết riêng theo loại tác vụ, gửi kèm kết quả. */
+  details?: TaskDetails;
+}>;
 
 interface TaskEntry {
   id: string;
@@ -134,10 +139,12 @@ export class TaskQueue extends EventEmitter {
 
     let outputPaths: string[] = [];
     let error: TaskResult['error'];
+    let details: TaskDetails | undefined;
 
     try {
       const result = await entry.handler(context);
       outputPaths = result.outputPaths ?? [];
+      details = result.details;
       entry.state = entry.controller.signal.aborted ? 'cancelled' : 'succeeded';
     } catch (caught) {
       if (entry.controller.signal.aborted) {
@@ -154,19 +161,20 @@ export class TaskQueue extends EventEmitter {
     this.entries.delete(entry.id);
     this.active -= 1;
 
-    this.emitState(entry, { outputPaths, error });
+    this.emitState(entry, { outputPaths, error, details });
     this.pump();
   }
 
   private emitState(
     entry: TaskEntry,
-    extra: { outputPaths: string[]; error?: TaskResult['error'] },
+    extra: { outputPaths: string[]; error?: TaskResult['error']; details?: TaskDetails },
   ): void {
     const result: TaskResult = {
       taskId: entry.id,
       state: entry.state,
       outputPaths: extra.outputPaths,
       ...(extra.error ? { error: extra.error } : {}),
+      ...(extra.details ? { details: extra.details } : {}),
     };
     this.emit('state', result);
   }

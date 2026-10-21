@@ -6,7 +6,7 @@ import { expect, test } from '@playwright/test';
 import type { ElectronApplication, Page } from 'playwright';
 
 import { checkPdf } from '../helpers/pdfCheck';
-import { fixturePath, launchApp } from './helpers';
+import { fixturePath, launchApp, stubFolderDialog } from './helpers';
 
 /**
  * Kiểm thử đầu-cuối cho công cụ Nén PDF (F-03).
@@ -29,6 +29,7 @@ async function openCompressTool(
   app: ElectronApplication,
   page: Page,
   paths: string[],
+  outputFolder?: string,
 ): Promise<void> {
   await stubFileDialog(app, paths);
   await page.getByTestId('tool-compress').click();
@@ -38,6 +39,11 @@ async function openCompressTool(
     .getByRole('button', { name: /Browse files|Select files/i })
     .click();
   await expect(page.getByTestId('compress-file')).toBeVisible();
+
+  if (outputFolder) {
+    await stubFolderDialog(app, outputFolder);
+    await page.getByRole('button', { name: /Choose folder/i }).click();
+  }
 }
 
 async function outputPathOf(page: Page): Promise<string> {
@@ -52,7 +58,7 @@ test.describe('Nén PDF (F-03)', () => {
     const dir = await mkdtemp(join(tmpdir(), 'optb-compress-e2e-'));
 
     try {
-      await openCompressTool(app, page, [fixturePath('scan-jpeg-1page.pdf')]);
+      await openCompressTool(app, page, [fixturePath('scan-jpeg-1page.pdf')], dir);
 
       // Ứng dụng hiện ước lượng trước khi chạy.
       await expect(page.getByTestId('compress-estimate')).toBeVisible({ timeout: 30_000 });
@@ -83,7 +89,7 @@ test.describe('Nén PDF (F-03)', () => {
     const dir = await mkdtemp(join(tmpdir(), 'optb-compress-e2e-'));
 
     try {
-      await openCompressTool(app, page, [fixturePath('scan-jpeg-1page.pdf')]);
+      await openCompressTool(app, page, [fixturePath('scan-jpeg-1page.pdf')], dir);
       await expect(page.getByTestId('compress-estimate')).toBeVisible({ timeout: 30_000 });
 
       await page.getByRole('combobox').first().click();
@@ -106,7 +112,7 @@ test.describe('Nén PDF (F-03)', () => {
     const dir = await mkdtemp(join(tmpdir(), 'optb-compress-e2e-'));
 
     try {
-      await openCompressTool(app, page, [fixturePath('scan-jpeg-1page.pdf')]);
+      await openCompressTool(app, page, [fixturePath('scan-jpeg-1page.pdf')], dir);
       await expect(page.getByTestId('compress-estimate')).toBeVisible({ timeout: 30_000 });
 
       // Nén lần một.
@@ -136,12 +142,55 @@ test.describe('Nén PDF (F-03)', () => {
     }
   });
 
+  test('dung lượng đích: nén cho tới khi tệp vừa yêu cầu', async () => {
+    const { app, page } = await launchApp({ pro: true });
+    const dir = await mkdtemp(join(tmpdir(), 'optb-compress-e2e-'));
+
+    try {
+      await openCompressTool(app, page, [fixturePath('scan-jpeg-1page.pdf')], dir);
+
+      // Bật chế độ dung lượng đích.
+      await page.getByTestId('compress-target-toggle').click();
+      await page.getByTestId('compress-target-size').fill('0.3');
+      await page.getByTestId('compress-target-size').blur();
+
+      await page.getByTestId('primary-action').click();
+      await expect(page.getByTestId('result-summary')).toBeVisible({ timeout: 60_000 });
+
+      const output = await outputPathOf(page);
+      expect((await stat(output)).size).toBeLessThanOrEqual(0.3 * 1024 * 1024);
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+      await app.close();
+    }
+  });
+
+  test('bảng kết quả hiện dung lượng trước, sau và phần trăm giảm', async () => {
+    const { app, page } = await launchApp();
+    const dir = await mkdtemp(join(tmpdir(), 'optb-compress-e2e-'));
+
+    try {
+      await openCompressTool(app, page, [fixturePath('scan-jpeg-1page.pdf')], dir);
+      await expect(page.getByTestId('compress-estimate')).toBeVisible({ timeout: 30_000 });
+
+      await page.getByTestId('primary-action').click();
+      await expect(page.getByTestId('result-summary')).toBeVisible({ timeout: 60_000 });
+
+      const table = page.getByTestId('compress-result-table');
+      await expect(table).toBeVisible();
+      await expect(table).toContainText('90%');
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+      await app.close();
+    }
+  });
+
   test('mức Mạnh là tính năng Pro nên bản Free bị chặn', async () => {
     const { app, page } = await launchApp();
     const dir = await mkdtemp(join(tmpdir(), 'optb-compress-e2e-'));
 
     try {
-      await openCompressTool(app, page, [fixturePath('scan-jpeg-1page.pdf')]);
+      await openCompressTool(app, page, [fixturePath('scan-jpeg-1page.pdf')], dir);
       await expect(page.getByTestId('compress-estimate')).toBeVisible({ timeout: 30_000 });
 
       await page.getByRole('combobox').first().click();

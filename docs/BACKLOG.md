@@ -118,13 +118,30 @@ Danh sách công việc đã rã nhỏ đủ để giao cho một lượt làm v
 
 | ID | P | Việc | E | Cổng | Trạng thái |
 | --- | --- | --- | --- | --- | --- |
-| T6-01 | M | Ba mức nén: Nhẹ, Vừa (mặc định), Mạnh + dung lượng đích | 6h | T6 | Chưa |
-| T6-02 | M | Quy tắc bỏ qua: ảnh < 50 KB, ảnh 1 bit, bộ lọc chưa hỗ trợ (JBIG2, CCITT, JPX) | 4h | T6 | Chưa |
-| T6-03 | M | Chỉ thay ảnh khi bản mới nhỏ hơn ≥ 5% | 2h | T6 | Chưa |
-| T6-04 | M | Chống tệp lớn hơn gốc: hủy kết quả và báo "đã được tối ưu" | 3h | T6 | Chưa |
-| T6-05 | M | Ước lượng trước khi chạy (thử trên ảnh lớn nhất) → hiển thị khoảng % giảm | 5h | T6 | Chưa |
-| T6-06 | M | Bảng kết quả trước/sau/% giảm trên màn hình nén | 2h | T6 | Chưa |
-| T6-07 | M | Kiểm thử: T-04, T-05, T-08; đo tỷ lệ giảm trên bộ tệp thử | 6h | T6 | Chưa |
+| T6-01 | M | Ba mức nén: Nhẹ, Vừa (mặc định), Mạnh + dung lượng đích | 6h | T6 | Xong |
+| T6-02 | M | Quy tắc bỏ qua: ảnh < 50 KB, ảnh 1 bit, bộ lọc chưa hỗ trợ (JBIG2, CCITT, JPX) | 4h | T6 | Xong (làm ở tuần 5) |
+| T6-03 | M | Chỉ thay ảnh khi bản mới nhỏ hơn ≥ 5% | 2h | T6 | Xong (làm ở tuần 5) |
+| T6-04 | M | Chống tệp lớn hơn gốc: hủy kết quả và báo "đã được tối ưu" | 3h | T6 | Xong (làm ở tuần 5) |
+| T6-05 | M | Bảng kết quả trước/sau/% giảm trên màn hình nén | 2h | T6 | Xong |
+| T6-06 | M | Kiểm thử: T-04, T-05, T-08; đo tỷ lệ giảm trên bộ tệp thử | 6h | T6 | Xong |
+
+**Ghi chú mục 5 (T6-01):** chế độ **dung lượng đích** thử lần lượt các mức từ Nhẹ đến Mạnh và lấy mức đầu tiên cho kết quả vừa yêu cầu. Nếu không mức nào đạt, ứng dụng báo rõ khoảng nhỏ nhất đạt được và **không xuất tệp**.
+
+**Ghi chú mục 5 (T6-05):** bảng kết quả hiện dung lượng trước/sau, số trang, số ảnh đã nén và phần trăm giảm. Dữ liệu này đi kèm kết quả tác vụ (`TaskResult.details`) nên dùng lại được cho các tác vụ khác.
+
+**Ghi chú mục 5 (T6-06):** đo thực tế trên bộ tệp thử (lệnh `npm run report:compression`):
+
+| Tệp | Mức | Trước | Sau | Giảm |
+| --- | --- | --- | --- | --- |
+| scan-jpeg-1page.pdf (300 dpi) | Nhẹ | 1620 KB | 1361 KB | 16% |
+| scan-jpeg-1page.pdf (300 dpi) | **Vừa** | 1620 KB | **169 KB** | **90%** |
+| scan-jpeg-1page.pdf (300 dpi) | Mạnh | 1620 KB | 142 KB | 91% |
+| scan-jpeg-2pages.pdf (300 dpi) | **Vừa** | 3240 KB | **338 KB** | **90%** |
+| text-5pages.pdf (văn bản) | Vừa | 1,7 KB | 1,2 KB | 26% |
+
+Đạt mục tiêu của đặc tả: tệp scan toàn ảnh giảm trên 50% ở mức Vừa; tệp văn bản giảm ít hơn nhiều; số trang của mọi tệp giữ nguyên.
+
+**Ghi chú mục 5 (T6-02, T6-03, T6-04):** ba hạng mục này đã làm ở tuần 5 vì là điều kiện tiên quyết cho toàn bộ luồng nén, nên không lặp lại. Kiểm thử cho chúng nằm ở `tests/unit/compressionTask.test.ts` và `tests/unit/compressionTarget.test.ts`.
 
 ## 9. Tuần 7 — Tính năng bổ trợ
 

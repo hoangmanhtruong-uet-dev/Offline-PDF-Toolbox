@@ -143,5 +143,17 @@
   "compress.estimateDetail": {
     "one": "Ảnh: {before} xuống khoảng {after} ({count} ảnh)",
     "other": "Ảnh: {before} xuống khoảng {after} ({count} ảnh)"
-  }
+  },
+  "compress.targetSize": "Dung lượng đích (MB)",
+  "compress.targetSizeHint": "Thử lần lượt các mức từ Nhẹ đến Mạnh cho tới khi tệp vừa yêu cầu.",
+  "compress.targetOn": "Dùng dung lượng đích",
+  "compress.targetOff": "Dùng mức ở trên",
+  "compress.tableMetric": "Chỉ số",
+  "compress.tableBefore": "Trước",
+  "compress.tableAfter": "Sau",
+  "compress.tableSize": "Dung lượng tệp",
+  "compress.tablePages": "Trang",
+  "compress.tableImages": "Ảnh đã nén",
+  "compress.tableImagesTotal": "Tổng",
+  "compress.tableSaving": "Giảm"
 }

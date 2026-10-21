@@ -1,3 +1,4 @@
+import type { TaskDetails } from './tasks';
 /**
  * Kiểu dữ liệu dùng chung giữa tiến trình chính (main), tiền tản (preload)
  * và giao diện (renderer).
@@ -106,6 +107,8 @@ export interface TaskResult {
   /** Các đường dẫn tệp đầu ra đã được kiểm tra và di chuyển vào đích. */
   outputPaths: string[];
   error?: ErrorPayload;
+  /** Chi tiết riêng theo loại tác vụ, ví dụ dung lượng trước và sau khi nén. */
+  details?: TaskDetails;
 }
 
 /** Cài đặt của người dùng. */

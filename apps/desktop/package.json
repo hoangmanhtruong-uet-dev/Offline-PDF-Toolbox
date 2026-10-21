@@ -20,7 +20,8 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "test:offline": "playwright test tests/e2e/offline.spec.ts",
-    "fixtures": "node tests/scripts/generate-fixtures.ts"
+    "fixtures": "node tests/scripts/generate-fixtures.ts",
+    "report:compression": "vite-node --config vite.scripts.config.ts tests/scripts/compression-report.ts"
   },
   "dependencies": {
     "@fluentui/react-components": "^9.74.10",

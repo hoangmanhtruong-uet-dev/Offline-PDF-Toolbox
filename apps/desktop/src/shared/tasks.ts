@@ -34,11 +34,34 @@ export type SplitMode =
 export interface CompressTaskPayload {
   path: string;
   level: CompressionLevel;
+  /**
+   * Dung lượng đích, tính bằng byte.
+   *
+   * Khi có giá trị này, ứng dụng thử lần lượt các mức từ Nhẹ đến Mạnh cho
+   * tới khi đạt được dung lượng đích.
+   */
+  targetBytes?: number;
   /** Thư mục đích. */
   outputDirectory: string;
   /** Tên tệp đầu ra, chưa kèm phần mở rộng. */
   outputName: string;
   password?: string;
+}
+
+/** Chi tiết kết quả tác vụ, tuỳ theo loại tác vụ. */
+export interface TaskDetails {
+  /** Dung lượng tệp gốc. */
+  originalBytes?: number;
+  /** Dung lượng tệp đầu ra. */
+  newBytes?: number;
+  /** Số trang của tệp đầu ra. */
+  pageCount?: number;
+  /** Số ảnh đã được nén. */
+  imagesProcessed?: number;
+  /** Số ảnh bị bỏ qua. */
+  imagesSkipped?: number;
+  /** Mức nén thực sự đã dùng, khi người dùng chọn dung lượng đích. */
+  levelUsed?: CompressionLevel;
 }
 
 /** Ước lượng mức giảm dung lượng trước khi nén. */

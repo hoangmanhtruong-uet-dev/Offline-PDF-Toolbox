@@ -3,6 +3,7 @@ import { basename, join } from 'node:path';
 import { PDFDict, PDFDocument, PDFName, PDFNumber, PDFRawStream } from 'pdf-lib';
 
 import { AppError } from '@shared/errors';
+import type { CompressionEstimate, CompressTaskPayload, TaskDetails } from '@shared/tasks';
 import type { CompressionLevel } from '@shared/types';
 
 import { finalizeOutput, verifyOutput } from './outputVerifier';
@@ -28,45 +29,6 @@ import type { TaskContext } from './taskQueue';
  * 8. Ước lượng trước khi chạy (xem `estimateCompression`).
  */
 
-/** Tham số tác vụ nén. */
-export interface CompressTaskPayload {
-  path: string;
-  level: CompressionLevel;
-  outputDirectory: string;
-  outputName: string;
-  password?: string;
-}
-
-/** Kết quả nén. */
-export interface CompressOutcome {
-  outputPath: string;
-  /** Dung lượng trước khi nén. */
-  originalBytes: number;
-  /** Dung lượng sau khi nén. */
-  newBytes: number;
-  /** Số trang của tệp đầu ra. */
-  pageCount: number;
-  /** Số ảnh đã được xử lý. */
-  imagesProcessed: number;
-  /** Số ảnh bị bỏ qua, kèm lý do. */
-  imagesSkipped: { name: string; reason: string }[];
-  /** Có tệp nào bị bỏ qua vì tệp đã được tối ưu hay không. */
-  alreadyOptimized: boolean;
-}
-
-/** Ước lượng mức giảm dung lượng trước khi chạy. */
-export interface CompressionEstimate {
-  /** Dung lượng ảnh nhúng hiện tại. */
-  imageBytes: number;
-  /** Dung lượng ảnh sau khi nén ước lượng. */
-  estimatedImageBytes: number;
-  /** Tỉ lệ giảm ước lượng của phần ảnh, 0-1. */
-  imageRatio: number;
-  /** Số ảnh sẽ được xử lý. */
-  processableImages: number;
-  /** Số ảnh bị bỏ qua. */
-  skippedImages: number;
-}
 
 /**
  * Ước lượng mức giảm dung lượng.
@@ -130,9 +92,12 @@ export async function runCompress(
   context: TaskContext,
   payload: CompressTaskPayload,
   qpdf: QpdfRunner,
-): Promise<{ outputPaths: string[]; skipped: { path: string; reason: string }[] }> {
+): Promise<{
+  outputPaths: string[];
+  skipped: { path: string; reason: string }[];
+  details?: TaskDetails;
+}> {
   const { signal, tempDir } = context;
-  const profile = COMPRESSION_PROFILES[payload.level];
 
   context.report(5, 'reading', 'tasks.preparing');
 
@@ -147,49 +112,55 @@ export async function runCompress(
   }
 
   const source = check.usable[0]?.path ?? payload.path;
-  const originalBytes = check.usable[0]?.pageCount ? await fileSize(source) : 0;
+  const originalBytes = await fileSize(source);
+
+  // Tạo sẵn thư mục đích, kể cả khi người dùng chọn thư mục chưa tồn tại.
+  await mkdir(payload.outputDirectory);
 
   context.report(20, 'processing', 'tasks.compressing');
 
-  // 2-5: quét ảnh, tính độ phân giải, quyết định, và thay ảnh.
-  const result = await compressDocument(source, profile, signal);
+  // Khi người dùng chọn dung lượng đích, thử lần lượt các mức từ Nhẹ đến
+  // Mạnh cho tới khi đạt được.
+  const levels: CompressionLevel[] = payload.targetBytes
+    ? (['light', 'medium', 'strong'] as CompressionLevel[])
+    : [payload.level];
 
-  // Ghi bản đã thay ảnh ra tệp tạm.
-  const compressedPath = join(tempDir, 'images.pdf');
-  await writeFile(compressedPath, result.bytes);
+  let chosen: CompressionAttempt | null = null;
+  let best: CompressionAttempt | null = null;
 
-  // 6: tối ưu cấu trúc bằng qpdf, trên bản đã thay ảnh.
-  const tempOutput = join(tempDir, 'compressed.pdf');
-  const optimize = await qpdf.run(
-    [
-      '--object-streams=generate',
-      '--compress-streams=y',
-      '--recompress-flate',
-      compressedPath,
-      tempOutput,
-    ],
-    { signal },
-  );
+  for (const level of levels) {
+    const attempt = await compressAtLevel(source, level, tempDir, qpdf, signal);
+    if (!best || attempt.newBytes < best.newBytes) best = attempt;
 
-  if (optimize.exitCode !== QPDF_EXIT_OK && optimize.exitCode !== QPDF_EXIT_WARNING) {
-    throw new AppError('E_STRUCT', 'Khong toi uu duoc tep', optimize.stderr.trim());
+    const smaller = attempt.newBytes < attempt.originalBytes;
+    const fits = payload.targetBytes ? attempt.newBytes <= payload.targetBytes : true;
+
+    if (smaller && fits) {
+      chosen = attempt;
+      break;
+    }
+
+    if (!payload.targetBytes) break;
+  }
+
+  if (!chosen) {
+    if (payload.targetBytes) {
+      throw new AppError(
+        'E_STRUCT',
+        'Khong dat duoc dung luong dich',
+        `nho nhat dat duoc ${best?.newBytes ?? 0} byte, yeu cau ${payload.targetBytes} byte`,
+      );
+    }
+    throw new AppError(
+      'E_STRUCT',
+      'Tep nay da duoc toi uu, khong giam them duoc',
+      `truoc ${originalBytes} byte, sau ${best?.newBytes ?? 0} byte`,
+    );
   }
 
   context.report(80, 'verifying', 'tasks.verifying');
 
-  // 7: so sánh dung lượng.
-  const newBytes = await fileSize(tempOutput);
-
-  if (newBytes >= originalBytes) {
-    // Không nhỏ hơn thì không xuất tệp mới.
-    throw new AppError(
-      'E_STRUCT',
-      'Tep nay da duoc toi uu, khong giam them duoc',
-      `truoc ${originalBytes} byte, sau ${newBytes} byte`,
-    );
-  }
-
-  const verification = await verifyOutput(tempOutput, result.pageCount, async (filePath) => {
+  const verification = await verifyOutput(chosen.path, chosen.pageCount, async (filePath) => {
     const valid = await qpdf.check(filePath, { signal });
     const count = valid ? await qpdf.pageCount(filePath, { signal }) : null;
     return { valid, pageCount: count };
@@ -200,14 +171,79 @@ export async function runCompress(
   }
 
   const finalized = await finalizeOutput(
-    tempOutput,
+    chosen.path,
     payload.outputDirectory,
     `${payload.outputName}.pdf`,
   );
 
   context.report(100, 'writing', 'tasks.done');
 
-  return { outputPaths: [finalized.path], skipped: [] };
+  return {
+    outputPaths: [finalized.path],
+    skipped: [],
+    details: {
+      originalBytes,
+      newBytes: chosen.newBytes,
+      pageCount: chosen.pageCount,
+      imagesProcessed: chosen.imagesProcessed,
+      imagesSkipped: chosen.imagesSkipped.length,
+      levelUsed: chosen.level,
+    },
+  };
+}
+
+/** Một lần thử nén ở một mức cụ thể. */
+interface CompressionAttempt {
+  level: CompressionLevel;
+  /** Đường dẫn tệp tạm đã tối ưu. */
+  path: string;
+  originalBytes: number;
+  newBytes: number;
+  pageCount: number;
+  imagesProcessed: number;
+  imagesSkipped: { name: string; reason: string }[];
+}
+
+/** Nén tài liệu ở một mức, trả về tệp tạm đã tối ưu. */
+async function compressAtLevel(
+  source: string,
+  level: CompressionLevel,
+  tempDir: string,
+  qpdf: QpdfRunner,
+  signal: AbortSignal | undefined,
+): Promise<CompressionAttempt> {
+  const profile = COMPRESSION_PROFILES[level];
+
+  const result = await compressDocument(source, profile, signal);
+
+  const compressedPath = join(tempDir, `images-${level}.pdf`);
+  await writeFile(compressedPath, result.bytes);
+
+  const optimizedPath = join(tempDir, `compressed-${level}.pdf`);
+  const optimize = await qpdf.run(
+    [
+      '--object-streams=generate',
+      '--compress-streams=y',
+      '--recompress-flate',
+      compressedPath,
+      optimizedPath,
+    ],
+    { signal },
+  );
+
+  if (optimize.exitCode !== QPDF_EXIT_OK && optimize.exitCode !== QPDF_EXIT_WARNING) {
+    throw new AppError('E_STRUCT', 'Khong toi uu duoc tep', optimize.stderr.trim());
+  }
+
+  return {
+    level,
+    path: optimizedPath,
+    originalBytes: await fileSize(source),
+    newBytes: await fileSize(optimizedPath),
+    pageCount: result.pageCount,
+    imagesProcessed: result.imagesProcessed,
+    imagesSkipped: result.imagesSkipped,
+  };
 }
 
 /** Kết quả nén tài liệu. */
@@ -235,6 +271,10 @@ async function compressDocument(
 
   const imagesSkipped: { name: string; reason: string }[] = [];
   let imagesProcessed = 0;
+
+  if (profile.stripMetadata) {
+    stripDocumentMetadata(document);
+  }
 
   for (const image of scan.images) {
     if (signal?.aborted) throw new AppError('E_UNKNOWN', 'Tac vu da bi huy');
@@ -283,6 +323,27 @@ async function compressDocument(
     imagesSkipped,
     bytes: output,
   };
+}
+
+/**
+ * Bỏ siêu dữ liệu không cần thiết của tài liệu.
+ *
+ * Mức Mạnh bỏ thông tin tài liệu (tiêu đề, tác giả, ứng dụng tạo) và
+ * siêu dữ liệu XMP. Đây là thông tin có thể chứa thông tin riêng tư của người
+ * dùng, nên bỏ đi cũng tốt cho quyền riêng tư.
+ */
+function stripDocumentMetadata(document: PDFDocument): void {
+  document.setTitle('');
+  document.setAuthor('');
+  document.setSubject('');
+  document.setKeywords([]);
+  document.setProducer('');
+  document.setCreator('');
+  document.setCreationDate(new Date(0));
+  document.setModificationDate(new Date(0));
+
+  // Siêu dữ liệu XMP nằm trong catalog.
+  document.catalog.delete(PDFName.of('Metadata'));
 }
 
 /** Đọc dữ liệu thô của một đối tượng ảnh. */
@@ -381,6 +442,12 @@ async function readFileBytes(path: string): Promise<Uint8Array> {
 async function writeFile(path: string, bytes: Uint8Array): Promise<void> {
   const { writeFile: write } = await import('node:fs/promises');
   await write(path, bytes);
+}
+
+/** Tạo thư mục (kể cả thư mục cha). */
+async function mkdir(path: string): Promise<void> {
+  const { mkdir: make } = await import('node:fs/promises');
+  await make(path, { recursive: true });
 }
 
 /** Lấy dung lượng tệp. */

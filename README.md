@@ -103,6 +103,7 @@ npm run lint               # ESLint
 npm run typecheck          # TypeScript
 npm run build              # dựng gói ứng dụng
 npm run fixtures           # sinh lại bộ tệp PDF kiểm thử
+npm run report:compression # báo cáo chất lượng nén trên bộ tệp thử
 ```
 
 Lệnh tuần 8 trở đi (cần Windows SDK cho gói MSIX):
@@ -124,9 +125,8 @@ $env:OPTB_BUILD_MSIX='1'; npm run make   # dựng gói phát hành kèm MSIX
 | Gộp PDF (F-01) | **Xong** — dải trang, thứ tự, ghi an toàn, bỏ qua tệp hỏng |
 | Tách PDF (F-02) | **Xong** — 6 chế độ, lưới trang, thư mục con |
 | Xoay PDF (F-04) | **Xong** — chọn trang, góc 90/180/270, cộng modulo 360 |
-| Nén PDF (F-03) | **Xong phần 1** — nén ảnh nhúng, 3 mức, ước lượng trước khi chạy |
+| Nén PDF (F-03) | **Xong** — nén ảnh nhúng, 3 mức, dung lượng đích, bảng kết quả |
 | Sắp xếp trang (F-05) | Tuần 4–5, dùng lại lưới trang |
-| Nén PDF phần 2 (F-03) | Tuần 6 — mức Nhẹ, dung lượng đích, cảnh báo chữ ký |
 | Giấy phép Store (F-08 tuần 8) | Tuần 8, cần `StoreBridge` |
 
 Bản **0.5.0 nội bộ** đã dựng xong. Kế hoạch thử nghiệm: [`docs/BETA-0.5.md`](docs/BETA-0.5.md).
