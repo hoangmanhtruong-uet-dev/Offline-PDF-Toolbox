@@ -1,8 +1,19 @@
+import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { BrowserWindow, shell } from 'electron';
+import { app, BrowserWindow, shell } from 'electron';
 
 import { APP_INDEX_URL } from '../protocol';
+
+function resolveAppIcon(): string | undefined {
+  const candidates = [
+    join(app.getAppPath(), 'assets', process.platform === 'win32' ? 'icon.ico' : 'icon.png'),
+    join(app.getAppPath(), 'assets', 'icon.png'),
+    join(__dirname, '../../assets', process.platform === 'win32' ? 'icon.ico' : 'icon.png'),
+    join(__dirname, '../../assets', 'icon.png'),
+  ];
+  return candidates.find((c) => existsSync(c));
+}
 
 /**
  * Tạo cửa sổ chính.
@@ -40,6 +51,7 @@ export function createMainWindow(): BrowserWindow {
     minHeight: 600,
     show: false,
     title: 'Offline PDF Toolbox',
+    icon: resolveAppIcon(),
     backgroundColor: '#f4f4f6',
     autoHideMenuBar: true,
     webPreferences: {

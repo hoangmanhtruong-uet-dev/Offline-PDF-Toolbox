@@ -104,6 +104,9 @@ function forwardTaskEvents(): void {
 }
 
 async function bootstrap(): Promise<void> {
+  if (process.platform === 'win32') {
+    app.setAppUserModelId('MTDStudio.OfflinePDFToolbox');
+  }
   await errorLog.milestone('bat dau bootstrap');
   await settingsStore.load();
   await errorLog.milestone('da nap cai dat');
