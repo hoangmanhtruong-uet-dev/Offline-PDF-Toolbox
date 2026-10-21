@@ -32,7 +32,7 @@ async function openCompressTool(
   outputFolder?: string,
 ): Promise<void> {
   await stubFileDialog(app, paths);
-  await page.getByTestId('tool-compress').click();
+  await page.locator('[data-tool-id="compress"]').click();
   await expect(page.getByTestId('options-panel')).toBeVisible();
   await page
     .getByTestId('drop-zone')

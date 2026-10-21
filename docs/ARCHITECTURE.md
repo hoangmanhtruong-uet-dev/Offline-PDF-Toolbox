@@ -81,23 +81,31 @@ offline-pdf-toolbox/
           ActionBar.tsx              # nút hành động chính + tiến độ + Hủy
           OfflineBadge.tsx           # dấu hiệu "Xử lý trên máy bạn"
           PasswordPrompt.tsx         # hộp thoại nhập mật khẩu
+          PageTitle.tsx              # tiêu đề dùng phần tử heading thật
+          RecentFiles.tsx            # danh sách tệp gần đây
           ResultSummary.tsx
+          ToolCard.tsx               # thẻ công cụ
           UpsellBanner.tsx
+          DragOverlay.tsx            # lớp phủ khi kéo tệp vào cửa sổ
         hooks/
           usePageThumbnails.ts       # vẽ hình thu nhổ theo yêu cầu
+          useShortcuts.ts            # phím tắt Ctrl+O, Ctrl+1..6, Ctrl+,
         services/
           pdfWorkerClient.ts        # khách hàng của worker hình thu nhổ
           fileReader.ts             # đọc một tệp: số trang, dấu trang, chữ ký
         state/
           appStore.ts               # cài đặt, thông tin môi trường, giấy phép
           filesStore.ts             # danh sách tệp của công cụ gộp
+          recentStore.ts            # danh sách tệp gần đây + số trang + hình thu nhỏ
           rotateStore.ts            # tệp đang xoay (một tệp)
           splitStore.ts             # tệp đang tách (một tệp)
           taskStore.ts              # tác vụ đang chạy, tiến độ, kết quả
         i18n/
           index.tsx                 # dịch, số ít/số nhiều, định dạng theo vùng
           en.json  de.json  fr.json  es.json  vi.json
-        styles/app.css
+        styles/
+          app.css
+          tokens.ts                 # design token tập trung + buildTheme()
       workers/
         thumbnail.worker.ts         # phân tích và vẽ hình thu nhổ bằng PDF.js
       shared/
@@ -349,6 +357,20 @@ Nhờ vậy không cần giả định "ảnh phủ trọn trang": ảnh nhỏ g
 **Ảnh có mặt nạ mền (SMask)** chỉ được nén lại cùng kích thước, vì mặt nạ phải khớp kích thước ảnh nền.
 
 **Quy tắc thay ảnh:** chỉ thay khi bản mới nhỏ hơn ít nhất 5%, và bỏ qua ảnh dưới 50 KB, ảnh 1 bit, bộ lọc chưa hỗ trợ (JBIG2, CCITT, JPEG 2000) và không gian màu lạ (Indexed, Separation).
+
+### 7.3. Lớp giao diện và design token
+
+Lớp giao diện chia làm ba tầng, không tầng nào biết logic xử lý PDF:
+
+| Tầng | Vị trí | Trách nhiệm |
+| --- | --- | --- |
+| Nghiệp vụ | `src/main/services/*` | Toàn bộ xử lý PDF: qpdf, pdf-lib, sharp, pdf.js |
+| Điều phối | `src/renderer/state/*`, `src/renderer/services/*` | Gọi IPC, giữ trạng thái giao diện, đọc hình thu nhỏ |
+| Trình bày | `src/renderer/components/*`, `src/renderer/features/*` | Chỉ hiển thị và nhận thao tác |
+
+**Design token tập trung** nằm ở `src/renderer/styles/tokens.ts`: khoảng cách, bo góc, cỡ chữ, độ đậm, đổ bóng, thời gian chuyển động, màu nhấn và màu chữ phụ. Theme Fluent được dựng lại từ đó trong `buildTheme(dark)`. Thành phần nào cần giá trị mới thì thêm vào đây, không hard-code rải rác.
+
+**Tiêu đề dùng phần tử heading thật.** `Title2`/`Title3` của Fluent render thành `<span>` nên trình đọc màn hình không nhận ra đâu là tiêu đề; `components/PageTitle.tsx` dùng `<h1>`/`<h2>` thật với cùng thang chữ.
 
 ## 8. Bộ nhớ và tệp lớn
 

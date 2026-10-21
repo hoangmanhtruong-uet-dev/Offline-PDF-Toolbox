@@ -134,4 +134,8 @@ export interface RecentFile {
   path: string;
   name: string;
   usedAt: number;
+  /** Dung lượng tệp, tính bằng byte. */
+  size: number;
+  /** Số trang, nếu đã đọc được tệp. */
+  pageCount?: number;
 }

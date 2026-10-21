@@ -41,6 +41,10 @@ async function describeMany(paths: string[]): Promise<FileMeta[]> {
 export interface FileHandlerDeps {
   /** Gọi lại khi người dùng dùng một tệp, để ghi vào danh sách gần đây. */
   onFileUsed?: (file: FileMeta) => void;
+  /** Xóa một tệp khỏi danh sách gần đây. */
+  removeRecentFile?: (path: string) => Promise<void>;
+  /** Cập nhật thông tin đã biết thêm của một tệp gần đây. */
+  touchRecentFile?: (path: string, pageCount: number) => Promise<void>;
 }
 
 export function registerFileHandlers(deps: FileHandlerDeps = {}): void {
@@ -100,4 +104,21 @@ export function registerFileHandlers(deps: FileHandlerDeps = {}): void {
   ipcMain.handle(IPC.filesReveal, async (_event, payload: { path: string }): Promise<void> => {
     shell.showItemInFolder(payload.path);
   });
+
+  ipcMain.handle(IPC.filesOpen, async (_event, payload: { path: string }): Promise<string> => {
+    // Mo tep bang chuong trinh mac dinh cua he dieu hanh. Khong dung lenh
+    // trong he thong, nen khong co rui ro chay ma lenh.
+    return shell.openPath(payload.path);
+  });
+
+  ipcMain.handle(IPC.recentRemove, async (_event, payload: { path: string }): Promise<void> => {
+    await deps.removeRecentFile?.(payload.path);
+  });
+
+  ipcMain.handle(
+    IPC.recentTouch,
+    async (_event, payload: { path: string; pageCount: number }): Promise<void> => {
+      await deps.touchRecentFile?.(payload.path, payload.pageCount);
+    },
+  );
 }

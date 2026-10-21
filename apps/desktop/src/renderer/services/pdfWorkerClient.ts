@@ -156,13 +156,23 @@ export class PdfWorkerClient {
 
   /** Xóa một tài liệu khỏi worker. */
   async close(documentId: string): Promise<void> {
-    await this.request({ id: documentId, type: 'close' }).catch(() => undefined);
+    await this.request({ id: this.nextId(), type: 'close', documentId }).catch(() => undefined);
     for (const key of [...this.thumbnails.keys()]) {
       if (key.startsWith(`${documentId}:`)) {
         URL.revokeObjectURL(this.thumbnails.get(key) as string);
         this.thumbnails.delete(key);
       }
     }
+  }
+
+  /**
+   * Đóng tài liệu trong worker nhưng **giữ lại** ảnh đã vẽ.
+   *
+   * Dùng cho danh sách tệp gần đây: sau khi dựng xong hình thu nhổ thì
+   * không cần giữ tài liệu trong bộ nhớ, nhưng ảnh vẫn dùng được.
+   */
+  async releaseDocument(documentId: string): Promise<void> {
+    await this.request({ id: this.nextId(), type: 'close', documentId }).catch(() => undefined);
   }
 
   /** Giải phóng toàn bộ tài nguyên. */

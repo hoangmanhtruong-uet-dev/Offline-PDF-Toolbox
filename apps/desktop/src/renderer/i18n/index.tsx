@@ -116,11 +116,45 @@ export function formatNumber(value: number, locale: SupportedLanguage): string {
   return new Intl.NumberFormat(locale).format(value);
 }
 
+/**
+ * Định dạng thời gian tương đối, ví dụ "3 phút trước".
+ */
+export function relativeTime(
+  timestamp: number,
+  locale: SupportedLanguage,
+  now: number = Date.now(),
+): string {
+  const seconds = Math.round((timestamp - now) / 1000);
+
+  const units: [Intl.RelativeTimeFormatUnit, number][] = [
+    ['second', 60],
+    ['minute', 60],
+    ['hour', 24],
+    ['day', 7],
+    ['week', 4.35],
+    ['month', 12],
+    ['year', Number.POSITIVE_INFINITY],
+  ];
+
+  let value = seconds;
+  let unit: Intl.RelativeTimeFormatUnit = 'second';
+
+  for (const [candidate, limit] of units) {
+    unit = candidate;
+    if (Math.abs(value) < limit) break;
+    value = Math.round(value / limit);
+  }
+
+  return new Intl.RelativeTimeFormat(locale, { numeric: 'auto' }).format(value, unit);
+}
+
 export interface I18nValue {
   locale: SupportedLanguage;
   t(key: MessageKey, vars?: TranslateVars): string;
   formatBytes(bytes: number): string;
   formatNumber(value: number): string;
+  /** Thời gian tương đối, ví dụ "3 phút trước". */
+  relativeTime(timestamp: number): string;
 }
 
 const I18nContext = createContext<I18nValue | null>(null);
@@ -137,6 +171,7 @@ export function I18nProvider({
     t: (key, vars) => translate(locale, key, vars),
     formatBytes: (bytes) => formatBytes(bytes, locale),
     formatNumber: (num) => formatNumber(num, locale),
+    relativeTime: (timestamp) => relativeTime(timestamp, locale),
   };
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;

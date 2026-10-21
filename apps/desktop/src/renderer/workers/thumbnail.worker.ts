@@ -51,7 +51,7 @@ export type ThumbnailRequest =
       pageNumber: number;
       width: number;
     }
-  | { id: string; type: 'close' };
+  | { id: string; type: 'close'; documentId: string };
 
 /** Một mục dấu trang cấp 1 của tài liệu. */
 export interface OutlineEntry {
@@ -271,10 +271,10 @@ scope.onmessage = async (event: MessageEvent<ThumbnailRequest>): Promise<void> =
       );
       return;
     case 'close': {
-      const opened = documents.get(request.id);
+      const opened = documents.get(request.documentId);
       if (opened) {
         await opened.loadingTask.destroy().catch(() => undefined);
-        documents.delete(request.id);
+        documents.delete(request.documentId);
       }
       scope.postMessage({ id: request.id, type: 'close', ok: true });
       return;

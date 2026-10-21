@@ -10,7 +10,7 @@ Nguyên tắc thiết kế: **"một màn hình, một việc"**. Người dùng
 
 | Mã | Màn hình | Mục đích | Thành phần chính |
 | --- | --- | --- | --- |
-| S-01 | Màn hình chính | Chọn công cụ nhanh | Lưới 6 ô công cụ (Gộp, Tách, Nén, Xoay, Sắp xếp trang, Ảnh sang PDF); vùng kéo thả lớn "Thả tệp vào đây"; danh sách tệp gần đây (chỉ tên và đường dẫn, có thể tắt) |
+| S-01 | Màn hình chính | Chọn công cụ nhanh | Lưới 3x2 sáu thẻ công cụ (Gộp, Tách, Nén, Xoay, Sắp xếp trang, Ảnh sang PDF), mỗi thẻ có icon lớn, tên, mô tả một dòng và phím tắt; vùng kéo thả; danh sách tệp gần đây có hình thu nhổ, số trang, dung lượng, thời gian tương đối và ba thao tác (Mở, Hiện trong thư mục, Xóa) |
 | S-02 | Công cụ Gộp | F-01 | Danh sách tệp kéo thả, ô dải trang, nút Gộp, thanh tiến độ |
 | S-03 | Công cụ Tách | F-02 | Chọn chế độ, lưới hình thu nhổ, mẫu tên, nút Tách |
 | S-04 | Công cụ Nén | F-03 | Chọn mức nén, ước lượng dung lượng, nút Nén, bảng kết quả trước và sau |
@@ -20,6 +20,12 @@ Nguyên tắc thiết kế: **"một màn hình, một việc"**. Người dùng
 | S-08 | Hàng loạt | F-09 | Chọn thư mục, chọn thao tác, bảng báo cáo |
 | S-09 | Nâng cấp Pro | Bán hàng | So sánh Free và Pro, nút Mua, nút Khôi phục giao dịch |
 | S-10 | Cài đặt và Giới thiệu | F-10 | Ngôn ngữ, chủ đề, thư mục lưu, quyền riêng tư, hỗ trợ, phiên bản, giấy phép |
+
+## 1.1. Luồng của màn hình chính
+
+**Chọn công cụ trước, thả tệp sau.** Mỗi công cụ có vùng thả riêng ở màn hình của nó và chỉ nhận đúng định dạng: PDF cho Gộp / Tách / Nén / Xoay / Sắp xếp trang, ảnh (JPG, PNG, TIFF, BMP) cho Ảnh sang PDF.
+
+Nếu người dùng thả tệp ngay trên màn hình chính, ứng dụng hiện một **bảng chọn công cụ ngay tại chỗ** (không phải hộp thoại bật lên) với các công cụ phù hợp: nhiều tệp thì gợi ý Gộp, một tệp thì gợi ý Tách / Nén / Xoay / Sắp xếp trang. Xem ADR-016.
 
 ## 2. Bố cục chuẩn của màn hình công cụ
 
@@ -73,6 +79,8 @@ Dòng trạng thái "Xử lý trên máy bạn" ở thanh trên là **bằng ch�
 | Phím | Chức năng |
 | --- | --- |
 | Ctrl+O | Chọn tệp |
+| Ctrl+1 … Ctrl+6 | Mở công cụ tương ứng theo thứ tự trên màn hình chính |
+| Ctrl+, | Mở Cài đặt |
 | Ctrl+S hoặc Enter | Thực hiện thao tác chính |
 | Ctrl+Z, Ctrl+Y | Hoàn tác, làm lại (màn hình sắp xếp trang) |
 | Delete | Xóa trang hoặc tệp đang chọn |

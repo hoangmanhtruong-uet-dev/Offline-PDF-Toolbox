@@ -1,4 +1,5 @@
 import { MessageBar, MessageBarBody } from '@fluentui/react-components';
+import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { AppShell } from '../../components/AppShell';
@@ -7,6 +8,7 @@ import { CompressScreen } from '../compress/CompressScreen';
 import { MergeScreen } from '../merge/MergeScreen';
 import { RotateScreen } from '../rotate/RotateScreen';
 import { SplitScreen } from '../split/SplitScreen';
+import { useTaskStore } from '../../state/taskStore';
 import { findTool } from './tools';
 
 /**
@@ -20,6 +22,12 @@ export function ToolScreen(): React.JSX.Element {
   const navigate = useNavigate();
   const params = useParams<{ toolId: string }>();
   const tool = findTool(params.toolId ?? '');
+  const clearResult = useTaskStore((state) => state.clear);
+
+  // Kết quả của tác vụ trước không được hiện lại ở công cụ khác.
+  useEffect(() => {
+    clearResult();
+  }, [clearResult, params.toolId]);
 
   if (!tool) {
     return (

@@ -76,6 +76,25 @@ export class SettingsStore {
     await writeJson(this.recentPath, this.recent);
   }
 
+  /** Xóa một tệp khỏi danh sách gần đây. */
+  async removeRecentFile(path: string): Promise<void> {
+    this.recent = this.recent.filter((item) => item.path !== path);
+    await writeJson(this.recentPath, this.recent);
+  }
+
+  /** Cập nhật thông tin đã biết thêm của một tệp, ví dụ số trang. */
+  async touchRecentFile(path: string, pageCount: number): Promise<void> {
+    let changed = false;
+
+    this.recent = this.recent.map((item) => {
+      if (item.path !== path || item.pageCount === pageCount) return item;
+      changed = true;
+      return { ...item, pageCount };
+    });
+
+    if (changed) await writeJson(this.recentPath, this.recent);
+  }
+
   /** Xóa toàn bộ danh sách tệp gần đây. */
   async clearRecentFiles(): Promise<void> {
     this.recent = [];

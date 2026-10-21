@@ -31,8 +31,10 @@ test.describe('Tính năng chạy hoàn toàn cục bộ (T-09)', () => {
     const requests = trackNetworkRequests(page);
 
     try {
+      await expect(page.getByTestId('tool-grid')).toBeVisible();
+
       for (const tool of ['merge', 'split', 'compress', 'rotate', 'pages', 'images']) {
-        await page.getByTestId(`tool-${tool}`).click();
+        await page.locator(`[data-tool-id="${tool}"]`).click();
         // Dấu hiệu offline nằm trên thanh trên của mọi màn hình công cụ.
         await expect(page.getByTestId('offline-badge')).toBeVisible();
         await page.goBack();

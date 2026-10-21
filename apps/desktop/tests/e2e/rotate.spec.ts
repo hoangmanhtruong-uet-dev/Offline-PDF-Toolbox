@@ -43,7 +43,7 @@ async function openRotateTool(
   paths: string[],
 ): Promise<void> {
   await stubFileDialog(app, paths);
-  await page.getByTestId('tool-rotate').click();
+  await page.locator('[data-tool-id="rotate"]').click();
   await expect(page.getByTestId('options-panel')).toBeVisible();
   await page
     .getByTestId('drop-zone')

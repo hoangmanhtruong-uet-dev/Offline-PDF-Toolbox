@@ -20,10 +20,13 @@ export const IPC = {
   filesStat: 'files:stat',
   filesReadBytes: 'files:readBytes',
   filesReveal: 'files:reveal',
+  filesOpen: 'files:open',
   settingsGet: 'settings:get',
   settingsUpdate: 'settings:update',
   recentGet: 'recent:get',
   recentClear: 'recent:clear',
+  recentRemove: 'recent:remove',
+  recentTouch: 'recent:touch',
   appInfo: 'app:info',
   licenseGet: 'license:get',
   taskStart: 'task:start',
@@ -59,10 +62,13 @@ export interface IpcInvokeMap {
   [IPC.filesStat]: { request: { paths: string[] }; response: FileMeta[] };
   [IPC.filesReadBytes]: { request: { path: string }; response: ReadBytesResult };
   [IPC.filesReveal]: { request: { path: string }; response: void };
+  [IPC.filesOpen]: { request: { path: string }; response: string };
   [IPC.settingsGet]: { request: void; response: AppSettings };
   [IPC.settingsUpdate]: { request: { patch: Partial<AppSettings> }; response: AppSettings };
   [IPC.recentGet]: { request: void; response: RecentFile[] };
   [IPC.recentClear]: { request: void; response: void };
+  [IPC.recentRemove]: { request: { path: string }; response: void };
+  [IPC.recentTouch]: { request: { path: string; pageCount: number }; response: void };
   [IPC.appInfo]: { request: void; response: AppInfo };
   [IPC.licenseGet]: { request: void; response: LicenseStatus };
   [IPC.taskStart]: {

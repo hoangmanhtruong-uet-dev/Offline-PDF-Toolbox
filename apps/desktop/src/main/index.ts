@@ -120,8 +120,15 @@ async function bootstrap(): Promise<void> {
 
   registerFileHandlers({
     onFileUsed: (file) => {
-      void settingsStore.addRecentFile({ path: file.path, name: file.name, usedAt: Date.now() });
+      void settingsStore.addRecentFile({
+        path: file.path,
+        name: file.name,
+        size: file.size,
+        usedAt: Date.now(),
+      });
     },
+    removeRecentFile: (path) => settingsStore.removeRecentFile(path),
+    touchRecentFile: (path, pageCount) => settingsStore.touchRecentFile(path, pageCount),
   });
   registerSettingsHandlers();
   registerLicenseHandlers();

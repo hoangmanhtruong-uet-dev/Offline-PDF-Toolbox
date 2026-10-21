@@ -15,6 +15,7 @@ export interface OptbApi {
     stat(paths: string[]): Promise<FileMeta[]>;
     readBytes(path: string): Promise<unknown>;
     reveal(path: string): Promise<void>;
+    open(path: string): Promise<string>;
     getPathForFile(file: File): string;
   };
   settings: {
@@ -24,6 +25,8 @@ export interface OptbApi {
   recent: {
     get(): Promise<RecentFile[]>;
     clear(): Promise<void>;
+    remove(path: string): Promise<void>;
+    touch(path: string, pageCount: number): Promise<void>;
   };
   app: {
     info(): Promise<AppInfo>;

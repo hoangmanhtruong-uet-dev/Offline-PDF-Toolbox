@@ -55,8 +55,12 @@ export const useFilesStore = create<FilesState>((set, get) => ({
 
     for (const entry of entries) {
       void readFileEntry(entry, entry.id).then((updated) => {
+        // Giữ lại dải trang người dùng đã nhập: kết quả đọc tệp chỉ bổ sung
+        // thông tin, không được xoá dữ liệu do người dùng nhập.
         useFilesStore.setState((state) => ({
-          files: state.files.map((file) => (file.id === updated.id ? updated : file)),
+          files: state.files.map((file) =>
+            file.id === updated.id ? { ...file, ...updated, pageRange: file.pageRange } : file,
+          ),
         }));
       });
     }
@@ -110,6 +114,10 @@ export const useFilesStore = create<FilesState>((set, get) => ({
     const file = get().files.find((item) => item.id === id);
     if (!file) return;
     const updated = await readFileEntry(file, id);
-    set({ files: get().files.map((item) => (item.id === id ? updated : item)) });
+    set({
+      files: get().files.map((item) =>
+        item.id === id ? { ...item, ...updated, pageRange: item.pageRange } : item,
+      ),
+    });
   },
 }));

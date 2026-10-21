@@ -33,7 +33,7 @@ async function openSplitTool(
   outputFolder?: string,
 ): Promise<void> {
   await stubFileDialog(app, paths);
-  await page.getByTestId('tool-split').click();
+  await page.locator('[data-tool-id="split"]').click();
   await expect(page.getByTestId('options-panel')).toBeVisible();
   await page
     .getByTestId('drop-zone')

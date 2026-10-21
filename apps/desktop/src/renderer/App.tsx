@@ -1,13 +1,15 @@
-import { FluentProvider, webDarkTheme, webLightTheme } from '@fluentui/react-components';
+import { FluentProvider } from '@fluentui/react-components';
 import { useEffect, useMemo } from 'react';
 import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
 
+import { DragOverlay } from './components/DragOverlay';
 import { I18nProvider } from './i18n';
 import { HomeScreen } from './features/home/HomeScreen';
 import { ProScreen } from './features/pro/ProScreen';
 import { SettingsScreen } from './features/settings/SettingsScreen';
 import { ToolScreen } from './features/tools/ToolScreen';
 import { resolveDarkMode, useAppStore } from './state/appStore';
+import { buildTheme } from './styles/tokens';
 
 /**
  * Gốc của ứng dụng giao diện.
@@ -30,7 +32,7 @@ export function App(): React.JSX.Element {
     [settings.theme, appInfo?.systemPrefersDark],
   );
 
-  const theme = dark ? webDarkTheme : webLightTheme;
+  const theme = useMemo(() => buildTheme(dark), [dark]);
 
   if (!initialized) {
     return <FluentProvider theme={theme} />;
@@ -40,6 +42,7 @@ export function App(): React.JSX.Element {
     <FluentProvider theme={theme}>
       <I18nProvider locale={locale}>
         <HashRouter>
+          <DragOverlay />
           <Routes>
             <Route path="/" element={<HomeScreen />} />
             <Route path="/tools/:toolId" element={<ToolScreen />} />

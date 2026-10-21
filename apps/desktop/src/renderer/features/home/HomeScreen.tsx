@@ -1,182 +1,303 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
-import { Button, Card, Text, Title2, makeStyles, tokens } from '@fluentui/react-components';
+import { Button, Text, makeStyles, shorthands, tokens } from '@fluentui/react-components';
 import { useNavigate } from 'react-router-dom';
 
-import type { FileMeta, RecentFile } from '@shared/types';
+import type { FileMeta } from '@shared/types';
 
-import { DropZone } from '../../components/DropZone';
 import { OfflineBadge } from '../../components/OfflineBadge';
+import { PageTitle } from '../../components/PageTitle';
+import { RecentFiles } from '../../components/RecentFiles';
+import { ToolCard } from '../../components/ToolCard';
 import { useI18n } from '../../i18n';
+import { useShortcuts } from '../../hooks/useShortcuts';
+import { useFilesStore } from '../../state/filesStore';
+import { appTokens } from '../../styles/tokens';
 import { TOOLS } from '../tools/tools';
 
 /**
  * Màn hình chính S-01.
  *
- * Ba phần: lưới sáu ô công cụ, vùng kéo thả lớn, danh sách tệp gần đây.
+ * Luồng: **chọn công cụ trước, thả tệp sau**. Mỗi công cụ có vùng thả tệp
+ * riêng ở màn hình của nó, chỉ nhận đúng định dạng (PDF cho năm công cụ đầu,
+ * ảnh cho Images to PDF). Vì vậy ở đây không có vùng thả chung gây mơ hồ.
+ *
+ * Nếu người dùng vẫn thả tệp vào cửa sổ, ứng dụng hiện một bảng chọn
+ * công cụ ngay tại chỗ — không phải hộp thoại bật lên — gợi ý đúng công cụ
+ * theo số tệp đã thả.
  */
 const useStyles = makeStyles({
   page: {
     display: 'flex',
     flexDirection: 'column',
-    gap: tokens.spacingVerticalXL,
-    maxWidth: '1080px',
+    gap: appTokens.spacing.xxl,
+    maxWidth: '1120px',
     margin: '0 auto',
-    paddingBlock: tokens.spacingVerticalXXL,
-  },
-  heading: {
-    color: tokens.colorNeutralForeground1,
+    paddingBlock: appTokens.spacing.xxxl,
+    paddingInline: appTokens.spacing.xl,
+    width: '100%',
   },
   header: {
     display: 'flex',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     justifyContent: 'space-between',
-    gap: tokens.spacingHorizontalL,
+    gap: appTokens.spacing.l,
+    flexWrap: 'wrap',
+  },
+  titleRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: appTokens.spacing.m,
     flexWrap: 'wrap',
   },
   subtitle: {
     display: 'block',
-    color: tokens.colorNeutralForeground3,
-    maxWidth: '60ch',
+    maxWidth: '62ch',
+    marginTop: appTokens.spacing.xs,
+    color: tokens.colorNeutralForeground2,
   },
   grid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
-    gap: tokens.spacingHorizontalL,
-    gapRow: tokens.spacingVerticalL,
-  },
-  tool: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: tokens.spacingHorizontalM,
-    padding: tokens.spacingVerticalL,
-    cursor: 'pointer',
-    transitionProperty: 'border-color',
-    transitionDuration: '120ms',
-    ':hover': {
-      borderTopColor: tokens.colorBrandStroke1,
-      borderRightColor: tokens.colorBrandStroke1,
-      borderBottomColor: tokens.colorBrandStroke1,
-      borderLeftColor: tokens.colorBrandStroke1,
+    gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+    gap: appTokens.spacing.l,
+    '@media (max-width: 900px)': {
+      gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+    },
+    '@media (max-width: 620px)': {
+      gridTemplateColumns: 'minmax(0, 1fr)',
     },
   },
-  toolIcon: {
-    fontSize: tokens.fontSizeBase600,
-    color: tokens.colorBrandForeground1,
-  },
-  toolName: {
-    fontWeight: tokens.fontWeightSemibold,
-  },
-  toolFeature: {
-    color: tokens.colorNeutralForeground3,
-    fontSize: tokens.fontSizeBase200,
-  },
-  recent: {
+  section: {
     display: 'flex',
     flexDirection: 'column',
-    gap: tokens.spacingVerticalS,
+    gap: appTokens.spacing.m,
   },
-  recentRow: {
+  sectionTitle: {
+    fontSize: appTokens.fontSize.md,
+    fontWeight: appTokens.fontWeight.semibold,
+    color: tokens.colorNeutralForeground1,
+  },
+  chooser: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: appTokens.spacing.m,
+    padding: appTokens.spacing.l,
+    borderRadius: appTokens.radius.lg,
+    backgroundColor: tokens.colorNeutralBackground1,
+    ...shorthands.border('1px', 'solid', tokens.colorBrandStroke1),
+  },
+  chooserHeader: {
     display: 'flex',
     alignItems: 'center',
-    gap: tokens.spacingHorizontalM,
-    padding: tokens.spacingVerticalS,
-    borderRadius: tokens.borderRadiusMedium,
+    justifyContent: 'space-between',
+    gap: appTokens.spacing.m,
+  },
+  chooserTitle: {
+    fontSize: appTokens.fontSize.base,
+    fontWeight: appTokens.fontWeight.semibold,
+    color: tokens.colorNeutralForeground1,
+  },
+  chooserList: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: appTokens.spacing.s,
+  },
+  chooserButton: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: appTokens.spacing.s,
+    padding: appTokens.spacing.s,
+    paddingInline: appTokens.spacing.m,
+    borderRadius: appTokens.radius.md,
+    cursor: 'pointer',
+    backgroundColor: tokens.colorNeutralBackground1,
+    color: tokens.colorNeutralForeground1,
+    ...shorthands.border('1px', 'solid', tokens.colorNeutralStroke2),
     ':hover': {
-      backgroundColor: tokens.colorNeutralBackground3,
+      ...shorthands.borderColor(tokens.colorBrandStroke1),
+      backgroundColor: tokens.colorNeutralBackground2,
+    },
+    ':focus-visible': {
+      ...shorthands.borderWidth('2px'),
+      ...shorthands.borderColor(tokens.colorBrandStroke1),
+      outlineStyle: 'none',
     },
   },
-  recentName: {
-    flexGrow: 1,
-    minWidth: 0,
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap',
+  hint: {
+    color: tokens.colorNeutralForeground2,
   },
-  empty: {
-    color: tokens.colorNeutralForeground3,
+  shortcuts: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: appTokens.spacing.m,
+    alignItems: 'center',
+  },
+  kbd: {
+    fontFamily: 'Consolas, monospace',
+    fontSize: appTokens.fontSize.xs,
+    paddingBlock: '1px',
+    paddingInline: '5px',
+    borderRadius: appTokens.radius.sm,
+    ...shorthands.border('1px', 'solid', tokens.colorNeutralStroke2),
+    color: tokens.colorNeutralForeground2,
   },
 });
 
+/** Các công cụ gợi ý khi người dùng thả tệp vào màn hình chính. */
+function suggestTools(count: number): string[] {
+  return count > 1 ? ['merge'] : ['split', 'compress', 'rotate', 'pages'];
+}
+
 export function HomeScreen(): React.JSX.Element {
   const styles = useStyles();
-  const { t, locale } = useI18n();
+  const { t } = useI18n();
   const navigate = useNavigate();
-  const [recent, setRecent] = useState<RecentFile[]>([]);
 
+  const addFiles = useFilesStore((state) => state.addFiles);
+  const gridRef = useRef<HTMLDivElement | null>(null);
+
+  const [dropped, setDropped] = useState<FileMeta[]>([]);
+
+  useShortcuts({
+    onOpenFiles: () => void window.optb.files.pick().then((metas) => {
+      if (Array.isArray(metas) && metas.length > 0) {
+        addFiles(metas as FileMeta[]);
+        navigate('/tools/merge');
+      }
+    }),
+    onOpenTool: (toolId) => navigate(`/tools/${toolId}`),
+    onOpenSettings: () => navigate('/settings'),
+  });
+
+  // Kéo tệp vào cửa sổ khi đang ở màn hình chính: hiện bảng chọn công cụ.
   useEffect(() => {
-    void window.optb.recent.get().then((files) => setRecent(files as RecentFile[]));
+    const onDragOver = (event: DragEvent): void => {
+      if (!Array.from(event.dataTransfer?.types ?? []).includes('Files')) return;
+      event.preventDefault();
+    };
+
+    const onDrop = (event: DragEvent): void => {
+      if (!Array.from(event.dataTransfer?.types ?? []).includes('Files')) return;
+      event.preventDefault();
+
+      const paths = Array.from(event.dataTransfer?.files ?? [])
+        .map((file) => {
+          try {
+            return window.optb.files.getPathForFile(file);
+          } catch {
+            return '';
+          }
+        })
+        .filter((path) => path.length > 0);
+
+      if (paths.length === 0) return;
+
+      void window.optb.files.stat(paths).then((metas) => {
+        const list = metas as FileMeta[];
+        if (list.length > 0) setDropped(list);
+      });
+    };
+
+    window.addEventListener('dragover', onDragOver);
+    window.addEventListener('drop', onDrop);
+    return () => {
+      window.removeEventListener('dragover', onDragOver);
+      window.removeEventListener('drop', onDrop);
+    };
   }, []);
 
-  const clearRecent = async (): Promise<void> => {
-    await window.optb.recent.clear();
-    setRecent([]);
-  };
+  const suggestions = useMemo(() => suggestTools(dropped.length), [dropped.length]);
 
-  const openTool = (toolId: string): void => {
+  const startWithTool = (toolId: string): void => {
+    addFiles(dropped);
+    setDropped([]);
     navigate(`/tools/${toolId}`);
-  };
-
-  const handleDropped = (_metas: FileMeta[]): void => {
-    // Trang chính chỉ giới thiệu công cụ; thao tác thật diễn ra trong màn
-    // hình của từng công cụ.
-    openTool('merge');
   };
 
   return (
     <div className={styles.page}>
-      <div className={styles.header}>
+      <header className={styles.header}>
         <div>
-          <Title2 className={styles.heading}>{t('home.heading')}</Title2>
+          <div className={styles.titleRow}>
+            <PageTitle level={1}>{t('home.heading')}</PageTitle>
+            <OfflineBadge />
+          </div>
           <Text className={styles.subtitle}>{t('home.subtitle')}</Text>
         </div>
-        <OfflineBadge />
-      </div>
 
-      <DropZone onFiles={handleDropped} />
+        <Button appearance="subtle" onClick={() => navigate('/settings')}>
+          {t('nav.settings')}
+        </Button>
+      </header>
 
-      <div className={styles.grid} data-testid="tool-grid">
-        {TOOLS.map((tool) => (
-          <Card
-            key={tool.id}
-            className={styles.tool}
-            onClick={() => openTool(tool.id)}
-            data-testid={`tool-${tool.id}`}
-          >
-            <tool.icon className={styles.toolIcon} />
-            <div>
-              <div className={styles.toolName}>{t(tool.nameKey)}</div>
-              <div className={styles.toolFeature}>{tool.feature}</div>
-            </div>
-          </Card>
-        ))}
-      </div>
-
-      <section className={styles.recent}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: tokens.spacingHorizontalM }}>
-          <Text weight="semibold">{t('home.recentTitle')}</Text>
-          {recent.length > 0 ? (
-            <Button size="small" appearance="subtle" onClick={() => void clearRecent()}>
-              {t('home.recentClear')}
+      {dropped.length > 0 ? (
+        <section className={styles.chooser} data-testid="home-chooser">
+          <div className={styles.chooserHeader}>
+            <span className={styles.chooserTitle}>{t('home.chooserTitle')}</span>
+            <Button
+              appearance="subtle"
+              size="small"
+              onClick={() => setDropped([])}
+              aria-label={t('common.close')}
+            >
+              {t('common.cancel')}
             </Button>
-          ) : null}
-        </div>
+          </div>
+          <Text className={styles.hint}>
+            {t('home.chooserHint', { count: dropped.length })}
+          </Text>
+          <div className={styles.chooserList}>
+            {suggestions.map((toolId) => {
+              const tool = TOOLS.find((item) => item.id === toolId);
+              if (!tool) return null;
 
-        {recent.length === 0 ? (
-          <Text className={styles.empty}>{t('home.recentEmpty')}</Text>
-        ) : (
-          recent.map((file) => (
-            <div key={file.path} className={styles.recentRow}>
-              <span className={styles.recentName} title={file.path}>
-                {file.name}
-              </span>
-              <Text size={200} className={styles.empty}>
-                {new Intl.DateTimeFormat(locale, { dateStyle: 'medium' }).format(file.usedAt)}
-              </Text>
-            </div>
-          ))
-        )}
+              return (
+                <button
+                  key={tool.id}
+                  type="button"
+                  className={styles.chooserButton}
+                  onClick={() => startWithTool(tool.id)}
+                  data-testid={`chooser-${tool.id}`}
+                >
+                  <tool.icon />
+                  {t(tool.nameKey)}
+                </button>
+              );
+            })}
+          </div>
+        </section>
+      ) : null}
+
+      <section className={styles.section}>
+        <span className={styles.sectionTitle}>{t('home.toolsTitle')}</span>
+        <div className={styles.grid} ref={gridRef} data-testid="tool-grid">
+          {TOOLS.map((tool, index) => (
+            <ToolCard
+              key={tool.id}
+              icon={tool.icon}
+              name={t(tool.nameKey)}
+              description={t(tool.descriptionKey)}
+              shortcut={`Ctrl+${index + 1}`}
+              testId={tool.id}
+              onSelect={() => navigate(`/tools/${tool.id}`)}
+            />
+          ))}
+        </div>
       </section>
+
+      <section className={styles.section}>
+        <span className={styles.sectionTitle}>{t('home.shortcutsTitle')}</span>
+        <div className={styles.shortcuts}>
+          <span className={styles.hint}>{t('home.shortcutOpen')}</span>
+          <kbd className={styles.kbd}>Ctrl+O</kbd>
+          <span className={styles.hint}>{t('home.shortcutTool')}</span>
+          <kbd className={styles.kbd}>Ctrl+1</kbd>
+          <span className={styles.kbd}>…</span>
+          <kbd className={styles.kbd}>Ctrl+6</kbd>
+        </div>
+      </section>
+
+      <RecentFiles />
     </div>
   );
 }

@@ -178,6 +178,19 @@ Giữ danh sách này để tra cứu khi cần giải thích hoặc đổi hư�
   - Rủi ro: pdf-lib ghi lại toàn bộ cấu trúc tệp. Giảm thiểu bằng bước kiểm tra đầu ra bắt buộc (qpdf --check và đối chiếu số trang) — nếu tệp hỏng, tác vụ báo lỗi và không xuất tệp.
 - **Phương án đã cân nhắc:** vẽ lại trang thành ảnh (nhanh hơn nhưng phá vỡ yêu cầu văn bản chọn được, và tăng dung lượng cho tài liệu nhiều chữ); dùng PDF.js để dựng lại tài liệu (PDF.js không sinh lại tệp PDF, chỉ hiển thị).
 
+## ADR-016: Màn hình chính đi theo luồng "chọn công cụ trước, thả tệp sau"
+
+- **Trạng thái:** Đã chấp nhận
+- **Ngày:** 2026-10-21
+- **Bối cảnh:** Màn hình chính cần một luồng rõ ràng. Đặc tả (UX.md mục 3) hứa rằng "kéo thả tệp vào cửa sổ là bắt đầu làm việc", nhưng với **một** tệp PDF thì ý định có bốn khả năng hợp lý: tách, nén, xoay, sắp xếp trang. Vùng thả chung ở màn hình chính vì vậy luôn mơ hồ.
+- **Quyết định:** Chọn phương án **(b)** — giữ vùng thả ở màn hình chính, nhưng khi thả tệp vào thì hiện một **bảng chọn công cụ ngay tại chỗ** (không phải hộp thoại bật lên) với đúng các công cụ phù hợp: nhiều tệp thì gợi ý Gộp, một tệp thì gợi ý Tách / Nén / Xoay / Sắp xếp trang.
+- **Hệ quả:**
+  - Tốt: giữ được lời hứa "thả tệp là bắt đầu làm việc" mà không phải đoán ý định; người dùng vẫn chọn được công cụ khi có nhiều cách làm.
+  - Tốt: mỗi màn hình công cụ vẫn có vùng thả riêng, nhận đúng định dạng (PDF cho năm công cụ đầu, ảnh cho Images to PDF) — không cần vùng thả trùng lặp ở màn hình chính.
+  - Bất tiện: thêm một bước chọn so với thả thẳng vào công cụ.
+- **Lý do không chọn phương án (a) "chọn công cụ trước":** nó loại bỏ hoàn toàn đường thả tệp nhanh nhất, đánh đổi lấy một màn hình chính sạch sẽ; đặc tả coi kéo thả là điểm khác biệt so với web tool.
+- **Lý do không dùng hộp thoại bật lên cho bảng chọn:** UX.md mục 4 cấm cửa sổ bật lên giữa lúc người dùng đang làm việc; bảng chọn nằm trong trang, tự tắt khi người dùng chọn xong.
+
 ---
 
 ## Mục lục ADR
@@ -199,6 +212,7 @@ Giữ danh sách này để tra cứu khi cần giải thích hoặc đổi hư�
 | ADR-013 | Mật khẩu qua `--password-file` + giải mã tạm | Đã chấp nhận |
 | ADR-014 | Công cụ xoay giữ một tệp riêng | Đã chấp nhận |
 | ADR-015 | Nén bằng cách thay luồng ảnh, không vẽ lại trang | Đã chấp nhận |
+| ADR-016 | Màn hình chính: chọn công cụ trước, thả tệp sau | Đã chấp nhận |
 
 ## Rủi ro đã biết (theo dõi)
 

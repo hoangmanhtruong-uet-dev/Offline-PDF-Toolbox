@@ -19,6 +19,7 @@ const api = {
     stat: (paths: string[]): Promise<unknown[]> => ipcRenderer.invoke(IPC.filesStat, { paths }),
     readBytes: (path: string): Promise<unknown> => ipcRenderer.invoke(IPC.filesReadBytes, { path }),
     reveal: (path: string): Promise<void> => ipcRenderer.invoke(IPC.filesReveal, { path }),
+    open: (path: string): Promise<string> => ipcRenderer.invoke(IPC.filesOpen, { path }),
     /**
      * Lấy đường dẫn thật của một tệp được kéo thả.
      *
@@ -35,6 +36,9 @@ const api = {
   recent: {
     get: (): Promise<unknown[]> => ipcRenderer.invoke(IPC.recentGet),
     clear: (): Promise<void> => ipcRenderer.invoke(IPC.recentClear),
+    remove: (path: string): Promise<void> => ipcRenderer.invoke(IPC.recentRemove, { path }),
+    touch: (path: string, pageCount: number): Promise<void> =>
+      ipcRenderer.invoke(IPC.recentTouch, { path, pageCount }),
   },
   app: {
     info: (): Promise<unknown> => ipcRenderer.invoke(IPC.appInfo),
