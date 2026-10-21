@@ -1,11 +1,12 @@
 import { create } from 'zustand';
 
-import type { ErrorCode, FileEntry, FileMeta } from '@shared/types';
+import type { FileEntry, FileMeta } from '@shared/types';
 
+import { readFileEntry } from '../services/fileReader';
 import { pdfWorkerClient } from '../services/pdfWorkerClient';
 
 /**
- * Danh sách tệp của công cụ đang mở.
+ * Danh sách tệp của công cụ gộp.
  *
  * Mỗi tệp được đọc trong worker: lấy số trang và dựng hình thu nhổ trang đầu.
  * Việc đọc chạy nền, không chặn giao diện.
@@ -18,6 +19,10 @@ interface FilesState {
   removeFile: (id: string) => void;
   clear: () => void;
   moveFile: (from: number, to: number) => void;
+  /** Đặt dải trang cho một tệp. */
+  setPageRange: (id: string, range: string) => void;
+  /** Sắp xếp lại danh sách theo một tiêu chí. */
+  sortBy: (key: 'name' | 'modifiedAt' | 'size') => void;
   /** Đọc lại một tệp, dùng sau khi người dùng thay đổi tệp nguồn. */
   reload: (id: string) => Promise<void>;
 }
@@ -49,7 +54,11 @@ export const useFilesStore = create<FilesState>((set, get) => ({
     set({ files: [...existing, ...entries] });
 
     for (const entry of entries) {
-      void readFile(entry.id);
+      void readFileEntry(entry, entry.id).then((updated) => {
+        useFilesStore.setState((state) => ({
+          files: state.files.map((file) => (file.id === updated.id ? updated : file)),
+        }));
+      });
     }
   },
 
@@ -74,50 +83,33 @@ export const useFilesStore = create<FilesState>((set, get) => ({
     set({ files });
   },
 
+  setPageRange: (id, range) => {
+    set({
+      files: get().files.map((file) => (file.id === id ? { ...file, pageRange: range } : file)),
+    });
+  },
+
+  sortBy: (key) => {
+    const files = [...get().files];
+    files.sort((a, b) => {
+      switch (key) {
+        case 'name':
+          return a.name.localeCompare(b.name);
+        case 'modifiedAt':
+          return b.modifiedAt - a.modifiedAt;
+        case 'size':
+          return b.size - a.size;
+        default:
+          return 0;
+      }
+    });
+    set({ files });
+  },
+
   reload: async (id) => {
-    await readFile(id);
+    const file = get().files.find((item) => item.id === id);
+    if (!file) return;
+    const updated = await readFileEntry(file, id);
+    set({ files: get().files.map((item) => (item.id === id ? updated : item)) });
   },
 }));
-
-/** Đọc một tệp: số trang và hình thu nhổ trang đầu. */
-async function readFile(id: string): Promise<void> {
-  const update = (patch: Partial<FileEntry>): void => {
-    useFilesStore.setState((state) => ({
-      files: state.files.map((file) => (file.id === id ? { ...file, ...patch } : file)),
-    }));
-  };
-
-  const file = useFilesStore.getState().files.find((item) => item.id === id);
-  if (!file) return;
-
-  update({ state: 'reading' });
-
-  try {
-    const result = (await window.optb.files.readBytes(file.path)) as
-      | { ok: true; bytes: Uint8Array }
-      | { ok: false; reason: string; size: number };
-
-    if (!result.ok) {
-      update({ state: 'error', errorCode: result.reason === 'tooLarge' ? 'E_DISK' : 'E_PARSE' });
-      return;
-    }
-
-    const buffer = result.bytes.buffer.slice(
-      result.bytes.byteOffset,
-      result.bytes.byteOffset + result.bytes.byteLength,
-    ) as ArrayBuffer;
-
-    const opened = await pdfWorkerClient.open(id, buffer);
-
-    if (!opened.ok) {
-      update({ state: 'error', errorCode: opened.code as ErrorCode });
-      return;
-    }
-
-    const thumbnail = await pdfWorkerClient.renderThumbnail(id, 1);
-    update({ state: 'ready', pageCount: opened.pageCount, thumbnail: thumbnail ?? undefined });
-  } catch (error) {
-    update({ state: 'error', errorCode: 'E_UNKNOWN' });
-    void error;
-  }
-}

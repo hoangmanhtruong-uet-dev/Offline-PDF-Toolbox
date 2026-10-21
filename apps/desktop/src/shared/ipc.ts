@@ -1,4 +1,5 @@
 import type { AppSettings, FileMeta, LicenseStatus, RecentFile, TaskProgress, TaskResult } from './types';
+import type { MergeTaskPayload, RotateTaskPayload } from './tasks';
 
 /**
  * Tên kênh IPC và kiểu dữ liệu đi qua kênh.
@@ -18,6 +19,8 @@ export const IPC = {
   recentClear: 'recent:clear',
   appInfo: 'app:info',
   licenseGet: 'license:get',
+  taskStart: 'task:start',
+  taskCancel: 'task:cancel',
   taskProgress: 'task:progress',
   taskState: 'task:state',
 } as const;
@@ -54,6 +57,11 @@ export interface IpcInvokeMap {
   [IPC.recentClear]: { request: void; response: void };
   [IPC.appInfo]: { request: void; response: AppInfo };
   [IPC.licenseGet]: { request: void; response: LicenseStatus };
+  [IPC.taskStart]: {
+    request: { kind: 'merge'; payload: MergeTaskPayload } | { kind: 'rotate'; payload: RotateTaskPayload };
+    response: string;
+  };
+  [IPC.taskCancel]: { request: { taskId: string }; response: boolean };
 }
 
 /** Các kênh main đẩy lên renderer. */

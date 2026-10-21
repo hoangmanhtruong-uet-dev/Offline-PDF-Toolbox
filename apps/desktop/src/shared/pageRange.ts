@@ -167,3 +167,32 @@ export function chunkRanges(totalPages: number, size: number): PageRange[] {
   }
   return ranges;
 }
+
+/**
+ * Chuyển các khoảng thành tham số dải trang của qpdf.
+ *
+ * Khoảng mở (`10-`) được đóng lại bằng tổng số trang, vì qpdf không hiểu
+ * ký hiệu "mở".
+ */
+export function toQpdfRange(ranges: PageRange[], totalPages: number): string {
+  return ranges
+    .map((range) => {
+      const end = range.end === 0 ? totalPages : range.end;
+      return range.start === end ? `${range.start}` : `${range.start}-${end}`;
+    })
+    .join(',');
+}
+
+/**
+ * Danh sách số trang lẻ hoặc chẵn, theo số thứ tự trang trong tệp.
+ *
+ * Dùng cho thao tác xoay: qpdf hiểu `:odd`/`:even` theo vị trí trong tập kết
+ * quả, nên tính trước danh sách trang rõ ràng hơn.
+ */
+export function selectOddOrEven(totalPages: number, kind: 'odd' | 'even'): number[] {
+  const pages: number[] = [];
+  for (let page = kind === 'odd' ? 1 : 2; page <= totalPages; page += 2) {
+    pages.push(page);
+  }
+  return pages;
+}

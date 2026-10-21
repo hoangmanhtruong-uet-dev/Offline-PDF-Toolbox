@@ -29,6 +29,11 @@ const useStyles = makeStyles({
     textTransform: 'uppercase',
     letterSpacing: '0.04em',
   },
+  divider: {
+    // Divider của Fluent mặc định co giãn để lấp chỗ trống; ở đây cần nó
+    // chỉ chiếm đúng bề dày của nó.
+    flexGrow: 0,
+  },
 });
 
 export function OptionsPanel({ children }: { children: React.ReactNode }): React.JSX.Element {
@@ -38,7 +43,7 @@ export function OptionsPanel({ children }: { children: React.ReactNode }): React
   return (
     <aside className={styles.panel} data-testid="options-panel">
       <span className={styles.title}>{t('shell.options')}</span>
-      <Divider />
+      <Divider className={styles.divider} />
       {children}
     </aside>
   );

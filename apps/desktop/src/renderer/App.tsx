@@ -4,6 +4,7 @@ import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
 
 import { I18nProvider } from './i18n';
 import { HomeScreen } from './features/home/HomeScreen';
+import { ProScreen } from './features/pro/ProScreen';
 import { SettingsScreen } from './features/settings/SettingsScreen';
 import { ToolScreen } from './features/tools/ToolScreen';
 import { resolveDarkMode, useAppStore } from './state/appStore';
@@ -43,6 +44,7 @@ export function App(): React.JSX.Element {
             <Route path="/" element={<HomeScreen />} />
             <Route path="/tools/:toolId" element={<ToolScreen />} />
             <Route path="/settings" element={<SettingsScreen />} />
+            <Route path="/pro" element={<ProScreen />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </HashRouter>

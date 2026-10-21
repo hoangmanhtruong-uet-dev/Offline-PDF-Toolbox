@@ -25,7 +25,7 @@ type Pending = {
 };
 
 export type OpenResult =
-  | { ok: true; pageCount: number }
+  | { ok: true; pageCount: number; hasSignature: boolean }
   | { ok: false; code: ErrorCode };
 
 export class PdfWorkerClient {
@@ -99,7 +99,7 @@ export class PdfWorkerClient {
     }
 
     if (response.type === 'open') {
-      return { ok: true, pageCount: response.pageCount };
+      return { ok: true, pageCount: response.pageCount, hasSignature: response.hasSignature };
     }
 
     return { ok: false, code: 'E_UNKNOWN' };

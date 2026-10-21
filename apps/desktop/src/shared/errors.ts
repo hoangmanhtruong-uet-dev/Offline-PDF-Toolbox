@@ -35,12 +35,15 @@ const MESSAGE_KEYS: Record<ErrorCode, string> = {
 export class AppError extends Error {
   readonly code: ErrorCode;
   readonly detail?: string;
+  /** Danh sách tệp liên quan, chỉ chứa tên tệp. */
+  readonly files?: string[];
 
-  constructor(code: ErrorCode, message?: string, detail?: string) {
+  constructor(code: ErrorCode, message?: string, detail?: string, files?: string[]) {
     super(message ?? code);
     this.name = 'AppError';
     this.code = code;
     this.detail = detail;
+    this.files = files;
   }
 }
 
@@ -87,10 +90,13 @@ export function toErrorPayload(error: unknown): ErrorPayload {
         ? error.message
         : String(error);
 
+  const files = error instanceof AppError ? error.files : undefined;
+
   return {
     code,
     messageKey: MESSAGE_KEYS[code],
     detail,
+    ...(files && files.length > 0 ? { files } : {}),
   };
 }
 

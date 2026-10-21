@@ -1,4 +1,14 @@
-import { Button, Spinner, Text, makeStyles, shorthands, tokens } from '@fluentui/react-components';
+import { useState } from 'react';
+
+import {
+  Button,
+  Input,
+  Spinner,
+  Text,
+  makeStyles,
+  shorthands,
+  tokens,
+} from '@fluentui/react-components';
 import { ArrowDownRegular, ArrowUpRegular, DismissRegular } from '@fluentui/react-icons';
 
 import type { FileEntry } from '@shared/types';
@@ -10,6 +20,9 @@ import { useErrorMessage, useI18n } from '../i18n';
  *
  * Mỗi dòng có tên, số trang, dung lượng, hình thu nhổ trang đầu; có nút xóa
  * và nút di chuyển lên/xuống để dùng được bằng bàn phím (F-01, F-04).
+ *
+ * Với công cụ gộp, mỗi dòng có thêm ô dải trang để chọn trang của riêng tệp
+ * đó.
  */
 const useStyles = makeStyles({
   list: {
@@ -29,6 +42,10 @@ const useStyles = makeStyles({
     borderRadius: tokens.borderRadiusMedium,
     backgroundColor: tokens.colorNeutralBackground1,
     ...shorthands.border('1px', 'solid', tokens.colorNeutralStroke2),
+  },
+  dragging: {
+    opacity: 0.5,
+    ...shorthands.border('1px', 'solid', tokens.colorBrandStroke1),
   },
   thumbnail: {
     width: '48px',
@@ -73,6 +90,10 @@ const useStyles = makeStyles({
     color: tokens.colorPaletteRedForeground2,
     fontSize: tokens.fontSizeBase200,
   },
+  range: {
+    width: '140px',
+    flexShrink: 0,
+  },
   actions: {
     display: 'flex',
     alignItems: 'center',
@@ -89,12 +110,25 @@ export interface FileListProps {
   files: FileEntry[];
   onRemove: (id: string) => void;
   onMove: (from: number, to: number) => void;
+  /** Hiện ô nhập dải trang cho từng tệp. */
+  showPageRange?: boolean;
+  onPageRangeChange?: (id: string, range: string) => void;
+  /** Cho phép kéo thả để đổi thứ tự. */
+  reorderable?: boolean;
 }
 
-export function FileList({ files, onRemove, onMove }: FileListProps): React.JSX.Element {
+export function FileList({
+  files,
+  onRemove,
+  onMove,
+  showPageRange = false,
+  onPageRangeChange,
+  reorderable = false,
+}: FileListProps): React.JSX.Element {
   const styles = useStyles();
   const { t, formatBytes } = useI18n();
   const errorText = useErrorMessage();
+  const [draggingIndex, setDraggingIndex] = useState<number | null>(null);
 
   if (files.length === 0) {
     return (
@@ -107,7 +141,28 @@ export function FileList({ files, onRemove, onMove }: FileListProps): React.JSX.
   return (
     <ul className={styles.list} data-testid="file-list">
       {files.map((file, index) => (
-        <li key={file.id} className={styles.row} data-testid="file-row">
+        <li
+          key={file.id}
+          className={`${styles.row} ${draggingIndex === index ? styles.dragging : ''}`}
+          data-testid="file-row"
+          draggable={reorderable}
+          onDragStart={() => setDraggingIndex(index)}
+          onDragEnd={() => {
+            setDraggingIndex(null);
+          }}
+          onDragOver={(event) => {
+            if (!reorderable) return;
+            event.preventDefault();
+          }}
+          onDrop={(event) => {
+            if (!reorderable) return;
+            event.preventDefault();
+            if (draggingIndex !== null && draggingIndex !== index) {
+              onMove(draggingIndex, index);
+            }
+            setDraggingIndex(null);
+          }}
+        >
           {file.thumbnail ? (
             <img className={styles.thumbnail} src={file.thumbnail} alt="" />
           ) : (
@@ -128,9 +183,22 @@ export function FileList({ files, onRemove, onMove }: FileListProps): React.JSX.
               <span className={styles.meta}>
                 {file.pageCount !== null ? `${t('files.pages', { count: file.pageCount })} · ` : ''}
                 {formatBytes(file.size)}
+                {file.hasSignature ? ` · ${t('files.signed')}` : ''}
               </span>
             )}
           </span>
+
+          {showPageRange ? (
+            <Input
+              className={styles.range}
+              size="small"
+              placeholder={t('files.rangePlaceholder')}
+              value={file.pageRange ?? ''}
+              onChange={(_event, data) => onPageRangeChange?.(file.id, data.value)}
+              aria-label={t('files.rangeLabel')}
+              data-testid={`range-${file.name}`}
+            />
+          ) : null}
 
           <span className={styles.actions}>
             <Button

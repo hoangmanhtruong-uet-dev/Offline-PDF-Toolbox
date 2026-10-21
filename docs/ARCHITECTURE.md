@@ -242,13 +242,32 @@ Renderer chỉ nhận `messageKey` để việc dịch không bị kẹt trong t
 
 ```ts
 // KHÔNG dùng shell: true — tránh chuyển chuỗi lệnh
-spawn(qpdfPath, ['--empty', '--pages', fileA, fileB, '--', outTmp], { shell: false });
+spawn(qpdfPath, ['--empty', '--pages', '--file=...', '--'], { shell: false });
 ```
 
 - Luôn truyền mảng tham số, không nối chuỗi.
-- Nạp `qpdf.exe` từ `resources/qpdf/` (đóng kèm), không từ PATH.
-- Dùng `--password=...` khi cần; xóa biến mật khẩu khỏi bộ nhớ sau khi tác vụ xong.
+- Nạp `qpdf.exe` từ `resources/qpdf/` (đóng kèm), không từ PATH. Đường dẫn là `join(app.getAppPath(), 'resources', 'qpdf', 'qpdf.exe')`.
+- Dùng `--password-file` (tệp tạm) thay vì `--password` để **mật khẩu không bao giờ nằm trên dòng lệnh** — nếu không nó sẽ bị lộ trong danh sách tiến trình của máy.
 - Bản ghi lỗi chỉ giữ mã lỗi, không giữ nội dung tài liệu.
+
+**Hạn chế của qpdf 12.4.2:** bên trong khối `--pages`, qpdf chỉ nhận `--password=` (tức là mật khẩu trên dòng lệnh), không nhận `--password-file=`. Vì vậy tệp được bảo vệ bằng mật khẩu được **giải mã vào thư mục tạm** trước (`qpdf --password-file=... --decrypt`), rồi mới gộp bản đã giải mã. Mật khẩu vẫn không bao giờ lộ ra ngoài.
+
+### Ba lệnh qpdf được dùng
+
+| Việc | Lệnh |
+| --- | --- |
+| Gộp | `qpdf --empty --pages --file=A [--range=1-3] --file=B -- out.pdf` |
+| Xoay | `qpdf --rotate=+90:1,3 in.pdf out.pdf` (không có dải trang nghĩa là xoay tất cả) |
+| Kiểm tra | `qpdf --check file.pdf` (mã thoát 0 = sạch, 2 = lỗi, 3 = cảnh báo) |
+| Đếm trang | `qpdf --show-npages file.pdf` |
+
+Góc xoay dùng dấu `+` (cộng thêm vào `/Rotate` theo modulo 360) đúng như đặc tả yêu cầu: xoay hai lần 90 độ cho kết quả giống xoay 180 độ.
+
+### Lấy qpdf và giấy phép
+
+qpdf **không** đưa vào git. Script `scripts/fetch-qpdf.mjs` tải bản phát hành chính thức, kiểm tra SHA-256 đã ghim, giải nén và ghi kèm giấy phép Apache-2.0 cùng `VERSION.txt`. Chạy tự động trước khi build và trong CI.
+
+Phiên bản dùng: **qpdf 12.4.2**, bản `msvc64` (tự chứa, không cần DLL MinGW).
 
 ## 7. Quy trình nén (chi tiết)
 

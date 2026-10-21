@@ -62,6 +62,14 @@ export interface FileEntry extends FileMeta {
   errorCode?: ErrorCode;
   /** Hình thu nhổ trang đầu, dạng data URL. */
   thumbnail?: string;
+  /**
+   * Dải trang người dùng chọn cho tệp này, ví dụ `1-3, 7`.
+   *
+   * Rỗng nghĩa là lấy toàn bộ.
+   */
+  pageRange?: string;
+  /** Tệp có chữ ký số hay không. */
+  hasSignature?: boolean;
 }
 
 /** Tiến độ tác vụ, phát từ main sang renderer. */
@@ -81,6 +89,12 @@ export interface ErrorPayload {
   messageKey: string;
   /** Chi tiết kỹ thuật, không bao giờ chứa nội dung tài liệu. */
   detail?: string;
+  /**
+   * Danh sách tệp liên quan tới lỗi, ví dụ các tệp bị hỏng.
+   *
+   * Chỉ chứa tên tệp, không chứa đường dẫn đầy đủ.
+   */
+  files?: string[];
 }
 
 /** Kết quả của một tác vụ. */

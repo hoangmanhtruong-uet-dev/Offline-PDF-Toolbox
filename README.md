@@ -94,6 +94,7 @@ Yêu cầu môi trường (kiểm tra lại khi bắt đầu tuần 1):
 
 ```bash
 npm install                # cài phụ thuộc
+npm run assets             # tải qpdf + chép bộ phông PDF.js (chạy trước khi build)
 npm run dev                # chạy Electron ở chế độ phát triển (có HMR)
 npm test                   # kiểm thử đơn vị (Vitest)
 npm run test:e2e           # kiểm thử đầu-cuối (Playwright cho Electron)
@@ -103,11 +104,10 @@ npm run build              # dựng gói ứng dụng
 npm run fixtures           # sinh lại bộ tệp PDF kiểm thử
 ```
 
-Lệnh tuần 3 trở đi (cần qpdf trong `apps/desktop/resources/qpdf/`):
+Lệnh tuần 8 trở đi (cần Windows SDK cho gói MSIX):
 
 ```bash
-npm run make               # dựng gói phát hành
-$env:OPTB_BUILD_MSIX='1'; npm run make   # kèm gói MSIX (cần Windows SDK)
+$env:OPTB_BUILD_MSIX='1'; npm run make   # dựng gói phát hành kèm MSIX
 ```
 
 ### Trạng thái hiện tại
@@ -120,7 +120,10 @@ $env:OPTB_BUILD_MSIX='1'; npm run make   # kèm gói MSIX (cần Windows SDK)
 | Đọc tệp, số trang, hình thu nhổ | **Xong**, có kiểm thử đầu-cuối |
 | Giao diện S-01 + khung màn hình công cụ | **Xong** |
 | i18n 5 ngôn ngữ, sáng/tối | **Xong** |
-| Gộp/tách/xoay/nén thật (F-01 … F-04) | Tuần 3–6, cần qpdf |
+| Gộp PDF (F-01) | **Xong** — dải trang, thứ tự, ghi an toàn, bỏ qua tệp hỏng |
+| Xoay PDF (F-04) | **Xong** — chọn trang, góc 90/180/270, cộng modulo 360 |
+| Tách PDF (F-02) | Tuần 4 |
+| Nén PDF (F-03) | Tuần 5–6, cần sharp |
 | Giấy phép Store (F-08 tuần 8) | Tuần 8, cần `StoreBridge` |
 
 ## 6. Quy trình làm việc

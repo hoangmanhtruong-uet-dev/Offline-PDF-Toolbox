@@ -2,11 +2,15 @@
  * Sinh bộ tệp PDF kiểm thử.
  *
  * Tự sinh để không dùng tài liệu thật của người khác (TESTING.md mục 1).
- * Chạy: `pnpm fixtures`.
+ * Chạy: `npm run fixtures`.
  */
+import { execFile } from 'node:child_process';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { promisify } from 'node:util';
+
+const execFileAsync = promisify(execFile);
 
 const here = dirname(fileURLToPath(import.meta.url));
 const fixturesDir = join(here, '..', 'fixtures');
@@ -15,8 +19,10 @@ const fixturesDir = join(here, '..', 'fixtures');
 interface PageSpec {
   /** Văn bản hiển thị trên trang. */
   text: string;
-  /** Vẽ hình chữ nhật đen, mô phỏng trang scan. */
+  /** Vẽ hình chữ nhật xám, mô phỏng trang scan. */
   filled?: boolean;
+  /** Kích thước trang theo điểm ảnh. Mặc định là Letter (612 x 792). */
+  size?: [number, number];
 }
 
 /** Tạo một tệp PDF hợp lệ với số trang cho trước. */
@@ -34,8 +40,9 @@ export function buildPdf(pages: PageSpec[]): Buffer {
   objects.push(`<< /Type /Pages /Kids [${kids}] /Count ${pageCount} >>`);
 
   pages.forEach((_page, index) => {
+    const [width, height] = pages[index]?.size ?? [612, 792];
     objects.push(
-      `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] ` +
+      `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${width} ${height}] ` +
         `/Resources << /Font << /F1 ${fontObject} 0 R >> >> ` +
         `/Contents ${contentStart + index} 0 R >>`,
     );
@@ -81,7 +88,10 @@ export function buildTruncatedPdf(): Buffer {
 /** Danh sách tệp sẽ sinh. */
 const files: { name: string; data: Buffer }[] = [
   { name: 'text-1page.pdf', data: buildPdf([{ text: 'Page one' }]) },
-  { name: 'text-5pages.pdf', data: buildPdf(Array.from({ length: 5 }, (_, i) => ({ text: `Text page ${i + 1}` }))) },
+  {
+    name: 'text-5pages.pdf',
+    data: buildPdf(Array.from({ length: 5 }, (_, i) => ({ text: `Text page ${i + 1}` }))),
+  },
   {
     name: 'mixed-3pages.pdf',
     data: buildPdf([
@@ -97,6 +107,10 @@ const files: { name: string; data: Buffer }[] = [
       { text: 'Scan two', filled: true },
     ]),
   },
+  // Ba khổ giấy khác nhau, dùng cho ca kiểm thử T-01.
+  { name: 'page-size-letter.pdf', data: buildPdf([{ text: 'Letter page', size: [612, 792] }]) },
+  { name: 'page-size-a4.pdf', data: buildPdf([{ text: 'A4 page', size: [595, 842] }]) },
+  { name: 'page-size-a3.pdf', data: buildPdf([{ text: 'A3 page', size: [842, 1191] }]) },
   { name: 'broken-truncated.pdf', data: buildTruncatedPdf() },
   { name: 'broken-not-a-pdf.pdf', data: Buffer.from('Day la khong phai mot tep PDF.', 'utf8') },
   { name: 'unicode-tiếng-việt.pdf', data: buildPdf([{ text: 'Hop dong hop nhat' }]) },
@@ -104,11 +118,41 @@ const files: { name: string; data: Buffer }[] = [
 
 async function main(): Promise<void> {
   await mkdir(fixturesDir, { recursive: true });
+
   for (const file of files) {
     await writeFile(join(fixturesDir, file.name), file.data);
     console.log(`da tao ${file.name} (${file.data.length} byte)`);
   }
-  console.log(`\n${files.length} tep da tao trong ${fixturesDir}`);
+
+  await createEncryptedFixture();
+
+  console.log(`\n${files.length + 1} tep da tao trong ${fixturesDir}`);
+}
+
+/**
+ * Tạo một tệp được bảo vệ bằng mật khẩu, dùng qpdf có sẵn.
+ *
+ * Không có qpdf thì bỏ qua: ca kiểm thử liên quan sẽ tự bỏ qua.
+ */
+async function createEncryptedFixture(): Promise<void> {
+  const qpdf = join(here, '..', '..', 'resources', 'qpdf', 'qpdf.exe');
+  const source = join(fixturesDir, 'text-1page.pdf');
+  const target = join(fixturesDir, 'locked-user-password.pdf');
+
+  try {
+    await execFileAsync(qpdf, [
+      '--encrypt',
+      'mat-khau-nguoi-dung',
+      'mat-khau-chu-so-hieu',
+      '256',
+      '--',
+      source,
+      target,
+    ]);
+    console.log('da tao locked-user-password.pdf');
+  } catch {
+    console.log('bo qua tep co mat khau (khong tim thay qpdf)');
+  }
 }
 
 void main();

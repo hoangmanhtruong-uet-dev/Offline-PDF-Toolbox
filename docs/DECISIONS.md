@@ -144,6 +144,28 @@ Giữ danh sách này để tra cứu khi cần giải thích hoặc đổi hư�
   - Bất tiện: bộ shim là điểm phụ thuộc vào hành vi nội bộ của PDF.js, phải kiểm tra lại khi nâng cấp phiên bản.
 - **Phương án đã cân nhắc:** chạy PDF.js trên luồng giao diện (đơn giản hơn nhưng vẽ ảnh sẽ đơ giao diện khi lưới trang lớn); dùng thư viện vẽ PDF khác (thêm giấy phép và phụ thuộc).
 
+## ADR-013: Mật khẩu tệp PDF được truyền cho qpdf bằng tệp tạm, không nằm trên dòng lệnh
+
+- **Trạng thái:** Đã chấp nhận
+- **Ngày:** 2026-10-21
+- **Bối cảnh:** qpdf hỗ trợ `--password=` (mật khẩu trên dòng lệnh) và `--password-file=` (mật khẩu trong tệp). Mật khẩu trên dòng lệnh bị lộ trong danh sách tiến trình của máy — bất kỳ ứng dụng nào khác cũng đọc được. Nhưng bên trong khối `--pages`, qpdf 12.4.2 chỉ nhận `--password=`.
+- **Quyết định:** Tệp được bảo vệ bằng mật khẩu được **giải mã vào thư mục tạm** (`qpdf --password-file=... --decrypt`) rồi mới gộp bản đã giải mã. Mật khẩu chỉ tồn tại trong bộ nhớ và trong tệp tạm, tệp tạm bị xóa cùng thư mục tạm của tác vụ.
+- **Hệ quả:**
+  - Tốt: mật khẩu không bao giờ xuất hiện trên dòng lệnh; bản giải mã tạm nằm trong thư mục tạm của tác vụ và bị dọn khi tác vụ kết thúc.
+  - Bất tiện: tốn thêm một lượt ghi/đọc tệp cho mỗi tệp có mật khẩu; tệp đã giải mã tồn tại trong thư mục tạm một khoảnh thời gian.
+- **Phương án đã cân nhắc:** truyền `--password=` trực tiếp (đơn giản hơn nhưng lộ mật khẩu); dùng `qpdf --decrypt` với mật khẩu đọc từ stdin (qpdf không hỗ trợ).
+
+## ADR-014: Công cụ xoay chỉ giữ một tệp, không dùng chung danh sách với công cụ gộp
+
+- **Trạng thái:** Đã chấp nhận
+- **Ngày:** 2026-10-21
+- **Bối cảnh:** F-04 xoay trang trong **một** tệp. Bản đầu tiên dùng chung danh sách tệp với công cụ gộp và lấy tệp đầu tiên, khiến người dùng dễ tưởng đang xoay nhầm tệp.
+- **Quyết định:** Công cụ xoay có trạng thái riêng (`rotateStore`) giữ đúng một tệp; thêm tệp mới thay thế tệp cũ. Tên tệp đang xoay luôn hiện rõ trên màn hình.
+- **Hệ quả:**
+  - Tốt: không thể xoay nhầm tệp; tác vụ xoay thuộc một tệp đúng như đặc tả.
+  - Bất tiện: thêm một store riêng và một đường đọc tệp dùng chung (`services/fileReader.ts`).
+- **Phương án đã cân nhắc:** giữ danh sách chung và ghi rõ "chỉ tệp đầu tiên được xoay" — dễ nhầm, đã bị bỏ.
+
 ---
 
 ## Mục lục ADR
@@ -162,6 +184,8 @@ Giữ danh sách này để tra cứu khi cần giải thích hoặc đổi hư�
 | ADR-010 | Logic xử lý độc lập framework giao diện | Đã chấp nhận |
 | ADR-011 | Giao thức nội bộ `app://` | Đã chấp nhận |
 | ADR-012 | PDF.js trong worker riêng kèm bộ shim | Đã chấp nhận |
+| ADR-013 | Mật khẩu qua `--password-file` + giải mã tạm | Đã chấp nhận |
+| ADR-014 | Công cụ xoay giữ một tệp riêng | Đã chấp nhận |
 
 ## Rủi ro đã biết (theo dõi)
 

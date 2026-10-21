@@ -54,7 +54,7 @@ export type ThumbnailRequest =
   | { id: string; type: 'close' };
 
 export type ThumbnailResponse =
-  | { id: string; type: 'open'; ok: true; pageCount: number }
+  | { id: string; type: 'open'; ok: true; pageCount: number; hasSignature: boolean }
   | { id: string; type: 'render'; ok: true; blob: Blob }
   | { id: string; type: 'close'; ok: true }
   | {
@@ -140,7 +140,19 @@ async function openDocument(
     const document = await loadingTask.promise;
     documents.set(id, { document, loadingTask });
 
-    return { id, type: 'open', ok: true, pageCount: document.numPages };
+    // Phát hiện chữ ký số: các trường biểu mẫu có fieldType là "Sig".
+    // Thao tác ghi tệp mới sẽ làm mất hiệu lực chữ ký, nên cần cảnh báo.
+    let hasSignature = false;
+    try {
+      const fields = await document.getFieldObjects();
+      hasSignature = Object.values(fields ?? {}).some(
+        (field) => (field as { fieldType?: string }).fieldType === 'Sig',
+      );
+    } catch {
+      hasSignature = false;
+    }
+
+    return { id, type: 'open', ok: true, pageCount: document.numPages, hasSignature };
   } catch (error) {
     return { id, ok: false, code: classify(error), detail: describe(error) };
   }

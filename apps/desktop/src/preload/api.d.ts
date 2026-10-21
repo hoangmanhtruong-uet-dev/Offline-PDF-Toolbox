@@ -28,6 +28,10 @@ export interface OptbApi {
     info(): Promise<AppInfo>;
     license(): Promise<LicenseStatus>;
   };
+  tasks: {
+    start(request: unknown): Promise<string>;
+    cancel(taskId: string): Promise<boolean>;
+  };
   onTaskProgress(callback: (progress: unknown) => void): () => void;
   onTaskState(callback: (result: unknown) => void): () => void;
 }

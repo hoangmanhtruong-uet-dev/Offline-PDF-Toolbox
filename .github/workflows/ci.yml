@@ -27,6 +27,9 @@ jobs:
       - name: Cài phụ thuộc
         run: npm ci
 
+      - name: Tải qpdf và tài nguyên PDF.js
+        run: npm run assets --workspace @optb/desktop
+
       - name: Sinh bộ tệp kiểm thử
         run: npm run fixtures --workspace @optb/desktop
 

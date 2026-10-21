@@ -64,15 +64,21 @@ Danh sách công việc đã rã nhỏ đủ để giao cho một lượt làm v
 
 | ID | P | Việc | E | Cổng | Trạng thái |
 | --- | --- | --- | --- | --- | --- |
-| T3-01 | M | Bọc qpdf: gọi bằng `spawn` (không `shell`), phân tích mã thoát, không nạp tệp vào bộ nhớ JS | 4h | T3 | Chưa |
-| T3-02 | M | Ghi tệp an toàn: tệp tạm → kiểm tra lại → đổi tên; không ghi đè; làm sạch tên tệp; chặn `..` và tên thiết bị đặc biệt | 5h | T3 | Chưa |
-| T3-03 | M | F-01 danh sách tệp: kéo thả, sắp xếp lại, sắp xếp nhanh theo tên/ngày/dung lượng | 5h | T3 | Chưa |
-| T3-04 | M | F-01 ô dải trang `1-3, 7, 10-` + báo lỗi ngay khi vượt số trang | 3h | T3 | Chưa |
-| T3-05 | M | F-01 xử lý tệp có mật khẩu và tệp hỏng: hỏi mật khẩu (chỉ giữ trong bộ nhớ), bỏ qua và tiếp tục | 4h | T3 | Chưa |
-| T3-06 | M | F-04 xoay: chọn nhóm trang, góc 90/270/180, cộng modulo 360 vào `/Rotate` | 4h | T3 | Chưa |
-| T3-07 | S | F-04 nút xoay trên từng hình thu nhổ, xoay ngay để xem trước | 3h | T3 | Chưa |
-| T3-08 | M | Phát hiện chữ ký số + cảnh báo trước khi ghi tệp mới (áp dụng cho mọi thao tác ghi) | 4h | T3 | Chưa |
-| T3-09 | M | Kiểm thử tự động: T-01, T-02, T-06, T-07, T-12 | 6h | T3 | Chưa |
+| T3-01 | M | Bọc qpdf: gọi bằng `spawn` (không `shell`), phân tích mã thoát, không nạp tệp vào bộ nhớ JS | 4h | T3 | Xong |
+| T3-02 | M | Ghi tệp an toàn: tệp tạm → kiểm tra lại → đổi tên; không ghi đè; làm sạch tên tệp; chặn `..` và tên thiết bị đặc biệt | 5h | T3 | Xong |
+| T3-03 | M | F-01 danh sách tệp: kéo thả, sắp xếp lại, sắp xếp nhanh theo tên/ngày/dung lượng | 5h | T3 | Xong |
+| T3-04 | M | F-01 ô dải trang `1-3, 7, 10-` + báo lỗi ngay khi vượt số trang | 3h | T3 | Xong |
+| T3-05 | M | F-01 xử lý tệp có mật khẩu và tệp hỏng: hỏi mật khẩu (chỉ giữ trong bộ nhớ), bỏ qua và tiếp tục | 4h | T3 | Xong (mục 5) |
+| T3-06 | M | F-04 xoay: chọn nhóm trang, góc 90/270/180, cộng modulo 360 vào `/Rotate` | 4h | T3 | Xong |
+| T3-07 | S | F-04 nút xoay trên từng hình thu nhổ, xoay ngay để xem trước | 3h | T3 | Chuyển (mục 5) |
+| T3-08 | M | Phát hiện chữ ký số + cảnh báo trước khi ghi tệp mới (áp dụng cho mọi thao tác ghi) | 4h | T3 | Xong |
+| T3-09 | M | Kiểm thử tự động: T-01, T-02, T-06, T-07, T-12 | 6h | T3 | Xong |
+
+**Ghi chú mục 5 (T3-05):** phần hỏi mật khẩu *trên giao diện* chưa làm. Luồng kỹ thuật đã hoàn chỉnh: mật khẩu được truyền cho qpdf bằng `--password-file` (tệp tạm, xóa ngay, không bao giờ nằm trên dòng lệnh), và tệp có mật khẩu được giải mã vào thư mục tạm trước khi gộp. Còn thiếu là hộp thoại nhập mật khẩu trong giao diện — nằm trong backlog của tuần 4, cùng với F-02 (tách), vì cả hai đều cần hộp thoại này.
+
+**Ghi chú mục 5 (T3-07):** nút xoay trên từng hình thu nhổ cần lưới trang (F-05, `PageGrid`), dự kiến ở tuần 4. Tuần 3 chỉ có lưới hình thu nhổ **trang đầu** của từng tệp, nên chưa có chỗ để đặt nút xoay.
+
+**Ghi chú mục 5 (T3-08):** phát hiện chữ ký số dùng trường biểu mẫu `fieldType === 'Sig'` của PDF.js, thực hiện trong worker nên không tốn thêm công sức. Việc tạo một tệp PDF có chữ ký số hợp lệ để kiểm thử chưa làm được vì cần chứng thư số — sẽ bổ sung khi có tài liệu thật.
 
 ## 6. Tuần 4 — Tách (F-02) và bản 0.5
 

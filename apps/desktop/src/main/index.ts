@@ -5,8 +5,10 @@ import type { AppInfo } from '@shared/ipc';
 import type { AppSettings, LicenseStatus } from '@shared/types';
 
 import { registerFileHandlers } from './ipc/files';
+import { registerTaskHandlers } from './ipc/tasks';
 import { ErrorLog } from './services/errorLog';
 import { installNetworkGuard } from './services/networkGuard';
+import { QpdfRunner } from './services/qpdfRunner';
 import { SettingsStore } from './services/settingsStore';
 import { TaskQueue } from './services/taskQueue';
 import { TempManager } from './services/tempManager';
@@ -24,6 +26,7 @@ const settingsStore = new SettingsStore(app.getPath('userData'));
 const tempManager = new TempManager();
 const taskQueue = new TaskQueue({ tempManager });
 const errorLog = new ErrorLog(app.getPath('userData'));
+const qpdf = new QpdfRunner(QpdfRunner.resolveBinaryPath(app.getAppPath()));
 
 let mainWindow: Electron.BrowserWindow | null = null;
 
@@ -69,8 +72,18 @@ function registerSettingsHandlers(): void {
 function registerLicenseHandlers(): void {
   // Bản 1.0 chưa nối StoreBridge (tuần 8). Trạng thái luôn là Free và
   // người dùng vẫn dùng được đầy đủ các tính năng trong giới hạn Free.
+  //
+  // Cờ môi trường `OPTB_TEST_PRO` chỉ dùng cho kiểm thử tự động: bật ở
+  // bản chạy thử để kiểm tra các luồng chỉ Pro mới cho phép. Nó bị bỏ qua
+  // hoàn toàn trong bản đóng gói.
+  const testPro = !app.isPackaged && process.env.OPTB_TEST_PRO === '1';
+
   ipcMain.handle(IPC.licenseGet, async (): Promise<LicenseStatus> => {
-    return { isPro: false, lastVerifiedAt: null, state: 'unknown' };
+    return {
+      isPro: testPro,
+      lastVerifiedAt: testPro ? Date.now() : null,
+      state: testPro ? 'active' : 'unknown',
+    };
   });
 }
 
@@ -112,6 +125,7 @@ async function bootstrap(): Promise<void> {
   });
   registerSettingsHandlers();
   registerLicenseHandlers();
+  registerTaskHandlers(taskQueue, qpdf);
   forwardTaskEvents();
 
   mainWindow = createMainWindow();
