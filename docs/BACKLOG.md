@@ -20,11 +20,11 @@ Danh sách công việc đã rã nhỏ đủ để giao cho một lượt làm v
 
 | ID | P | Việc | E | Cổng | Trạng thái |
 | --- | --- | --- | --- | --- | --- |
-| T0-01 | M | Đăng ký tài khoản nhà phát triển Microsoft, hoàn tất xác minh danh tính | 3h | T1 | Chưa |
+| T0-01 | M | Đăng ký tài khoản nhà phát triển Microsoft, hoàn tất xác minh danh tính | 3h | T1 | Xong |
 | T0-02 | M | Hoàn tất hồ sơ nhận tiền + thuế trong Partner Center | 2h | T1 | Chưa |
-| T0-03 | M | Giữ chỗ tên; ghi lại `Identity Name` và `Publisher` | 1h | T1 | Chưa |
-| T0-04 | M | Kiểm tra trùng tên và rủi ro nhãn hiệu; viết ADR-009 | 1h | T1 | Chưa |
-| T0-05 | S | Tạo repo GitHub, bật CI chạy `windows-latest`, cấu hình lint + test | 2h | T1 | Chưa |
+| T0-03 | M | Giữ chỗ tên; ghi lại `Identity Name` và `Publisher` | 1h | T1 | Xong |
+| T0-04 | M | Kiểm tra trùng tên và rủi ro nhãn hiệu; viết ADR-009 | 1h | T1 | Xong |
+| T0-05 | S | Tạo repo GitHub, bật CI chạy `windows-latest`, cấu hình lint + test | 2h | T1 | Xong |
 | T0-06 | M | Thu thập bộ tệp thử tối thiểu (10 nhóm) — xem `TESTING.md` | 4h | T2 | Chưa |
 | T0-07 | S | Nghiên cứu từ khóa trên Microsoft Store, ghi lại 10 kết quả đầu mỗi từ khóa | 3h | T1 | Chưa |
 

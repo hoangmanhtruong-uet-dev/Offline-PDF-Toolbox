@@ -34,12 +34,12 @@ Tạo tài khoản nhà phát triển → giữ chỗ tên → đóng gói MSIX 
 
 ```xml
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10">
-  <Identity Name="<Identity Name từ Partner Center>"
-            Publisher="<Publisher từ Partner Center>"
+  <Identity Name="MTDStudio.OfflinePDFToolbox"
+            Publisher="CN=F6CFEAEE-C755-4C7E-BDC5-FD89DA169656"
             Version="1.0.0.0" />
   <Properties>
     <DisplayName>Offline PDF Toolbox</DisplayName>
-    <PublisherDisplayName>...</PublisherDisplayName>
+    <PublisherDisplayName>MTD Studio</PublisherDisplayName>
     <Logo>assets\StoreLogo.png</Logo>
   </Properties>
   <Dependencies>
@@ -50,7 +50,7 @@ Tạo tài khoản nhà phát triển → giữ chỗ tên → đóng gói MSIX 
     <Application Id="App" Executable="app\OfflinePdfToolbox.exe"
                  EntryPoint="Windows.FullTrustApplication">
       <uap:VisualElements DisplayName="Offline PDF Toolbox"
-                          Description="..." BackgroundColor="transparent"
+                          Description="Merge, split, compress and rotate PDFs entirely on your PC" BackgroundColor="transparent"
                           Square150x150Logo="assets\Square150x150Logo.png"
                           Square44x44Logo="assets\Square44x44Logo.png" />
     </Application>
@@ -60,6 +60,11 @@ Tạo tài khoản nhà phát triển → giữ chỗ tên → đóng gói MSIX 
   </Capabilities>
 </Package>
 ```
+
+> **Thông tin Store chính thức:**
+> - **Store ID:** `9P0G6ZR05JHK`
+> - **Store URL:** `https://apps.microsoft.com/detail/9P0G6ZR05JHK`
+> - **Package Family Name (PFN):** `MTDStudio.OfflinePDFToolbox_27k0mmmjqfnmj`
 
 > `runFullTrust` là bắt buộc với ứng dụng desktop. Phải **ghi rõ lý do** trong ghi chú cho người kiểm tra: ứng dụng cần truy cập hệ thống tệp cục bộ để xử lý tài liệu của người dùng, và chạy qpdf như tiến trình con.
 

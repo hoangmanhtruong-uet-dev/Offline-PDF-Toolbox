@@ -8,7 +8,7 @@ const config: ForgeConfig = {
   packagerConfig: {
     name: 'Offline PDF Toolbox',
     executableName: 'OfflinePdfToolbox',
-    appBundleId: 'com.offlinepdftoolbox.app',
+    appBundleId: 'com.mtdstudio.offlinepdftoolbox',
     appCategoryType: 'public.app-category.productivity',
     icon: 'assets/icon',
     // The Vite plugin sets this automatically to keep only the built output.
@@ -33,9 +33,9 @@ const config: ForgeConfig = {
             {
               packageAssets: 'assets',
               manifestVariables: {
-                packageIdentity: process.env.MSIX_IDENTITY_NAME || 'OfflinePDFToolbox',
-                publisher: process.env.MSIX_PUBLISHER || 'CN=Offline PDF Toolbox',
-                publisherDisplayName: process.env.MSIX_PUBLISHER_DISPLAY_NAME || 'Offline PDF Toolbox',
+                packageIdentity: process.env.MSIX_IDENTITY_NAME || 'MTDStudio.OfflinePDFToolbox',
+                publisher: process.env.MSIX_PUBLISHER || 'CN=F6CFEAEE-C755-4C7E-BDC5-FD89DA169656',
+                publisherDisplayName: process.env.MSIX_PUBLISHER_DISPLAY_NAME || 'MTD Studio',
                 packageDisplayName: 'Offline PDF Toolbox',
                 packageDescription: 'Merge, split, compress and rotate PDFs entirely on your PC',
               },
