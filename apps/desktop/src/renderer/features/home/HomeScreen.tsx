@@ -37,6 +37,9 @@ const useStyles = makeStyles({
     paddingBlock: appTokens.spacing.xxxl,
     paddingInline: appTokens.spacing.xl,
     width: '100%',
+    animationName: 'fadeIn',
+    animationDuration: '240ms',
+    animationTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
   },
   header: {
     display: 'flex',
@@ -287,6 +290,7 @@ export function HomeScreen(): React.JSX.Element {
               description={t(tool.descriptionKey)}
               shortcut={`Ctrl+${index + 1}`}
               testId={tool.id}
+              toolId={tool.id}
               onSelect={() => navigate(`/tools/${tool.id}`)}
             />
           ))}

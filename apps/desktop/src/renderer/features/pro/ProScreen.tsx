@@ -46,7 +46,11 @@ const useStyles = makeStyles({
     gap: tokens.spacingHorizontalM,
   },
   card: {
-    padding: tokens.spacingVerticalL,
+    padding: tokens.spacingVerticalXL,
+    borderRadius: '16px',
+    backgroundColor: tokens.colorNeutralBackground1,
+    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.04)',
+    border: `1px solid ${tokens.colorNeutralStroke2}`,
   },
   perksList: {
     display: 'flex',

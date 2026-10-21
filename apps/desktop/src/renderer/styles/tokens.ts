@@ -74,21 +74,63 @@ export const shadow = {
   overlay: '0 8px 40px rgba(0, 0, 0, 0.35)',
 } as const;
 
-/** Màu nhấn của ứng dụng — xanh đậm, gợi sự tin cậy. */
+/** Màu nhấn của ứng dụng — đỏ tươi đặc trưng thương hiệu PDF, tràn đầy sức sống. */
 export const brand = {
   light: {
-    foreground: '#0b5cab',
-    background: '#e8f1fb',
-    backgroundHover: '#d6e7f8',
-    backgroundPressed: '#c2dcf5',
-    stroke: '#0b5cab',
+    foreground: '#be123c',
+    background: '#e11d48',
+    backgroundHover: '#be123c',
+    backgroundPressed: '#9f1239',
+    stroke: '#e11d48',
+    tint: '#fff1f2',
   },
   dark: {
-    foreground: '#7fb3f0',
-    background: '#12283f',
-    backgroundHover: '#17324e',
-    backgroundPressed: '#1c3c5c',
-    stroke: '#4f8fd6',
+    foreground: '#fb7185',
+    background: '#e11d48',
+    backgroundHover: '#f43f5e',
+    backgroundPressed: '#fda4af',
+    stroke: '#f43f5e',
+    tint: '#381017',
+  },
+} as const;
+
+/** Màu nhận diện riêng cho từng công cụ trên nền sáng. */
+export const toolColors = {
+  merge: {
+    bg: '#eff6ff',
+    fg: '#2563eb',
+    border: '#dbeafe',
+    hoverBg: '#dbeafe',
+  },
+  split: {
+    bg: '#faf5ff',
+    fg: '#9333ea',
+    border: '#f3e8ff',
+    hoverBg: '#f3e8ff',
+  },
+  compress: {
+    bg: '#fffbeb',
+    fg: '#d97706',
+    border: '#fef3c7',
+    hoverBg: '#fef3c7',
+  },
+  rotate: {
+    bg: '#f0fdf4',
+    fg: '#16a34a',
+    border: '#dcfce7',
+    hoverBg: '#dcfce7',
+  },
+  pages: {
+    bg: '#eef2ff',
+    fg: '#4f46e5',
+    border: '#e0e7ff',
+    hoverBg: '#e0e7ff',
+  },
+  images: {
+    bg: '#fdf2f8',
+    fg: '#db2777',
+    border: '#fce7f3',
+    hoverBg: '#fce7f3',
   },
 } as const;
 
@@ -124,11 +166,29 @@ export function buildTheme(dark: boolean): Theme {
     colorBrandBackground: accent.background,
     colorBrandBackgroundHover: accent.backgroundHover,
     colorBrandBackgroundPressed: accent.backgroundPressed,
+    colorBrandBackground2: accent.tint,
     colorBrandStroke1: accent.stroke,
     colorBrandStroke2: accent.stroke,
+    colorNeutralForegroundOnBrand: '#ffffff',
     colorNeutralForeground1: text.primary,
     colorNeutralForeground2: text.secondary,
     colorNeutralForeground3: text.tertiary,
+    ...(dark
+      ? {
+          colorNeutralBackground1: '#1e222b',
+          colorNeutralBackground2: '#14171f',
+          colorNeutralBackground3: '#0f1117',
+          colorNeutralStroke1: '#2e3545',
+          colorNeutralStroke2: '#3d465c',
+        }
+      : {
+          colorNeutralBackground1: '#ffffff',
+          colorNeutralBackground2: '#f8fafc',
+          colorNeutralBackground3: '#f1f5f9',
+          colorNeutralBackground4: '#e2e8f0',
+          colorNeutralStroke1: '#e2e8f0',
+          colorNeutralStroke2: '#cbd5e1',
+        }),
   };
 }
 
@@ -142,4 +202,5 @@ export const appTokens = {
   shadow,
   brand,
   textColor,
+  toolColors,
 } as const;

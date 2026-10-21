@@ -19,7 +19,7 @@ const useStyles = makeStyles({
     borderInlineStartWidth: '1px',
     borderInlineStartStyle: 'solid',
     borderInlineStartColor: tokens.colorNeutralStroke2,
-    backgroundColor: tokens.colorNeutralBackground2,
+    backgroundColor: tokens.colorNeutralBackground1,
     overflowY: 'auto',
   },
   title: {

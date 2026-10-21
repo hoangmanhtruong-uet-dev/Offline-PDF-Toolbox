@@ -52,7 +52,7 @@ export function createMainWindow(): BrowserWindow {
     show: false,
     title: 'Offline PDF Toolbox',
     icon: resolveAppIcon(),
-    backgroundColor: '#f4f4f6',
+    backgroundColor: '#ffffff',
     autoHideMenuBar: true,
     webPreferences: {
       preload: join(__dirname, 'preload.cjs'),

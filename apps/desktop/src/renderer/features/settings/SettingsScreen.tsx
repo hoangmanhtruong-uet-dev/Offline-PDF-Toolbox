@@ -41,6 +41,9 @@ const useStyles = makeStyles({
     paddingBlock: appTokens.spacing.xxxl,
     paddingInline: appTokens.spacing.xl,
     width: '100%',
+    animationName: 'fadeIn',
+    animationDuration: '200ms',
+    animationTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
   },
   header: {
     display: 'flex',

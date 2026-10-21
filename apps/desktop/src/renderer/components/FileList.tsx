@@ -39,9 +39,16 @@ const useStyles = makeStyles({
     gap: tokens.spacingHorizontalM,
     padding: tokens.spacingVerticalS,
     paddingInline: tokens.spacingHorizontalM,
-    borderRadius: tokens.borderRadiusMedium,
+    borderRadius: '10px',
     backgroundColor: tokens.colorNeutralBackground1,
     ...shorthands.border('1px', 'solid', tokens.colorNeutralStroke2),
+    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.02)',
+    transitionProperty: 'border-color, box-shadow, transform',
+    transitionDuration: '150ms',
+    ':hover': {
+      ...shorthands.borderColor(tokens.colorBrandStroke1),
+      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
+    },
   },
   dragging: {
     opacity: 0.5,

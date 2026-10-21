@@ -58,10 +58,14 @@ const useStyles = makeStyles({
   list: {
     display: 'flex',
     flexDirection: 'column',
-    gap: appTokens.spacing.xs,
+    gap: '2px',
     listStyleType: 'none',
     margin: 0,
-    padding: 0,
+    padding: appTokens.spacing.xs,
+    borderRadius: appTokens.radius.lg,
+    backgroundColor: tokens.colorNeutralBackground1,
+    ...shorthands.border('1px', 'solid', tokens.colorNeutralStroke2),
+    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.03)',
   },
   row: {
     display: 'flex',
@@ -70,8 +74,10 @@ const useStyles = makeStyles({
     padding: appTokens.spacing.s,
     paddingInline: appTokens.spacing.m,
     borderRadius: appTokens.radius.md,
+    transitionProperty: 'background-color',
+    transitionDuration: '150ms',
     ':hover': {
-      backgroundColor: tokens.colorNeutralBackground3,
+      backgroundColor: tokens.colorNeutralBackground2,
     },
   },
   thumbnail: {

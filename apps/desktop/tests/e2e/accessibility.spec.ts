@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { expect, test } from '@playwright/test';
@@ -6,23 +6,19 @@ import type { Page } from 'playwright';
 
 import { launchApp } from './helpers';
 
-/**
- * Kiểm tra khả năng tiếp cận bằng axe-core.
- *
- * Bắt lỗi tương phản WCAG AA trên giao diện thật, cho cả chủ đề sáng và
- * tối. Bổ sung cho bài kiểm tra ở mức token
- * (`tests/scripts/contrast-check.mjs`), vốn chỉ kiểm tra các cặp màu trong
- * design token.
- *
- * axe được nạp bằng `addInitScript` (chèn ở tầng debugger) vì CSP của ứng
- * dụng cấm inline script — đúng như thiết kế bảo mật.
- */
+/** Nạp mã axe-core từ node_modules. */
+function resolveAxeSource(): string {
+  const candidates = [
+    join(__dirname, '..', '..', '..', 'node_modules', 'axe-core', 'axe.min.js'),
+    join(process.cwd(), 'node_modules', 'axe-core', 'axe.min.js'),
+    join(process.cwd(), '..', '..', 'node_modules', 'axe-core', 'axe.min.js'),
+  ];
+  const found = candidates.find((c) => existsSync(c));
+  if (!found) throw new Error('Cannot find axe.min.js');
+  return readFileSync(found, 'utf8');
+}
 
-/** Nạp mã axe-core từ node_modules (npm workspaces đặt ở thư mục gốc). */
-const AXE_SOURCE = readFileSync(
-  join(process.cwd(), '..', '..', 'node_modules', 'axe-core', 'axe.min.js'),
-  'utf8',
-);
+const AXE_SOURCE = resolveAxeSource();
 
 /** Kết quả vi phạm của axe. */
 interface AxeViolation {

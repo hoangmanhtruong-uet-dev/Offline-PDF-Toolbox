@@ -19,6 +19,7 @@ const useStyles = makeStyles({
     borderTopStyle: 'solid',
     borderTopColor: tokens.colorNeutralStroke2,
     backgroundColor: tokens.colorNeutralBackground1,
+    boxShadow: '0 -2px 8px rgba(0, 0, 0, 0.02)',
   },
   summary: {
     flexGrow: 1,
