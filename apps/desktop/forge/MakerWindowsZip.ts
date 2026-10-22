@@ -1,5 +1,5 @@
 import { execFile } from 'node:child_process';
-import { rm } from 'node:fs/promises';
+import { mkdir, rm } from 'node:fs/promises';
 import path from 'node:path';
 import { promisify } from 'node:util';
 
@@ -41,6 +41,9 @@ export class MakerWindowsZip extends MakerBase<Record<string, never>> {
   }: MakerOptions): Promise<string[]> {
     const zipName = `${path.basename(dir)}-${packageJSON.version}.zip`;
     const zipPath = path.resolve(makeDir, 'zip', targetPlatform, targetArch, zipName);
+
+    // Bảo đảm thư mục đích tồn tại trước khi nén.
+    await mkdir(path.dirname(zipPath), { recursive: true });
 
     // CreateFromDirectory không ghi đè, nên dọn tệp cũ trước.
     await rm(zipPath, { force: true });
