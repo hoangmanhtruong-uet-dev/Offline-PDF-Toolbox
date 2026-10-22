@@ -1,3 +1,4 @@
+import path from 'node:path';
 import type { ForgeConfig } from '@electron-forge/shared-types';
 import { MakerMSIX } from '@electron-forge/maker-msix';
 import { VitePlugin } from '@electron-forge/plugin-vite';
@@ -31,8 +32,10 @@ const config: ForgeConfig = {
       ? [
           new MakerMSIX(
             {
-              packageAssets: 'assets',
+              packageAssets: path.resolve(__dirname, 'assets'),
+              appManifest: path.resolve(__dirname, 'AppxManifest.xml'),
               manifestVariables: {
+                appExecutable: 'OfflinePdfToolbox.exe',
                 packageIdentity: process.env.MSIX_IDENTITY_NAME || 'MTDStudio.OfflinePDFToolbox',
                 publisher: process.env.MSIX_PUBLISHER || 'CN=F6CFEAEE-C755-4C7E-BDC5-FD89DA169656',
                 publisherDisplayName: process.env.MSIX_PUBLISHER_DISPLAY_NAME || 'MTD Studio',

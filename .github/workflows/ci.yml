@@ -57,9 +57,10 @@ jobs:
         run: npm run test:e2e --workspace @optb/desktop
 
       - name: Đóng gói MSIX cho Microsoft Store
-        run: npm run make --workspace @optb/desktop
+        run: npm run make --workspace @optb/desktop -- --verbose
         env:
           OPTB_BUILD_MSIX: '1'
+          DEBUG: 'electron-windows-msix'
           MSIX_IDENTITY_NAME: 'MTDStudio.OfflinePDFToolbox'
           MSIX_PUBLISHER: 'CN=F6CFEAEE-C755-4C7E-BDC5-FD89DA169656'
           MSIX_PUBLISHER_DISPLAY_NAME: 'MTD Studio'

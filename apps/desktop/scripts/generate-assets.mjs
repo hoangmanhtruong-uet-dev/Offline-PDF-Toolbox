@@ -205,11 +205,15 @@ async function main() {
   await sharp(splashSvg).resize(620, 300).png().toFile(join(assetsDir, 'SplashScreen.png'));
   console.log('  ✓ SplashScreen.png (620x300)');
 
-  // 7. Master icon.png (512x512)
+  // 7. Square310x310Logo.png (Start Menu Large Tile)
+  await sharp(iconSvg).resize(310, 310).png().toFile(join(assetsDir, 'Square310x310Logo.png'));
+  console.log('  ✓ Square310x310Logo.png (310x310)');
+
+  // 8. Master icon.png (512x512)
   await sharp(iconSvg).resize(512, 512).png().toFile(join(assetsDir, 'icon.png'));
   console.log('  ✓ icon.png (512x512)');
 
-  // 8. icon.ico cho Windows Desktop executable
+  // 9. icon.ico cho Windows Desktop executable
   const icoSizes = [16, 32, 48, 64, 128, 256];
   const icoBuffers = [];
   for (const s of icoSizes) {
