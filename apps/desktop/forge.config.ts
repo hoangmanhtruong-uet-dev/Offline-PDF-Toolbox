@@ -32,6 +32,7 @@ const config: ForgeConfig = {
       ? [
           new MakerMSIX(
             {
+              windowsKitVersion: process.env.WINDOWS_KIT_VERSION || '10.0.26100.0',
               packageAssets: path.resolve(__dirname, 'assets'),
               appManifest: path.resolve(__dirname, 'AppxManifest.xml'),
               manifestVariables: {

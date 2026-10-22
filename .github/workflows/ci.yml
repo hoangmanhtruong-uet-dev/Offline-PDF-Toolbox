@@ -57,10 +57,17 @@ jobs:
         run: npm run test:e2e --workspace @optb/desktop
 
       - name: Đóng gói MSIX cho Microsoft Store
-        run: npm run make --workspace @optb/desktop -- --verbose
+        shell: pwsh
+        run: |
+          $kit = (Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin\10.*" -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Name | Sort-Object -Descending | Select-Object -First 1)
+          if (-not $kit) { $kit = "10.0.26100.0" }
+          Write-Host "Phat hien Windows SDK Version: $kit"
+          $env:WINDOWS_KIT_VERSION = $kit
+          npm run make --workspace @optb/desktop -- --verbose
         env:
           OPTB_BUILD_MSIX: '1'
           DEBUG: 'electron-windows-msix'
+          WINDOWS_KIT_VERSION: '10.0.26100.0'
           MSIX_IDENTITY_NAME: 'MTDStudio.OfflinePDFToolbox'
           MSIX_PUBLISHER: 'CN=F6CFEAEE-C755-4C7E-BDC5-FD89DA169656'
           MSIX_PUBLISHER_DISPLAY_NAME: 'MTD Studio'
