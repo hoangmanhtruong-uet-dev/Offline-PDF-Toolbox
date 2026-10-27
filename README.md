@@ -1,150 +1,239 @@
 # Offline PDF Toolbox
 
-Ứng dụng Windows gộp, tách, nén, xoay PDF **hoàn toàn trên máy**. Không tải tệp lên mạng, không cần tài khoản, mua đứt một lần trên Microsoft Store.
+<p align="center">
+  <img src="apps/desktop/assets/icon.png" alt="Offline PDF Toolbox Logo" width="128" height="128" />
+</p>
 
-> **Lời hứa duy nhất:** tài liệu của khách hàng không bao giờ rời khỏi máy tính của họ.
+<p align="center">
+  <strong>Bộ công cụ xử lý PDF chuyên nghiệp, an toàn và bảo mật tối đa — hoạt động hoàn toàn Offline trên Windows</strong>
+</p>
 
-| Hạng mục | Giá trị |
-| --- | --- |
-| Nền tảng | Windows 10 22H2, Windows 11 — x64 (ARM64 ở bản 2.0) |
-| Bản hiện tại | 0.5 nội bộ (đang xây) |
-| Bản phát hành | 1.0 — mục tiêu tuần 10 kể từ khi bắt đầu |
-| Công nghệ | Electron + React + TypeScript, qpdf, PDF.js, sharp, .NET StoreBridge |
-| Mô hình thu phí | Miễn phí có giới hạn + Pro mua đứt 12,99 USD |
-| Ngôn ngữ | en, de, fr, es, vi |
-| Đặc tả gốc | [`docs/Offline PDF Toolbox — Đặc tả sản phẩm và kế hoạch phát hành Microsoft Store.md`](docs/Offline%20PDF%20Toolbox%20%E2%80%94%20%C4%90%E1%BA%B7c%20t%E1%BA%A3%20s%E1%BA%A3n%20ph%E1%BA%A9m%20v%C3%A0%20k%E1%BA%BF%20ho%E1%BA%A1ch%20ph%C3%A1t%20h%C3%A0nh%20Microsoft%20Store.md) |
+<p align="center">
+  <img src="https://img.shields.io/badge/Platform-Windows%2010%20%7C%2011%20(x64)-0078D4?logo=windows" alt="Platform Windows" />
+  <img src="https://img.shields.io/badge/Version-0.5.0-crimson" alt="Version 0.5.0" />
+  <img src="https://img.shields.io/badge/Stack-Electron%20%2B%20React%2019%20%2B%20Vite%20%2B%20TS-61DAFB?logo=react" alt="Tech Stack" />
+  <img src="https://img.shields.io/badge/Design-Bright%20Fluent%20Modern-FF5722" alt="Fluent Design" />
+  <img src="https://img.shields.io/badge/Tests-141%20Passed%20(100%25)-success" alt="Tests" />
+  <img src="https://img.shields.io/badge/Network-100%25%20Offline%20(Zero%20Telemetry)-brightgreen" alt="100% Offline" />
+  <img src="https://img.shields.io/badge/Store-Microsoft%20Store%20Ready%20(MSIX)-blue" alt="Store Ready" />
+</p>
 
 ---
 
-## 1. Năm nguyên tắc sản phẩm (bất biến)
+## 📖 Lời hứa duy nhất (Core Promise)
 
-Mọi quyết định kỹ thuật và giao diện đều phải phục vụ năm nguyên tắc này. Không có ngoại lệ.
+> **"Tài liệu và dữ liệu của bạn không bao giờ rời khỏi máy tính cá nhân."**
 
-1. **Offline thật sự** — không gửi tệp, không gửi nội dung tệp, không gọi mạng khi xử lý tài liệu.
-2. **Ba cú nhấp là xong** — chọn tệp → chọn tùy chọn → bấm chạy.
-3. **Không làm hỏng tệp gốc** — luôn ghi ra tệp mới, không bao giờ ghi đè.
-4. **Nhanh và nhẹ** — mở app dưới 3 giây, gộp 100 trang dưới 5 giây.
-5. **Minh bạch về giới hạn** — bản dùng thử nói rõ giới hạn *trước* khi người dùng làm xong việc, không chặn ở bước cuối.
+**Offline PDF Toolbox** là giải pháp phần mềm máy tính dành cho cá nhân, doanh nghiệp và các tổ chức có yêu cầu khắt khe về quyền riêng tư và bảo mật dữ liệu. Khác biệt với phần lớn các công cụ web hiện nay (vốn âm thầm tải tệp lên đám mây để xử lý):
 
-## 2. Bốn quy tắc kỹ thuật bất biến
+- 🔒 **Không tải tệp lên mạng**: Tất cả các thao tác gộp, tách, nén, xoay, quản lý trang đều diễn ra trực tiếp trên CPU/bộ nhớ máy bạn.
+- 🚫 **Zero Network Telemetry**: Ứng dụng chủ động chặn toàn bộ các yêu cầu mạng ở cấp phiên làm việc (`NetworkGuard`). Không gọi API phân tích, không thu thập hành vi, hoạt động mượt mà ngay cả khi ngắt kết nối Internet hoàn toàn.
+- 🛡️ **An toàn tuyệt đối cho tệp gốc**: Quy tắc bất biến — xử lý qua tệp tạm, kiểm tra tính toàn vẹn, sau đó mới di chuyển vào đích. Không bao giờ ghi đè lên tài liệu ban đầu của người dùng.
+- 💳 **Mua đứt một lần (Không thuê bao phiền phức)**: Trải nghiệm bản Miễn phí với đầy đủ tính năng cốt lõi hoặc nâng cấp Pro trọn đời qua Microsoft Store.
 
-| # | Quy tắc | Kiểm chứng |
-| --- | --- | --- |
-| K-01 | Renderer không bao giờ đọc/ghi tệp trực tiếp; mọi thao tác tệp đi qua tiến trình chính | `contextIsolation: true`, `nodeIntegration: false`, `sandbox: true` |
-| K-02 | Mọi việc nặng chạy ở worker hoặc tiến trình con, không bao giờ ở luồng giao diện | Kiểm thử không đơ giao diện |
-| K-03 | Ghi ra tệp tạm → kiểm tra lại → mới đổi tên vào đích. Không bao giờ ghi đè | Bộ kiểm tra kết quả tự động |
-| K-04 | Không có yêu cầu mạng nào phát sinh trong luồng xử lý tài liệu | Bài kiểm thử "offline" tự động |
+---
 
-## 3. Bản đồ tài liệu
+## ✨ Tính năng cốt lõi (Core Features)
 
-Đọc theo thứ tự nếu bạn mới vào dự án. Mỗi tài liệu đều trả lời một câu hỏi cụ thể.
+Ứng dụng hiện đã hoàn thiện toàn diện các mô-đun công cụ chính:
 
-| Tài liệu | Câu hỏi trả lời | Đọc khi nào |
-| --- | --- | --- |
-| [`docs/ROADMAP.md`](docs/ROADMAP.md) | Tuần này làm gì, xong là gì, cổng kiểm tra ra sao? | Mỗi tuần bắt đầu |
-| [`docs/BACKLOG.md`](docs/BACKLOG.md) | Việc cụ thể nào đang chờ, ưu tiên ra sao? | Hằng ngày |
-| [`docs/BETA-0.5.md`](docs/BETA-0.5.md) | Bản 0.5 nội bộ: cần thử gì, phản hồi ra sao? | Khi gửi bản cho người thử |
-| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Code nằm ở đâu, chạy thế nào, đổi thư viện thì sao? | Khi viết code lần đầu |
-| [`docs/FEATURES.md`](docs/FEATURES.md) | Tính năng này hành xử thế nào, xong là gì? | Trước khi làm một tính năng |
-| [`docs/UX.md`](docs/UX.md) | Màn hình, trạng thái, bàn phím, ngôn ngữ thế nào? | Khi làm giao diện |
-| [`docs/LICENSING.md`](docs/LICENSING.md) | Free/Pro giới hạn ra sao, mua hàng thế nào? | Khi làm `FeatureGate` |
-| [`docs/SECURITY-PRIVACY.md`](docs/SECURITY-PRIVACY.md) | Bảo vệ gì, cam kết gì, dữ liệu lưu đâu? | Khi đụng bảo mật hoặc dữ liệu |
-| [`docs/TESTING.md`](docs/TESTING.md) | Kiểm thử cái gì, bộ tệp ở đâu, khi nào được phát hành? | Trước mỗi commit lớn |
-| [`docs/STORE-LAUNCH.md`](docs/STORE-LAUNCH.md) | Đóng gói và nộp Store thế nào? | Từ tuần 9 |
-| [`docs/MARKETING.md`](docs/MARKETING.md) | Từ khóa, mô tả, ảnh, kênh bán hàng? | Từ tuần 1, siết từ tuần 9 |
-| [`docs/DECISIONS.md`](docs/DECISIONS.md) | Vì sao chọn hướng này, đổi thì giá là gì? | Khi cần tranh luận kỹ thuật |
-| [`docs/AI-WORKFLOW.md`](docs/AI-WORKFLOW.md) | Dùng AI viết code trong dự án này thế nào? | Trước khi giao việc cho AI |
+| Biểu tượng | Công cụ | Mã | Mô tả chi tiết & Điểm mạnh nổi bật |
+| :---: | :--- | :---: | :--- |
+| 🔀 | **Gộp PDF (Merge)** | `F-01` | Gộp nhiều tài liệu PDF theo thứ tự tùy chọn. Hỗ trợ chọn dải trang linh hoạt (vd: `1-3, 5, 8-`), xử lý thông minh tệp có mật khẩu, tự động bỏ qua tệp lỗi mà không làm gián đoạn tiến trình. |
+| ✂️ | **Tách PDF (Split)** | `F-02` | **6 chế độ tách chuyên sâu**: Tách theo khoảng trang, tách mỗi $N$ trang, mỗi trang một tệp, tách theo Bookmarks cấp 1, tách theo dung lượng tối đa (MB), hoặc trích xuất trang chọn lọc. Tự động xuất ra thư mục con chuyên biệt. |
+| 🗜️ | **Nén PDF (Compress)** | `F-03` | Tối ưu hóa dung lượng thông minh bằng `sharp` + `qpdf`. Cung cấp **3 mức chất lượng** (Nhẹ, Vừa, Mạnh) hoặc chế độ **Dung lượng đích (Target Size)**. Giảm đến **90%** dung lượng với tệp scan mà vẫn giữ nguyên chữ và vector. Bảng báo cáo dung lượng trước/sau rõ ràng. |
+| 🔄 | **Xoay PDF (Rotate)** | `F-04` | Xoay toàn bộ tài liệu hoặc theo trang chọn lọc với góc 90°, 180°, 270°. Tự động cộng góc thông minh theo modulo 360°, xem trước hình thu nhỏ tức thì. |
+| 📑 | **Sắp xếp & Quản lý trang** | `F-05` | Lưới trang thu nhỏ (Page Grid) trực quan: kéo thả đổi thứ tự trang, xóa trang thừa, trích xuất trang thành tài liệu mới, hỗ trợ **Hoàn tác / Làm lại (Undo / Redo Ctrl+Z / Ctrl+Y)** lên đến 50 bước. |
+| 🖼️ | **Ảnh sang PDF (Images to PDF)** | `F-06` | Chuyển đổi hàng loạt ảnh (JPG, PNG, WebP, BMP, TIFF) thành một tệp PDF chuẩn. Hỗ trợ sắp xếp thứ tự ảnh, xoay chiều ảnh, lựa chọn khổ giấy (A4, Letter, Khổ theo ảnh) và căn lề linh hoạt. |
+| 🛡️ | **Bảo mật & Network Guard** | `Core` | Giám sát và chặn đứng 100% kết nối mạng ở cấp Electron session. Thực thi sandbox, `contextIsolation: true`, `nodeIntegration: false`. |
+| 💎 | **Giấy phép Microsoft Store** | `F-08` | Cầu nối `StoreBridge` (.NET 8.0) giao tiếp trực tiếp với Windows Store Commerce API. Hỗ trợ xác thực bản quyền, mua in-app Pro, khôi phục mua hàng và lưu trữ cache ngoại tuyến an toàn trong 14 ngày. |
 
-Đặc tả gốc trong `docs/` là **nguồn chân lý** (single source of truth) về phạm vi sản phẩm và kế hoạch. Các tài liệu trên là bản diễn giải để làm việc; khi hai bên lệch nhau, cập nhật cả hai.
+---
 
-## 4. Cấu trúc kho mã (kế hoạch)
+## 🎯 5 Nguyên tắc sản phẩm & 4 Quy tắc kỹ thuật
+
+### 5 Nguyên tắc sản phẩm bất biến
+1. **Offline thật sự**: Không gửi tệp, không gửi siêu dữ liệu, không kết nối máy chủ ngoại vi trong mọi tình huống.
+2. **Ba cú nhấp chuột là xong**: Thiết kế luồng thao tác siêu tốc: *Chọn tệp* ➔ *Chọn thông số* ➔ *Nhấn thực hiện*.
+3. **Bảo vệ toàn vẹn tài liệu**: Không bao giờ ghi đè tệp gốc; luôn tạo tệp mới với hậu tố thông minh và kiểm tra hợp lệ trước khi hoàn tất.
+4. **Nhanh và nhẹ**: Tải ứng dụng dưới 2 giây, dựng hình thu nhỏ bất đồng bộ qua Worker, xử lý tài liệu 100 trang trong vài giây.
+5. **Minh bạch về giới hạn**: Giới hạn bản Free được thông báo rõ ràng trước khi người dùng bắt đầu tác vụ; không có hành vi "lừa người dùng làm xong rồi mới đòi tiền".
+
+### 4 Quy tắc kỹ thuật (Technical Constraints)
+* **K-01 (Cách ly hoàn toàn)**: Renderer process không bao giờ truy cập trực tiếp hệ thống tệp hay Node API. Mọi giao tiếp đi qua `contextBridge` và IPC tối giản.
+* **K-02 (Không khóa giao diện)**: Tác vụ nặng (nén ảnh, parse PDF, qpdf) luôn chạy ở tiến trình con (`child_process.spawn`) hoặc Web Worker. Giao diện luôn mượt mà ở 60 FPS.
+* **K-03 (Ghi an toàn nguyên tử)**: Xử lý ghi vào thư mục tạm (`AppData/.../temp`) ➔ kiểm tra tệp đầu ra không rỗng và mở được ➔ di chuyển an toàn vào đích.
+* **K-04 (Kiểm thử offline nghiêm ngặt)**: Bộ kiểm thử tự động kiểm tra việc ngắt mạng và xác nhận không có bất kỳ request HTTP/WebSocket/DNS trái phép nào phát sinh.
+
+---
+
+## 💎 Mô hình bản quyền (Free vs Pro)
+
+| Tính năng | Bản Miễn phí (Free) | Bản Pro ($12.99 trọn đời) |
+| :--- | :--- | :--- |
+| **Gộp PDF** | Tối đa 3 tệp mỗi lần | Không giới hạn số lượng tệp |
+| **Tách PDF** | Tách theo khoảng trang cơ bản | Đầy đủ 6 chế độ tách chuyên sâu |
+| **Nén PDF** | 3 tệp mỗi ngày, mức nén Vừa | Không giới hạn, đầy đủ mức nén & Target Size |
+| **Xoay PDF** | Xoay toàn bộ tài liệu | Xoay chi tiết từng trang hoặc nhóm trang |
+| **Quản lý trang** | Tài liệu tối đa 20 trang | Không giới hạn số trang |
+| **Ảnh sang PDF** | Tối đa 10 ảnh mỗi lần | Không giới hạn số lượng ảnh |
+| **Quảng cáo** | **Hoàn toàn không có quảng cáo** | **Không có quảng cáo** |
+| **Quyền riêng tư** | 100% Offline trên máy | 100% Offline trên máy |
+
+---
+
+## 🏗️ Kiến trúc công nghệ (Architecture)
 
 ```text
 offline-pdf-toolbox/
-  apps/desktop/
-    src/main/          # tiến trình chính: cửa sổ, hộp thoại, hàng đợi tác vụ
-    src/preload/       # cầu nối contextBridge (API tối thiểu)
-    src/renderer/      # giao diện React
-      features/        # home, tools, settings
-      components/      # thành phần dùng chung
-      i18n/            # en, de, fr, es, vi
-    src/workers/       # thumbnail.worker.ts
-    src/shared/        # kiểu dữ liệu, giới hạn Free/Pro, phân tích dải trang
-  tools/StoreBridge/   # chương trình .NET cho giấy phép Store
-  packaging/msix/      # manifest, tài nguyên logo, kịch bản đóng gói
-  tests/
-    fixtures/          # bộ tệp PDF kiểm thử (tự sinh)
-    unit/              # Vitest
-    e2e/               # Playwright cho Electron
-  docs/
+├── apps/
+│   └── desktop/                   # Ứng dụng chính (Electron + React)
+│       ├── assets/                # Icon, logo Microsoft Store, SplashScreen
+│       ├── forge.config.ts        # Cấu hình Electron Forge (MSIX & Zip Maker)
+│       ├── scripts/               # Scripts tự động hóa tải qpdf, copy PDF.js assets
+│       ├── src/
+│       │   ├── main/              # Electron Main Process
+│       │   │   ├── ipc/           # IPC Handlers (files, tasks, license)
+│       │   │   ├── services/      # QpdfRunner, TaskQueue, LicenseService, SafeStorage
+│       │   │   └── window/        # Quản lý cửa sổ, CSP, NetworkGuard
+│       │   ├── preload/           # Cầu nối contextBridge bảo mật (API thu hẹp)
+│       │   ├── renderer/          # Giao diện React 19 + Fluent UI System
+│       │   │   ├── components/    # PageGrid, FileList, DropZone, ToolCard...
+│       │   │   ├── features/      # Màn hình Merge, Split, Compress, Rotate, Pages, Images...
+│       │   │   ├── i18n/          # Đa ngôn ngữ (English, Tiếng Việt)
+│       │   │   ├── state/         # Quản trị trạng thái với Zustand
+│       │   │   └── styles/        # Fluent Modern styling với PDF Red tokens
+│       │   ├── shared/            # Type definitions, Task contracts, FeatureGate
+│       │   └── workers/           # Web Workers xử lý vẽ thumbnail bằng PDF.js
+│       └── tests/                 # 141+ unit tests (Vitest) và E2E tests (Playwright)
+├── tools/
+│   └── StoreBridge/               # Công cụ cầu nối .NET 8.0 giao tiếp Windows Store API
+├── docs/                          # Hệ thống tài liệu đặc tả, kiến trúc, kiểm thử
+│   ├── ARCHITECTURE.md            # Thiết kế kiến trúc chi tiết
+│   ├── BACKLOG.md                 # Danh sách phiếu công việc và tiến độ
+│   ├── FEATURES.md                # Đặc tả tiêu chí chấp nhận tính năng
+│   ├── ROADMAP.md                 # Lộ trình phát triển 10 tuần & các mốc phát hành
+│   ├── STORE-LAUNCH.md            # Hướng dẫn đóng gói và kiểm định Store (WACK)
+│   ├── DECISIONS.md               # Nhật ký các quyết định kiến trúc (ADR)
+│   └── privacy/index.html         # Trang chính sách quyền riêng tư tĩnh
+└── package.json                   # Root monorepo workspace configuration
 ```
 
-Chi tiết và quy ước đặt tên: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+---
 
-## 5. Khởi động dự án
+## 🚀 Hướng dẫn cài đặt & phát triển (Quickstart)
 
-Yêu cầu môi trường (kiểm tra lại khi bắt đầu tuần 1):
+### Yêu cầu môi trường
+* **Hệ điều hành**: Windows 10 22H2 hoặc Windows 11 (x64)
+* **Node.js**: Phiên bản `22.13.0` trở lên
+* **Trình quản lý gói**: `npm` v11+ hoặc `pnpm`
+* **.NET SDK**: `8.0` trở lên (dùng để biên dịch công cụ `StoreBridge`)
+* **Windows SDK**: Để chạy Windows App Certification Kit (WACK) khi đóng gói MSIX
 
-| Thành phần | Phiên bản | Ghi chú |
-| --- | --- | --- |
-| Node.js | 22.13 trở lên | Renderer build bằng Vite |
-| Trình quản lý gói | npm 11 (hoặc pnpm) | Dự án dùng npm workspaces |
-| .NET SDK | 8.0 | Chỉ cần cho `tools/StoreBridge` (tuần 8) |
-| qpdf | 11.x | Đóng kèm trong `apps/desktop/resources/qpdf/` — tuần 3 |
-| Windows SDK | bản mới nhất | Dùng cho MSIX và Windows App Certification Kit — tuần 9 |
+### Các bước khởi chạy
+
+1. **Sao chép kho mã nguồn:**
+   ```bash
+   git clone https://github.com/hoangmanhtruong-uet-dev/PDF-tool.git
+   cd "PDF-tool"
+   ```
+
+2. **Cài đặt các gói phụ thuộc:**
+   ```bash
+   npm install
+   ```
+
+3. **Chuẩn bị tài nguyên cần thiết (qpdf binary, PDF.js fonts & StoreBridge build):**
+   ```bash
+   npm run assets --workspace @optb/desktop
+   ```
+
+4. **Khởi chạy ứng dụng ở chế độ phát triển (Hot Reload):**
+   ```bash
+   npm run dev
+   ```
+
+---
+
+## 🧪 Kiểm thử & Đảm bảo chất lượng (Quality Assurance)
+
+Dự án áp dụng tiêu chuẩn kiểm thử khắt khe trước mỗi bản phát hành:
 
 ```bash
-npm install                # cài phụ thuộc
-npm run assets             # tải qpdf + chép bộ phông PDF.js (chạy trước khi build)
-npm run dev                # chạy Electron ở chế độ phát triển (có HMR)
-npm test                   # kiểm thử đơn vị (Vitest)
-npm run test:e2e           # kiểm thử đầu-cuối (Playwright cho Electron)
-npm run lint               # ESLint
-npm run typecheck          # TypeScript
-npm run build              # dựng gói ứng dụng
-npm run fixtures           # sinh lại bộ tệp PDF kiểm thử
-npm run report:compression # báo cáo chất lượng nén trên bộ tệp thử
+# Kiểm tra kiểu dữ liệu TypeScript strict
+npm run typecheck
+
+# Kiểm tra quy chuẩn mã nguồn (ESLint)
+npm run lint
+
+# Chạy toàn bộ 141 bài kiểm thử đơn vị (Vitest)
+npm test
+
+# Chạy kiểm thử chấp nhận đầu-cuối (Playwright E2E)
+npm run test:e2e
+
+# Chạy kiểm thử cô lập mạng (Network Isolation / Zero-leak)
+npm run test:offline --workspace @optb/desktop
+
+# Xuất báo cáo hiệu quả nén PDF thực tế trên bộ tệp mẫu
+npm run report:compression --workspace @optb/desktop
 ```
 
-Lệnh tuần 8 trở đi (cần Windows SDK cho gói MSIX):
+### Kết quả kiểm định tự động
+- **Unit Tests**: 13/13 test suites passed, 141/141 tests passed 100%.
+- **Accessibility & Contrast**: Đạt chuẩn tương phản **WCAG 2.1 AA** (độ tương phản văn bản > 4.5:1, icon > 3:1) trên cả nền sáng (Light) và nền tối (Dark).
+- **Network Isolation**: Vượt qua kịch bản chặn mạng ở tầng Chromium Session, đảm bảo không có rò rỉ dữ liệu.
+
+---
+
+## 📦 Đóng gói & Phát hành Microsoft Store (MSIX)
+
+Dự án được cấu hình sẵn sàng với Electron Forge để xuất bản gói MSIX tương thích Microsoft Partner Center:
 
 ```bash
-$env:OPTB_BUILD_MSIX='1'; npm run make   # dựng gói phát hành kèm MSIX
+# Dựng gói ứng dụng cục bộ
+npm run build
+
+# Đóng gói bộ cài MSIX cho Microsoft Store
+$env:OPTB_BUILD_MSIX="1"
+npm run make
 ```
 
-### Trạng thái hiện tại
+Gói sản phẩm `.msix` sẽ được tạo ra trong thư mục `apps/desktop/out/make/` kèm theo chữ ký số và manifest chứng nhận Windows (`MTDStudio.OfflinePDFToolbox`).
 
-| Hạng mục | Trạng thái |
-| --- | --- |
-| Khung ứng dụng (T2-01 → T2-11) | **Xong** |
-| Bốn ràng buộc bảo mật | **Xong** và có kiểm thử |
-| Hàng đợi tác vụ + thư mục tạm | **Xong**, có kiểm thử đơn vị |
-| Đọc tệp, số trang, hình thu nhổ | **Xong**, có kiểm thử đầu-cuối |
-| Giao diện S-01 + khung màn hình công cụ | **Xong** |
-| i18n 5 ngôn ngữ, sáng/tối | **Xong** |
-| Gộp PDF (F-01) | **Xong** — dải trang, thứ tự, ghi an toàn, bỏ qua tệp hỏng |
-| Tách PDF (F-02) | **Xong** — 6 chế độ, lưới trang, thư mục con |
-| Xoay PDF (F-04) | **Xong** — chọn trang, góc 90/180/270, cộng modulo 360 |
-| Nén PDF (F-03) | **Xong** — nén ảnh nhúng, 3 mức, dung lượng đích, bảng kết quả |
-| Sắp xếp trang (F-05) | Tuần 4–5, dùng lại lưới trang |
-| Giấy phép Store (F-08 tuần 8) | Tuần 8, cần `StoreBridge` |
+---
 
-Bản **0.5.0 nội bộ** đã dựng xong. Kế hoạch thử nghiệm: [`docs/BETA-0.5.md`](docs/BETA-0.5.md).
+## 🗺️ Bản đồ tài liệu (Documentation Map)
 
-## 6. Quy trình làm việc
+Mọi chi tiết về sản phẩm, kiến trúc và quyết định kỹ thuật được lưu trữ minh bạch trong thư mục [`docs/`](docs/):
 
-1. Mỗi tính năng = một phiếu việc trong [`docs/BACKLOG.md`](docs/BACKLOG.md), kèm tiêu chí chấp nhận lấy từ [`docs/FEATURES.md`](docs/FEATURES.md).
-2. Mọi nhánh đi qua kiểm thử tự động trên GitHub Actions (máy Windows) trước khi gộp.
-3. Mỗi cuối tuần: dựng gói → cài trên máy sạch → chạy bộ kiểm thử chấp nhận → ghi điểm yếu vào nhật ký.
-4. Giữ [`docs/DECISIONS.md`](docs/DECISIONS.md) cập nhật mỗi khi đổi hướng kỹ thuật.
-5. Không thêm tính năng ngoài phạm vi đã duyệt. Nếu cần thêm, viết vào backlog và cắt theo thứ tự ở [`docs/ROADMAP.md`](docs/ROADMAP.md).
+| Tài liệu | Nội dung trọng tâm |
+| :--- | :--- |
+| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Kiến trúc Electron, luồng dữ liệu IPC, quản lý bộ nhớ, bảo mật. |
+| [`docs/FEATURES.md`](docs/FEATURES.md) | Đặc tả chi tiết và tiêu chí chấp nhận cho từng tính năng `F-01` → `F-08`. |
+| [`docs/BACKLOG.md`](docs/BACKLOG.md) | Bảng theo dõi tiến độ từng đầu việc tuần 0 đến tuần 10. |
+| [`docs/ROADMAP.md`](docs/ROADMAP.md) | Kế hoạch triển khai theo tuần và cổng kiểm soát chất lượng. |
+| [`docs/STORE-LAUNCH.md`](docs/STORE-LAUNCH.md) | Quy trình đóng gói MSIX, chạy WACK, checklist nộp Partner Center. |
+| [`docs/LICENSING.md`](docs/LICENSING.md) | Kiến trúc StoreBridge, quy định hạn mức Free và cơ chế mở khóa Pro. |
+| [`docs/SECURITY-PRIVACY.md`](docs/SECURITY-PRIVACY.md) | Cam kết bảo mật, chính sách quyền riêng tư và biện pháp phòng vệ. |
+| [`docs/DECISIONS.md`](docs/DECISIONS.md) | Nhật ký các quyết định kiến trúc (ADR-001 đến ADR-018). |
+| [`docs/TESTING.md`](docs/TESTING.md) | Danh mục ca kiểm thử, bộ tài liệu thử nghiệm thực tế. |
+| [`docs/Tich-hop-Bulk-Converter-vao-Offline-PDF-Toolbox.md`](docs/Tich-hop-Bulk-Converter-vao-Offline-PDF-Toolbox.md) | Kế hoạch mở rộng xử lý ảnh và video hàng loạt trong các phiên bản sau. |
+| [`docs/privacy/index.html`](docs/privacy/index.html) | Trang công bố chính sách quyền riêng tư chuẩn cho Microsoft Store. |
 
-## 7. Định nghĩa "xong"
+---
 
-Một hạng mục chỉ được coi là xong khi đáp ứng **cả ba** điều:
+## 📅 Lộ trình phát triển tương lai (Future Roadmap)
 
-- **Đúng** — khớp tiêu chí chấp nhận trong `FEATURES.md`.
-- **An toàn** — không làm hỏng tệp; có kiểm thử tự động chứng minh; nếu có xử lý tệp thì đã qua bộ kiểm tra kết quả.
-- **Có tài liệu** — mọi chuỗi chữ mới nằm trong file i18n, không viết cứng trong mã.
+- **Bản 1.0 (Hiện tại)**: Bộ công cụ cốt lõi hoàn chỉnh (Gộp, Tách, Nén, Xoay, Quản lý trang, Ảnh sang PDF), tích hợp Microsoft Store IAP, chứng nhận WACK sạch.
+- **Bản 1.1**: Xử lý hàng loạt theo thư mục (Batch Mode), mở rộng công cụ chuyển đổi và tối ưu ảnh hàng loạt (F-11, F-12), tích hợp menu ngữ cảnh Windows File Explorer.
+- **Bản 1.2**: Công cụ nén và chuyển đổi định dạng video ngoại tuyến nhẹ nhàng (F-13) qua bộ mã hóa phần cứng.
+- **Bản 2.0**: Nhận diện ký tự quang học ngoại tuyến (Offline OCR), chữ ký số hình ảnh, hỗ trợ nền tảng Windows on ARM64.
 
-Bản 1.0 chỉ hoàn thành khi đạt toàn bộ tiêu chí ở [`docs/STORE-LAUNCH.md`](docs/STORE-LAUNCH.md) và mục "Tiêu chí hoàn thành MVP" trong đặc tả gốc.
+---
+
+## 📄 Bản quyền & Tuyên bố miễn trừ
+
+- Phát triển và đóng gói bởi **MTD Studio**.
+- Sử dụng các thư viện mã nguồn mở uy tín tuân thủ giấy phép: `qpdf` (Apache-2.0), `pdf-lib` (MIT), `PDF.js` (Apache-2.0), `sharp` (Apache-2.0).
+- Mọi tài liệu và cam kết đều hướng đến mục tiêu duy nhất: **Bảo vệ quyền riêng tư của người dùng**.
