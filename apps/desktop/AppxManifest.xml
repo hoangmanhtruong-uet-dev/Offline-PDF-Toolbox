@@ -10,7 +10,7 @@
   <Identity
     Name="MTDStudio.OfflinePDFToolbox"
     ProcessorArchitecture="x64"
-    Version="0.5.0.0"
+    Version="1.0.0.0"
     Publisher="CN=F6CFEAEE-C755-4C7E-BDC5-FD89DA169656" />
   <Properties>
     <DisplayName>Offline PDF Toolbox</DisplayName>

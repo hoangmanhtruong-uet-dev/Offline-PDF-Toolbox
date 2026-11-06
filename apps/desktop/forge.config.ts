@@ -33,6 +33,9 @@ const config: ForgeConfig = {
           new MakerMSIX(
             {
               windowsKitVersion: process.env.WINDOWS_KIT_VERSION || '10.0.26100.0',
+              // Gói nộp Store không cần tự ký (Store ký lại khi chứng nhận). Đặt
+              // OPTB_MSIX_UNSIGNED=1 để bỏ bước tạo chứng chỉ thử, vốn cần PowerShell 7.
+              ...(process.env.OPTB_MSIX_UNSIGNED === '1' ? { sign: false } : {}),
               packageAssets: path.resolve(__dirname, 'assets'),
               appManifest: path.resolve(__dirname, 'AppxManifest.xml'),
               manifestVariables: {

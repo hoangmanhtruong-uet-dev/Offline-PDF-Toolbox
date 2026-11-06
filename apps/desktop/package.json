@@ -1,7 +1,7 @@
 {
   "name": "@optb/desktop",
   "productName": "Offline PDF Toolbox",
-  "version": "0.5.0",
+  "version": "1.0.0",
   "description": "Merge, split, compress and rotate PDFs entirely on your PC. No uploads, no account.",
   "main": ".vite/build/main.cjs",
   "license": "UNLICENSED",
