@@ -9,7 +9,7 @@ import { ProScreen } from './features/pro/ProScreen';
 import { SettingsScreen } from './features/settings/SettingsScreen';
 import { ToolScreen } from './features/tools/ToolScreen';
 import { resolveDarkMode, useAppStore } from './state/appStore';
-import { buildTheme } from './styles/tokens';
+import { buildTheme, gradients } from './styles/tokens';
 
 /**
  * Gốc của ứng dụng giao diện.
@@ -34,12 +34,20 @@ export function App(): React.JSX.Element {
 
   const theme = useMemo(() => buildTheme(dark), [dark]);
 
+  // Nền aurora và gradient nhấn theo chủ đề sáng/tối.
+  useEffect(() => {
+    const style = document.body.style;
+    style.setProperty('--app-bg', dark ? '#0e0b16' : '#faf8ff');
+    style.setProperty('--app-aurora', dark ? gradients.auroraDark : gradients.auroraLight);
+    style.setProperty('--app-gradient', gradients.brand);
+  }, [dark]);
+
   if (!initialized) {
-    return <FluentProvider theme={theme} />;
+    return <FluentProvider theme={theme} style={{ background: 'transparent' }} />;
   }
 
   return (
-    <FluentProvider theme={theme}>
+    <FluentProvider theme={theme} style={{ background: 'transparent' }}>
       <I18nProvider locale={locale}>
         <HashRouter>
           <DragOverlay />

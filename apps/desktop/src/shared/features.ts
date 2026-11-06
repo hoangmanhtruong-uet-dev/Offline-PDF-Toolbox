@@ -20,7 +20,10 @@ export type FeatureId =
   | 'images'
   | 'password'
   | 'batch'
-  | 'presets';
+  | 'presets'
+  | 'stamp'
+  | 'pdf2img'
+  | 'privacy';
 
 /** Cấu hình giới hạn của toàn bộ tính năng. */
 export interface FeatureLimits {
@@ -37,6 +40,9 @@ export interface FeatureLimits {
   password: { enabled: boolean };
   batch: { enabled: boolean };
   presets: { enabled: boolean };
+  stamp: { maxPages: number };
+  pdf2img: { maxPages: number; maxWidth: number };
+  privacy: { maxFiles: number };
 }
 
 /** Giới hạn của bản Free (dùng thử). */
@@ -50,6 +56,9 @@ export const FREE_LIMITS: FeatureLimits = {
   password: { enabled: false },
   batch: { enabled: false },
   presets: { enabled: false },
+  stamp: { maxPages: 10 },
+  pdf2img: { maxPages: 5, maxWidth: 1600 },
+  privacy: { maxFiles: 1 },
 };
 
 /** Giới hạn của bản Pro: không giới hạn số lượng, mở khoá hết tính năng. */
@@ -67,6 +76,9 @@ export const PRO_LIMITS: FeatureLimits = {
   password: { enabled: true },
   batch: { enabled: true },
   presets: { enabled: true },
+  stamp: { maxPages: Number.POSITIVE_INFINITY },
+  pdf2img: { maxPages: Number.POSITIVE_INFINITY, maxWidth: 4000 },
+  privacy: { maxFiles: Number.POSITIVE_INFINITY },
 };
 
 /** Bậc tính năng. */
@@ -82,6 +94,7 @@ export type LimitReason =
   | 'maxImages'
   | 'maxInputBytes'
   | 'levelNotAllowed'
+  | 'maxWidth'
   | 'featureDisabled';
 
 /** Kết quả kiểm tra một tính năng. */
@@ -110,6 +123,8 @@ export interface FeatureUsage {
   inputBytes?: number;
   /** Mức nén được yêu cầu. */
   level?: CompressionLevel;
+  /** Chiều rộng ảnh xuất ra, tính bằng pixel. */
+  width?: number;
 }
 
 /**
@@ -213,6 +228,29 @@ export class FeatureGate {
         return this.limits.presets.enabled
           ? { allowed: true }
           : denied('featureDisabled', 0, 0, 'limits.featureDisabled');
+      case 'stamp': {
+        const limit = this.limits.stamp.maxPages;
+        const actual = usage.pages ?? 0;
+        return actual <= limit
+          ? { allowed: true }
+          : denied('maxPages', limit, actual, 'limits.maxPages');
+      }
+      case 'pdf2img': {
+        const { maxPages, maxWidth } = this.limits.pdf2img;
+        const pages = usage.pages ?? 0;
+        if (pages > maxPages) return denied('maxPages', maxPages, pages, 'limits.maxPages');
+        const width = usage.width ?? 0;
+        return width <= maxWidth
+          ? { allowed: true }
+          : denied('maxWidth', maxWidth, width, 'limits.imageQuality');
+      }
+      case 'privacy': {
+        const limit = this.limits.privacy.maxFiles;
+        const actual = usage.files ?? 0;
+        return actual <= limit
+          ? { allowed: true }
+          : denied('maxFiles', limit, actual, 'limits.maxFiles');
+      }
       default: {
         const exhaustive: never = feature;
         throw new Error(`Tinh nang khong duoc xu ly: ${String(exhaustive)}`);

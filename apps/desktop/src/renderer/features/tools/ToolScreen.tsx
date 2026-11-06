@@ -4,6 +4,11 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 import { AppShell } from '../../components/AppShell';
 import { useI18n } from '../../i18n';
+import { BatchScreen } from '../extra/BatchScreen';
+import { PdfToImagesScreen } from '../extra/PdfToImagesScreen';
+import { PrivacyScreen } from '../extra/PrivacyScreen';
+import { ProtectScreen } from '../extra/ProtectScreen';
+import { StampScreen } from '../extra/StampScreen';
 import { CompressScreen } from '../compress/CompressScreen';
 import { ImagesScreen } from '../images/ImagesScreen';
 import { MergeScreen } from '../merge/MergeScreen';
@@ -54,6 +59,16 @@ export function ToolScreen(): React.JSX.Element {
       return <PagesScreen />;
     case 'images':
       return <ImagesScreen />;
+    case 'stamp':
+      return <StampScreen />;
+    case 'pdf2img':
+      return <PdfToImagesScreen />;
+    case 'protect':
+      return <ProtectScreen />;
+    case 'privacy':
+      return <PrivacyScreen />;
+    case 'batch':
+      return <BatchScreen />;
     default:
       return (
         <AppShell title={t(tool.nameKey)} onBack={() => navigate('/')}>

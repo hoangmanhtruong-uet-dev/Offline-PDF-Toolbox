@@ -3,16 +3,21 @@ import { ipcMain } from 'electron';
 import { IPC } from '@shared/ipc';
 import type { CompressionLevel } from '@shared/types';
 import type {
+  BatchTaskPayload,
   CompressionEstimate,
   CompressTaskPayload,
   ImagesTaskPayload,
   MergeTaskPayload,
   PagesTaskPayload,
+  PrivacyTaskPayload,
+  ProtectTaskPayload,
   RotateTaskPayload,
   SplitTaskPayload,
+  StampTaskPayload,
 } from '@shared/tasks';
 
 import { estimateCompression, runCompress } from '../services/compressionTask';
+import { runBatch, runPrivacy, runProtect, runStamp } from '../services/extraTasks';
 import { runImages } from '../services/imagesTask';
 import { runMerge, runRotate } from '../services/pdfTasks';
 import { runPages } from '../services/pagesTask';
@@ -37,7 +42,11 @@ export function registerTaskHandlers(queue: TaskQueue, qpdf: QpdfRunner): void {
         | { kind: 'split'; payload: SplitTaskPayload }
         | { kind: 'compress'; payload: CompressTaskPayload }
         | { kind: 'pages'; payload: PagesTaskPayload }
-        | { kind: 'images'; payload: ImagesTaskPayload },
+        | { kind: 'images'; payload: ImagesTaskPayload }
+        | { kind: 'stamp'; payload: StampTaskPayload }
+        | { kind: 'protect'; payload: ProtectTaskPayload }
+        | { kind: 'privacy'; payload: PrivacyTaskPayload }
+        | { kind: 'batch'; payload: BatchTaskPayload },
     ): Promise<string> => {
       switch (request.kind) {
         case 'merge':
@@ -52,6 +61,14 @@ export function registerTaskHandlers(queue: TaskQueue, qpdf: QpdfRunner): void {
           return queue.enqueue((context) => runPages(context, request.payload, qpdf));
         case 'images':
           return queue.enqueue((context) => runImages(context, request.payload, qpdf));
+        case 'stamp':
+          return queue.enqueue((context) => runStamp(context, request.payload, qpdf));
+        case 'protect':
+          return queue.enqueue((context) => runProtect(context, request.payload, qpdf));
+        case 'privacy':
+          return queue.enqueue((context) => runPrivacy(context, request.payload, qpdf));
+        case 'batch':
+          return queue.enqueue((context) => runBatch(context, request.payload, qpdf));
         default:
           throw new Error('Loai tac vu khong duoc ho tro');
       }

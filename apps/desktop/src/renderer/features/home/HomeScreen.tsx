@@ -6,13 +6,12 @@ import { useNavigate } from 'react-router-dom';
 import type { FileMeta } from '@shared/types';
 
 import { OfflineBadge } from '../../components/OfflineBadge';
-import { PageTitle } from '../../components/PageTitle';
 import { RecentFiles } from '../../components/RecentFiles';
 import { ToolCard } from '../../components/ToolCard';
 import { useI18n } from '../../i18n';
 import { useShortcuts } from '../../hooks/useShortcuts';
 import { useFilesStore } from '../../state/filesStore';
-import { appTokens } from '../../styles/tokens';
+import { appTokens, gradients } from '../../styles/tokens';
 import { TOOLS } from '../tools/tools';
 import type { ToolDefinition } from '../tools/tools';
 
@@ -34,7 +33,9 @@ const useStyles = makeStyles({
     gap: appTokens.spacing.xxl,
     maxWidth: '1120px',
     margin: '0 auto',
-    paddingBlock: appTokens.spacing.xxxl,
+    height: '100%',
+    overflowY: 'auto',
+    paddingBlock: appTokens.spacing.xxl,
     paddingInline: appTokens.spacing.xl,
     width: '100%',
     animationName: 'fadeIn',
@@ -54,16 +55,54 @@ const useStyles = makeStyles({
     gap: appTokens.spacing.m,
     flexWrap: 'wrap',
   },
+  hero: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    gap: appTokens.spacing.m,
+    paddingBlock: appTokens.spacing.xl,
+  },
+  heroTitle: {
+    margin: 0,
+    fontSize: '56px',
+    lineHeight: '1.05',
+    fontWeight: appTokens.fontWeight.bold,
+    letterSpacing: '-0.04em',
+    color: tokens.colorNeutralForeground1,
+  },
   subtitle: {
     display: 'block',
-    maxWidth: '62ch',
-    marginTop: appTokens.spacing.xs,
+    maxWidth: '58ch',
+    fontSize: appTokens.fontSize.md,
+    lineHeight: '24px',
     color: tokens.colorNeutralForeground2,
+  },
+  topBar: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: appTokens.spacing.m,
+  },
+  brandMark: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: appTokens.spacing.s,
+    fontWeight: appTokens.fontWeight.bold,
+    fontSize: appTokens.fontSize.md,
+    letterSpacing: '-0.02em',
+    color: tokens.colorNeutralForeground1,
+  },
+  brandDot: {
+    width: '28px',
+    height: '28px',
+    borderRadius: '10px',
+    backgroundImage: gradients.brand,
+    boxShadow: '0 6px 16px rgba(124,58,237,0.45)',
   },
   grid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
-    gap: appTokens.spacing.l,
+    gap: appTokens.spacing.xl,
     '@media (max-width: 900px)': {
       gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
     },
@@ -77,8 +116,9 @@ const useStyles = makeStyles({
     gap: appTokens.spacing.m,
   },
   sectionTitle: {
-    fontSize: appTokens.fontSize.md,
-    fontWeight: appTokens.fontWeight.semibold,
+    fontSize: appTokens.fontSize.lg,
+    fontWeight: appTokens.fontWeight.bold,
+    letterSpacing: '-0.02em',
     color: tokens.colorNeutralForeground1,
   },
   chooser: {
@@ -86,9 +126,10 @@ const useStyles = makeStyles({
     flexDirection: 'column',
     gap: appTokens.spacing.m,
     padding: appTokens.spacing.l,
-    borderRadius: appTokens.radius.lg,
+    borderRadius: '28px',
     backgroundColor: tokens.colorNeutralBackground1,
-    ...shorthands.border('1px', 'solid', tokens.colorBrandStroke1),
+    boxShadow: '0 12px 36px rgba(124,58,237,0.2)',
+    ...shorthands.border('2px', 'solid', tokens.colorBrandStroke1),
   },
   chooserHeader: {
     display: 'flex',
@@ -111,8 +152,9 @@ const useStyles = makeStyles({
     alignItems: 'center',
     gap: appTokens.spacing.s,
     padding: appTokens.spacing.s,
-    paddingInline: appTokens.spacing.m,
-    borderRadius: appTokens.radius.md,
+    paddingInline: appTokens.spacing.l,
+    borderRadius: appTokens.radius.pill,
+    fontWeight: appTokens.fontWeight.semibold,
     cursor: 'pointer',
     backgroundColor: tokens.colorNeutralBackground1,
     color: tokens.colorNeutralForeground1,
@@ -157,7 +199,7 @@ function suggestTools(count: number): ToolDefinition[] {
   const candidates =
     count > 1
       ? TOOLS.filter((tool) => tool.id === 'merge')
-      : TOOLS.filter((tool) => ['split', 'compress', 'rotate', 'pages'].includes(tool.id));
+      : TOOLS.filter((tool) => ['split', 'compress', 'rotate', 'pages', 'stamp', 'pdf2img', 'privacy'].includes(tool.id));
 
   return candidates.filter((tool) => tool.ready);
 }
@@ -232,18 +274,22 @@ export function HomeScreen(): React.JSX.Element {
 
   return (
     <div className={styles.page}>
-      <header className={styles.header}>
-        <div>
-          <div className={styles.titleRow}>
-            <PageTitle level={1}>{t('home.heading')}</PageTitle>
-            <OfflineBadge />
-          </div>
-          <Text className={styles.subtitle}>{t('home.subtitle')}</Text>
+      <div className={styles.topBar}>
+        <span className={styles.brandMark}>
+          <span className={styles.brandDot} aria-hidden="true" />
+          {t('app.title')}
+        </span>
+        <div className={styles.titleRow}>
+          <OfflineBadge />
+          <Button appearance="subtle" shape="circular" onClick={() => navigate('/settings')}>
+            {t('nav.settings')}
+          </Button>
         </div>
+      </div>
 
-        <Button appearance="subtle" onClick={() => navigate('/settings')}>
-          {t('nav.settings')}
-        </Button>
+      <header className={styles.hero}>
+        <h1 className={`${styles.heroTitle} gradient-text`}>{t('home.heading')}</h1>
+        <Text className={styles.subtitle}>{t('home.subtitle')}</Text>
       </header>
 
       {dropped.length > 0 ? (
@@ -288,9 +334,11 @@ export function HomeScreen(): React.JSX.Element {
               icon={tool.icon}
               name={t(tool.nameKey)}
               description={t(tool.descriptionKey)}
-              shortcut={`Ctrl+${index + 1}`}
+              shortcut={index < 9 ? `Ctrl+${index + 1}` : undefined}
+              pro={tool.pro}
               testId={tool.id}
               toolId={tool.id}
+              delay={index * 60}
               onSelect={() => navigate(`/tools/${tool.id}`)}
             />
           ))}
@@ -305,7 +353,7 @@ export function HomeScreen(): React.JSX.Element {
           <span className={styles.hint}>{t('home.shortcutTool')}</span>
           <kbd className={styles.kbd}>Ctrl+1</kbd>
           <span className={styles.kbd}>…</span>
-          <kbd className={styles.kbd}>Ctrl+6</kbd>
+          <kbd className={styles.kbd}>Ctrl+9</kbd>
         </div>
       </section>
 

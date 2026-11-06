@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 
 import type { AppInfo } from '@shared/ipc';
+import { withPromo } from '@shared/promo';
 import type { AppSettings, LicenseStatus, SupportedLanguage } from '@shared/types';
 
 /**
@@ -61,10 +62,10 @@ export const useAppStore = create<AppState>((set) => ({
     const locale = settings.language === 'en' ? systemLocale : settings.language;
 
     window.optb.onLicenseChanged?.((license: unknown) => {
-      set({ license: license as LicenseStatus });
+      set({ license: withPromo(license as LicenseStatus) });
     });
 
-    set({ settings, appInfo, license, locale, initialized: true });
+    set({ settings, appInfo, license: withPromo(license), locale, initialized: true });
   },
 
   updateSettings: async (patch) => {
@@ -74,20 +75,20 @@ export const useAppStore = create<AppState>((set) => ({
 
   refreshLicense: async () => {
     const license = await window.optb.app.license();
-    set({ license });
+    set({ license: withPromo(license) });
   },
 
   purchase: async () => {
     const res = await window.optb.app.purchase();
     if (res.success) {
       const license = await window.optb.app.license();
-      set({ license });
+      set({ license: withPromo(license) });
     }
     return res;
   },
 
   restore: async () => {
-    const license = await window.optb.app.restore();
+    const license = withPromo(await window.optb.app.restore());
     set({ license });
     return license;
   },

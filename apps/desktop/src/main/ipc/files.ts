@@ -1,11 +1,12 @@
-import { readFile, stat } from 'node:fs/promises';
-import { basename } from 'node:path';
+import { mkdir, readFile, stat, writeFile } from 'node:fs/promises';
+import { basename, join } from 'node:path';
 
 import { BrowserWindow, dialog, ipcMain, shell } from 'electron';
 
 import { IPC } from '@shared/ipc';
-import type { FileKind, ImageInfo } from '@shared/ipc';
-import { extensionOf } from '@shared/naming';
+import type { FileKind, ImageInfo, SaveImagesRequest } from '@shared/ipc';
+import { extensionOf, sanitizeFileName } from '@shared/naming';
+import { uniqueOutputPath } from '../services/safePath';
 
 import { makeThumbnail, readImageInfo } from '../services/imageTools';
 import type { FileMeta } from '@shared/types';
@@ -134,6 +135,30 @@ export function registerFileHandlers(deps: FileHandlerDeps = {}): void {
     IPC.filesImageThumbnail,
     async (_event, payload: { path: string; rotation: number }): Promise<string | null> => {
       return makeThumbnail(payload.path, payload.rotation);
+    },
+  );
+
+  // Lưu các ảnh trang do renderer vẽ ra vào một thư mục con mới.
+  ipcMain.handle(
+    IPC.filesSaveImages,
+    async (_event, request: SaveImagesRequest): Promise<string[]> => {
+      const folder = await uniqueOutputPath(request.directory, sanitizeFileName(request.folderName));
+      await mkdir(folder, { recursive: true });
+
+      const base = sanitizeFileName(request.baseName);
+      const digits = Math.max(3, String(request.images.length).length);
+      const saved: string[] = [];
+
+      for (let index = 0; index < request.images.length; index += 1) {
+        const image = request.images[index];
+        if (!image) continue;
+        const name = `${base}-${String(index + 1).padStart(digits, '0')}.${request.format}`;
+        const target = join(folder, name);
+        await writeFile(target, image);
+        saved.push(target);
+      }
+
+      return saved;
     },
   );
 

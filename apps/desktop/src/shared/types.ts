@@ -127,6 +127,8 @@ export interface LicenseStatus {
   /** Epoch milliseconds của lần kiểm tra thành công gần nhất. */
   lastVerifiedAt: number | null;
   state: 'unknown' | 'active' | 'expired' | 'unavailable';
+  /** Có giá trị khi Pro đang được mở nhờ khuyến mãi: epoch ms ngày kết thúc. */
+  promoUntil?: number;
 }
 
 /** Một tệp trong danh sách tệp gần đây. */

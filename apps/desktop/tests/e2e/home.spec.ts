@@ -6,14 +6,14 @@ import { launchApp } from './helpers';
  * Kiểm thử đầu-cuối của màn hình chính S-01 sau khi thiết kế lại.
  */
 test.describe('Màn hình chính (S-01)', () => {
-  test('hiện lưới 3x2 gồm sáu thẻ công cụ, không hiện mã tính năng', async () => {
+  test('hiện lưới 3 cột gồm mười một thẻ công cụ, không hiện mã tính năng', async () => {
     const { app, page } = await launchApp();
 
     try {
       await expect(page.getByTestId('tool-grid')).toBeVisible();
 
       const cards = page.getByTestId('tool-card');
-      await expect(cards).toHaveCount(6);
+      await expect(cards).toHaveCount(11);
 
       // Ba cột trên mỗi hàng.
       const grid = page.getByTestId('tool-grid');
@@ -22,9 +22,9 @@ test.describe('Màn hình chính (S-01)', () => {
       );
       expect(columns).toBe(3);
 
-      // Mã tính năng F-01 … F-06 không được lộ ra giao diện.
+      // Mã tính năng F-01 … F-11 không được lộ ra giao diện.
       await expect(page.getByText('F-01')).toHaveCount(0);
-      await expect(page.getByText('F-06')).toHaveCount(0);
+      await expect(page.getByText('F-11')).toHaveCount(0);
 
       // Mỗi thẻ có tên và mô tả.
       await expect(cards.first()).toContainText('Merge PDF');

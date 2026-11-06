@@ -23,6 +23,7 @@ const api = {
     imageInfo: (path: string): Promise<unknown> => ipcRenderer.invoke(IPC.filesImageInfo, { path }),
     imageThumbnail: (path: string, rotation: number): Promise<string | null> =>
       ipcRenderer.invoke(IPC.filesImageThumbnail, { path, rotation }),
+    saveImages: (request: unknown): Promise<string[]> => ipcRenderer.invoke(IPC.filesSaveImages, request),
     /**
      * Lấy đường dẫn thật của một tệp được kéo thả.
      *

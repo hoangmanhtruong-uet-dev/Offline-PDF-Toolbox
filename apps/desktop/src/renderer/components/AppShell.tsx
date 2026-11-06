@@ -1,6 +1,7 @@
 import { Button, makeStyles, tokens } from '@fluentui/react-components';
 import { ArrowLeftRegular } from '@fluentui/react-icons';
 
+import { appTokens } from '../styles/tokens';
 import { OfflineBadge } from './OfflineBadge';
 
 /**
@@ -18,25 +19,28 @@ const useStyles = makeStyles({
     display: 'flex',
     flexDirection: 'column',
     height: '100vh',
-    backgroundColor: tokens.colorNeutralBackground2,
+    backgroundColor: 'transparent',
   },
   header: {
     display: 'flex',
     alignItems: 'center',
     gap: tokens.spacingHorizontalM,
-    paddingInline: tokens.spacingHorizontalL,
-    paddingBlock: tokens.spacingVerticalM,
-    borderBottomWidth: '1px',
-    borderBottomStyle: 'solid',
-    borderBottomColor: tokens.colorNeutralStroke2,
-    backgroundColor: tokens.colorNeutralBackground1,
-    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.02)',
+    marginInline: tokens.spacingHorizontalL,
+    marginBlockStart: tokens.spacingVerticalM,
+    paddingInline: tokens.spacingHorizontalM,
+    paddingBlock: tokens.spacingVerticalS,
+    borderRadius: appTokens.radius.xl,
+    backgroundColor: 'color-mix(in srgb, var(--colorNeutralBackground1) 74%, transparent)',
+    backdropFilter: 'blur(18px) saturate(160%)',
+    border: `1px solid ${tokens.colorNeutralStroke2}`,
+    boxShadow: appTokens.shadow.md,
     zIndex: 10,
   },
   title: {
     flexGrow: 1,
-    fontSize: tokens.fontSizeBase500,
-    fontWeight: tokens.fontWeightBold,
+    fontSize: appTokens.fontSize.lg,
+    fontWeight: appTokens.fontWeight.bold,
+    letterSpacing: '-0.02em',
     color: tokens.colorNeutralForeground1,
   },
   body: {
@@ -49,6 +53,8 @@ const useStyles = makeStyles({
     overflowY: 'auto',
     padding: tokens.spacingHorizontalL,
     paddingBlock: tokens.spacingVerticalL,
+    animationName: 'fadeIn',
+    animationDuration: '260ms',
   },
 });
 
@@ -69,7 +75,7 @@ export function AppShell({ title, onBack, children, options, footer }: AppShellP
   return (
     <div className={styles.shell}>
       <header className={styles.header}>
-        <Button appearance="subtle" icon={<ArrowLeftRegular />} onClick={onBack} aria-label="Back" />
+        <Button appearance="subtle" shape="circular" icon={<ArrowLeftRegular />} onClick={onBack} aria-label="Back" />
         <span className={styles.title}>{title}</span>
         <OfflineBadge />
       </header>

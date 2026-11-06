@@ -129,6 +129,11 @@ export const OUTPUT_TEMPLATES = {
   rotated: '{name}_rotated',
   compressed: '{name}_compressed',
   images: 'Images_{date}',
+  stamped: '{name}_stamped',
+  protected: '{name}_protected',
+  unlocked: '{name}_unlocked',
+  cleaned: '{name}_clean',
+  pageImages: '{name}_images',
 } as const;
 
 /** Khoá của mẫu tên đầu ra. */

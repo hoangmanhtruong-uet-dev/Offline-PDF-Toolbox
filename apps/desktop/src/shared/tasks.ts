@@ -9,7 +9,17 @@ import type { CompressionLevel } from './types';
  */
 
 /** Loại tác vụ. */
-export type TaskKind = 'merge' | 'rotate' | 'split' | 'compress' | 'pages' | 'images';
+export type TaskKind =
+  | 'merge'
+  | 'rotate'
+  | 'split'
+  | 'compress'
+  | 'pages'
+  | 'images'
+  | 'stamp'
+  | 'protect'
+  | 'privacy'
+  | 'batch';
 
 /** Cách chọn trang cho thao tác xoay. */
 export type PageSelection =
@@ -160,6 +170,60 @@ export interface RotateTaskPayload {
   outputDirectory: string;
   outputName: string;
   password?: string;
+}
+
+/** Vị trí đánh số trang. */
+export type PageNumberPosition = 'none' | 'bottom-center' | 'bottom-right' | 'bottom-left' | 'top-right';
+
+/** Tham số tác vụ đóng dấu chữ và đánh số trang. */
+export interface StampTaskPayload {
+  path: string;
+  /** Chữ đóng dấu chìm chéo giữa trang. Rỗng nghĩa là không đóng dấu. */
+  watermarkText: string;
+  /** Độ đậm của dấu, 0.05 - 1. */
+  watermarkOpacity: number;
+  /** Đánh số trang ở vị trí này, `none` để tắt. */
+  pageNumbers: PageNumberPosition;
+  /** Dạng số: `1` hay `1 / 10`. */
+  pageNumberFormat: 'n' | 'n-of-total';
+  outputDirectory: string;
+  outputName: string;
+}
+
+/** Tham số tác vụ đặt hoặc gỡ mật khẩu. */
+export interface ProtectTaskPayload {
+  path: string;
+  mode: 'encrypt' | 'decrypt';
+  /** Mật khẩu để mở (khi mã hóa) hoặc mật khẩu hiện có (khi gỡ). */
+  password: string;
+  /** Cấm in tài liệu khi mã hóa. */
+  disablePrinting?: boolean;
+  /** Cấm sao chép nội dung khi mã hóa. */
+  disableCopying?: boolean;
+  outputDirectory: string;
+  outputName: string;
+}
+
+/** Tham số tác vụ xóa siêu dữ liệu. */
+export interface PrivacyTaskPayload {
+  path: string;
+  outputDirectory: string;
+  outputName: string;
+}
+
+/** Thao tác áp dụng cho cả lô tệp. */
+export type BatchOperation =
+  | { kind: 'compress'; level: CompressionLevel }
+  | { kind: 'rotate'; angle: RotateAngle }
+  | { kind: 'stamp'; watermarkText: string; watermarkOpacity: number; pageNumbers: PageNumberPosition }
+  | { kind: 'privacy' }
+  | { kind: 'protect'; password: string };
+
+/** Tham số tác vụ xử lý hàng loạt. */
+export interface BatchTaskPayload {
+  paths: string[];
+  operation: BatchOperation;
+  outputDirectory: string;
 }
 
 /** Tham số của một tác vụ bất kỳ. */

@@ -5,6 +5,7 @@ import { Button, makeStyles, shorthands, tokens } from '@fluentui/react-componen
 
 import type { FileMeta } from '@shared/types';
 
+import { gradients } from '../styles/tokens';
 import { useI18n } from '../i18n';
 
 /**
@@ -20,34 +21,39 @@ const useStyles = makeStyles({
     alignItems: 'center',
     justifyContent: 'center',
     gap: tokens.spacingVerticalM,
-    paddingBlock: tokens.spacingVerticalXXL,
+    paddingBlock: '56px',
     paddingInline: tokens.spacingHorizontalXXL,
-    borderRadius: '16px',
-    ...shorthands.border('2px', 'dashed', tokens.colorNeutralStroke2),
+    borderRadius: '28px',
+    ...shorthands.border('2px', 'dashed', tokens.colorBrandStroke1),
+    backgroundImage: gradients.brandSoft,
     backgroundColor: tokens.colorNeutralBackground1,
     cursor: 'pointer',
     transitionProperty: 'border-color, background-color, transform, box-shadow',
-    transitionDuration: '180ms',
+    transitionDuration: '220ms',
     transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
     textAlign: 'center',
-    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.02)',
     ':hover': {
-      ...shorthands.borderColor(tokens.colorBrandStroke1),
-      backgroundColor: tokens.colorNeutralBackground1,
-      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.04)',
+      transform: 'translateY(-2px)',
+      boxShadow: '0 16px 40px rgba(124, 58, 237, 0.18)',
     },
   },
   active: {
-    borderTopColor: tokens.colorBrandStroke1,
-    borderRightColor: tokens.colorBrandStroke1,
-    borderBottomColor: tokens.colorBrandStroke1,
-    borderLeftColor: tokens.colorBrandStroke1,
-    backgroundColor: tokens.colorBrandBackground,
-    boxShadow: '0 8px 24px rgba(225, 29, 72, 0.08)',
+    transform: 'scale(1.02)',
+    backgroundColor: tokens.colorBrandBackground2,
+    boxShadow: '0 20px 50px rgba(124, 58, 237, 0.3)',
+  },
+  emoji: {
+    fontSize: '44px',
+    lineHeight: 1,
+    animationName: 'floaty',
+    animationDuration: '3s',
+    animationIterationCount: 'infinite',
+    animationTimingFunction: 'ease-in-out',
   },
   title: {
-    fontSize: tokens.fontSizeBase500,
-    fontWeight: tokens.fontWeightSemibold,
+    fontSize: tokens.fontSizeBase600,
+    fontWeight: tokens.fontWeightBold,
+    letterSpacing: '-0.02em',
     color: tokens.colorNeutralForeground1,
   },
   hint: {
@@ -145,9 +151,10 @@ export function DropZone({
       tabIndex={0}
       style={compact ? { paddingBlock: tokens.spacingVerticalXL } : undefined}
     >
+      <span className={styles.emoji} aria-hidden="true">📄</span>
       <span className={styles.title}>{title ?? t('home.dropTitle')}</span>
       <span className={styles.hint}>{hint ?? t('home.dropHint')}</span>
-      <Button appearance="primary" onClick={(event) => { event.stopPropagation(); void pickFiles(); }}>
+      <Button appearance="primary" shape="circular" size="large" onClick={(event) => { event.stopPropagation(); void pickFiles(); }}>
         {buttonLabel ?? t('home.browse')}
       </Button>
     </div>

@@ -1,4 +1,4 @@
-import type { AppInfo, ImageInfo } from '@shared/ipc';
+import type { AppInfo, ImageInfo, SaveImagesRequest } from '@shared/ipc';
 import type { CompressionEstimate } from '@shared/tasks';
 import type { AppSettings, FileMeta, LicenseStatus, RecentFile } from '@shared/types';
 
@@ -18,6 +18,7 @@ export interface OptbApi {
     open(path: string): Promise<string>;
     imageInfo(path: string): Promise<ImageInfo | null>;
     imageThumbnail(path: string, rotation: number): Promise<string | null>;
+    saveImages(request: SaveImagesRequest): Promise<string[]>;
     getPathForFile(file: File): string;
   };
   settings: {

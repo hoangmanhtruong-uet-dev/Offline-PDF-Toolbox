@@ -1,6 +1,7 @@
 import { LockClosedRegular } from '@fluentui/react-icons';
 import { makeStyles, tokens } from '@fluentui/react-components';
 
+import { gradients } from '../styles/tokens';
 import { useI18n } from '../i18n';
 
 /**
@@ -17,8 +18,8 @@ const useStyles = makeStyles({
     paddingInline: '10px',
     paddingBlock: '3px',
     borderRadius: '999px',
-    backgroundColor: tokens.colorNeutralBackground3,
-    color: tokens.colorNeutralForeground2,
+    backgroundImage: gradients.brandSoft,
+    color: tokens.colorBrandForeground1,
     fontSize: tokens.fontSizeBase200,
     fontWeight: tokens.fontWeightSemibold,
     whiteSpace: 'nowrap',
@@ -26,7 +27,7 @@ const useStyles = makeStyles({
   },
   icon: {
     fontSize: tokens.fontSizeBase300,
-    color: tokens.colorNeutralForeground3,
+    color: tokens.colorBrandForeground1,
   },
 });
 

@@ -3,11 +3,15 @@ import type { CompressionLevel } from './types';
 import type {
   CompressionEstimate,
   CompressTaskPayload,
+  BatchTaskPayload,
   ImagesTaskPayload,
   MergeTaskPayload,
   PagesTaskPayload,
+  PrivacyTaskPayload,
+  ProtectTaskPayload,
   RotateTaskPayload,
   SplitTaskPayload,
+  StampTaskPayload,
 } from './tasks';
 
 /**
@@ -25,6 +29,7 @@ export const IPC = {
   filesOpen: 'files:open',
   filesImageInfo: 'files:imageInfo',
   filesImageThumbnail: 'files:imageThumbnail',
+  filesSaveImages: 'files:saveImages',
   settingsGet: 'settings:get',
   settingsUpdate: 'settings:update',
   recentGet: 'recent:get',
@@ -72,6 +77,18 @@ export type ReadBytesResult =
   | { ok: true; bytes: Uint8Array }
   | { ok: false; reason: 'tooLarge' | 'unreadable'; size: number };
 
+/** Yêu cầu lưu các ảnh trang đã vẽ ở renderer. */
+export interface SaveImagesRequest {
+  directory: string;
+  /** Tên thư mục con sẽ được tạo trong thư mục đích. */
+  folderName: string;
+  /** Tiền tố tên tệp ảnh. */
+  baseName: string;
+  format: 'png' | 'jpg';
+  /** Nội dung từng ảnh, theo thứ tự trang. */
+  images: Uint8Array[];
+}
+
 /** Kiểu các lệnh được preload lộ ra. */
 export interface IpcInvokeMap {
   [IPC.filesPick]: { request: { accept?: FileKind }; response: FileMeta[] };
@@ -84,6 +101,10 @@ export interface IpcInvokeMap {
   [IPC.filesImageThumbnail]: {
     request: { path: string; rotation: number };
     response: string | null;
+  };
+  [IPC.filesSaveImages]: {
+    request: SaveImagesRequest;
+    response: string[];
   };
   [IPC.settingsGet]: { request: void; response: AppSettings };
   [IPC.settingsUpdate]: { request: { patch: Partial<AppSettings> }; response: AppSettings };
@@ -100,7 +121,11 @@ export interface IpcInvokeMap {
       | { kind: 'split'; payload: SplitTaskPayload }
       | { kind: 'compress'; payload: CompressTaskPayload }
       | { kind: 'pages'; payload: PagesTaskPayload }
-      | { kind: 'images'; payload: ImagesTaskPayload };
+      | { kind: 'images'; payload: ImagesTaskPayload }
+      | { kind: 'stamp'; payload: StampTaskPayload }
+      | { kind: 'protect'; payload: ProtectTaskPayload }
+      | { kind: 'privacy'; payload: PrivacyTaskPayload }
+      | { kind: 'batch'; payload: BatchTaskPayload };
     response: string;
   };
   [IPC.taskCancel]: { request: { taskId: string }; response: boolean };

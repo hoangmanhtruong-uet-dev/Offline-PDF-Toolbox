@@ -109,6 +109,7 @@ export function ProScreen(): React.JSX.Element {
   const navigate = useNavigate();
 
   const license = useAppStore((state) => state.license);
+  const locale = useAppStore((state) => state.locale);
   const purchase = useAppStore((state) => state.purchase);
   const restore = useAppStore((state) => state.restore);
 
@@ -192,11 +193,13 @@ export function ProScreen(): React.JSX.Element {
             <CheckmarkCircleRegular className={styles.ownedIcon} />
             <div>
               <Text size={500} weight="semibold">
-                {t('pro.ownedTitle')}
+                {license.promoUntil ? t('pro.promoTitle') : t('pro.ownedTitle')}
               </Text>
               <div>
                 <Text size={300} style={{ color: tokens.colorNeutralForeground2 }}>
-                  {t('pro.ownedSubtitle')}
+                  {license.promoUntil
+                    ? t('pro.promoSubtitle', { date: new Date(license.promoUntil).toLocaleDateString(locale) })
+                    : t('pro.ownedSubtitle')}
                 </Text>
               </div>
             </div>
@@ -236,6 +239,14 @@ export function ProScreen(): React.JSX.Element {
             <li className={styles.perkItem}>
               <CheckmarkCircleRegular className={styles.perkIcon} />
               <Text>{t('pro.perk3')}</Text>
+            </li>
+            <li className={styles.perkItem}>
+              <CheckmarkCircleRegular className={styles.perkIcon} />
+              <Text>{t('pro.perk5')}</Text>
+            </li>
+            <li className={styles.perkItem}>
+              <CheckmarkCircleRegular className={styles.perkIcon} />
+              <Text>{t('pro.perk6')}</Text>
             </li>
             <li className={styles.perkItem}>
               <CheckmarkCircleRegular className={styles.perkIcon} />

@@ -2,9 +2,14 @@ import {
   ArrowMinimizeRegular,
   ArrowRotateClockwiseRegular,
   CutRegular,
+  DocumentSignatureRegular,
   DocumentTableRegular,
+  EraserRegular,
+  ImageMultipleRegular,
   ImageRegular,
+  LayerRegular,
   LibraryRegular,
+  LockClosedRegular,
 } from '@fluentui/react-icons';
 
 import type { MessageKey } from '../../i18n';
@@ -17,7 +22,18 @@ import type { MessageKey } from '../../i18n';
  * nội bộ.
  */
 export interface ToolDefinition {
-  id: 'merge' | 'split' | 'compress' | 'rotate' | 'pages' | 'images';
+  id:
+    | 'merge'
+    | 'split'
+    | 'compress'
+    | 'rotate'
+    | 'pages'
+    | 'images'
+    | 'stamp'
+    | 'pdf2img'
+    | 'protect'
+    | 'privacy'
+    | 'batch';
   /** Mã tính năng trong đặc tả. */
   feature: string;
   nameKey: MessageKey;
@@ -28,6 +44,8 @@ export interface ToolDefinition {
   accepts: 'pdf' | 'image';
   /** Bản 1.0 đã sẵn sàng hay chưa. */
   ready: boolean;
+  /** Công cụ chỉ dành cho gói Pro. */
+  pro?: boolean;
 }
 
 export const TOOLS: ToolDefinition[] = [
@@ -84,6 +102,53 @@ export const TOOLS: ToolDefinition[] = [
     icon: ImageRegular,
     accepts: 'image',
     ready: true,
+  },
+  {
+    id: 'stamp',
+    feature: 'F-07',
+    nameKey: 'home.tool.stamp',
+    descriptionKey: 'home.tool.stampDesc',
+    icon: DocumentSignatureRegular,
+    accepts: 'pdf',
+    ready: true,
+  },
+  {
+    id: 'pdf2img',
+    feature: 'F-08',
+    nameKey: 'home.tool.pdf2img',
+    descriptionKey: 'home.tool.pdf2imgDesc',
+    icon: ImageMultipleRegular,
+    accepts: 'pdf',
+    ready: true,
+  },
+  {
+    id: 'privacy',
+    feature: 'F-09',
+    nameKey: 'home.tool.privacy',
+    descriptionKey: 'home.tool.privacyDesc',
+    icon: EraserRegular,
+    accepts: 'pdf',
+    ready: true,
+  },
+  {
+    id: 'protect',
+    feature: 'F-10',
+    nameKey: 'home.tool.protect',
+    descriptionKey: 'home.tool.protectDesc',
+    icon: LockClosedRegular,
+    accepts: 'pdf',
+    ready: true,
+    pro: true,
+  },
+  {
+    id: 'batch',
+    feature: 'F-11',
+    nameKey: 'home.tool.batch',
+    descriptionKey: 'home.tool.batchDesc',
+    icon: LayerRegular,
+    accepts: 'pdf',
+    ready: true,
+    pro: true,
   },
 ];
 

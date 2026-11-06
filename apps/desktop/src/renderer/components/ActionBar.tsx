@@ -1,5 +1,6 @@
 import { Button, ProgressBar, makeStyles, tokens } from '@fluentui/react-components';
 
+import { appTokens, gradients } from '../styles/tokens';
 import { useI18n } from '../i18n';
 
 /**
@@ -13,13 +14,25 @@ const useStyles = makeStyles({
     display: 'flex',
     alignItems: 'center',
     gap: tokens.spacingHorizontalL,
-    padding: tokens.spacingVerticalM,
+    padding: tokens.spacingVerticalS,
     paddingInline: tokens.spacingHorizontalL,
-    borderTopWidth: '1px',
-    borderTopStyle: 'solid',
-    borderTopColor: tokens.colorNeutralStroke2,
-    backgroundColor: tokens.colorNeutralBackground1,
-    boxShadow: '0 -2px 8px rgba(0, 0, 0, 0.02)',
+    marginInline: tokens.spacingHorizontalL,
+    marginBlockEnd: tokens.spacingVerticalM,
+    borderRadius: appTokens.radius.pill,
+    border: `1px solid ${tokens.colorNeutralStroke2}`,
+    backgroundColor: 'color-mix(in srgb, var(--colorNeutralBackground1) 74%, transparent)',
+    backdropFilter: 'blur(18px)',
+    boxShadow: appTokens.shadow.lg,
+  },
+  primary: {
+    backgroundImage: gradients.brand,
+    border: 'none',
+    color: '#fff',
+    fontWeight: appTokens.fontWeight.bold,
+    paddingInline: tokens.spacingHorizontalXXL,
+    boxShadow: '0 6px 20px rgba(124, 58, 237, 0.4)',
+    ':hover': { backgroundImage: gradients.brand, filter: 'brightness(1.08)', color: '#fff' },
+    ':hover:active': { backgroundImage: gradients.brand, filter: 'brightness(0.95)', color: '#fff' },
   },
   summary: {
     flexGrow: 1,
@@ -60,7 +73,7 @@ export function ActionBar({
       <footer className={styles.bar} data-testid="action-bar">
         <ProgressBar className={styles.progress} value={progressPercent} />
         <span className={styles.summary}>{Math.round(progressPercent)}%</span>
-        <Button appearance="secondary" onClick={onCancel}>
+        <Button appearance="secondary" shape="circular" onClick={onCancel}>
           {t('shell.cancel')}
         </Button>
       </footer>
@@ -69,7 +82,7 @@ export function ActionBar({
 
   return (
     <footer className={styles.bar} data-testid="action-bar">
-      <Button appearance="primary" onClick={onAction} disabled={disabled} data-testid="primary-action">
+      <Button appearance="primary" shape="circular" size="large" className={styles.primary} onClick={onAction} disabled={disabled} data-testid="primary-action">
         {actionLabel}
       </Button>
       {summary ? <span className={styles.summary}>{summary}</span> : null}

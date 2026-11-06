@@ -1,5 +1,6 @@
 import { Divider, makeStyles, tokens } from '@fluentui/react-components';
 
+import { appTokens } from '../styles/tokens';
 import { useI18n } from '../i18n';
 
 /**
@@ -16,10 +17,13 @@ const useStyles = makeStyles({
     gap: tokens.spacingVerticalM,
     padding: tokens.spacingVerticalL,
     paddingInline: tokens.spacingHorizontalL,
-    borderInlineStartWidth: '1px',
-    borderInlineStartStyle: 'solid',
-    borderInlineStartColor: tokens.colorNeutralStroke2,
-    backgroundColor: tokens.colorNeutralBackground1,
+    marginBlock: tokens.spacingVerticalL,
+    marginInlineEnd: tokens.spacingHorizontalL,
+    borderRadius: appTokens.radius.xl,
+    border: `1px solid ${tokens.colorNeutralStroke2}`,
+    backgroundColor: 'color-mix(in srgb, var(--colorNeutralBackground1) 74%, transparent)',
+    backdropFilter: 'blur(18px)',
+    boxShadow: appTokens.shadow.md,
     overflowY: 'auto',
   },
   title: {
@@ -27,7 +31,7 @@ const useStyles = makeStyles({
     fontWeight: tokens.fontWeightSemibold,
     color: tokens.colorNeutralForeground2,
     textTransform: 'uppercase',
-    letterSpacing: '0.04em',
+    letterSpacing: '0.08em',
   },
   divider: {
     // Divider của Fluent mặc định co giãn để lấp chỗ trống; ở đây cần nó

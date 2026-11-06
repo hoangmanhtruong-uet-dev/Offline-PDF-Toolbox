@@ -178,7 +178,7 @@ async function openDocument(
     const loadingTask = pdfjsLib.getDocument({
       data,
       useSystemFonts: false,
-      disableFontFace: false,
+      disableFontFace: true,
       // Bộ phông chuẩn (font 14 chuẩn) cần để vẽ chữ trong hình thu nhổ.
       standardFontDataUrl,
     });

@@ -104,6 +104,7 @@ export function SettingsScreen(): React.JSX.Element {
   const settings = useAppStore((state) => state.settings);
   const appInfo = useAppStore((state) => state.appInfo);
   const license = useAppStore((state) => state.license);
+  const locale = useAppStore((state) => state.locale);
   const updateSettings = useAppStore((state) => state.updateSettings);
   const restore = useAppStore((state) => state.restore);
 
@@ -245,7 +246,11 @@ export function SettingsScreen(): React.JSX.Element {
           <CardFooter>
             <div className={styles.field}>
               <span className={styles.hint}>
-                {license.isPro ? t('pro.ownedSubtitle') : t('pro.comingSoon')}
+                {license.promoUntil
+                  ? t('pro.promoSubtitle', { date: new Date(license.promoUntil).toLocaleDateString(locale) })
+                  : license.isPro
+                    ? t('pro.ownedSubtitle')
+                    : t('pro.comingSoon')}
               </span>
               <div className={styles.row}>
                 {!license.isPro ? (
