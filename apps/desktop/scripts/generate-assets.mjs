@@ -15,8 +15,8 @@ function createIconSvg(size = 512) {
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="${size}" height="${size}">
   <defs>
     <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0f6cbd" />
-      <stop offset="100%" stop-color="#004c87" />
+      <stop offset="0%" stop-color="#7c3aed" />
+      <stop offset="100%" stop-color="#db2777" />
     </linearGradient>
     <linearGradient id="paperGrad" x1="0%" y1="0%" x2="0%" y2="100%">
       <stop offset="0%" stop-color="#ffffff" />
@@ -63,7 +63,7 @@ function createIconSvg(size = 512) {
   </g>
 
   <!-- Các dòng tài liệu -->
-  <rect x="180" y="210" width="150" height="18" rx="9" fill="#0f6cbd" opacity="0.8" />
+  <rect x="180" y="210" width="150" height="18" rx="9" fill="#7c3aed" opacity="0.8" />
   <rect x="180" y="250" width="130" height="18" rx="9" fill="#8da4be" />
   <rect x="180" y="290" width="100" height="18" rx="9" fill="#8da4be" />
 
@@ -91,8 +91,8 @@ function createWideSvg() {
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 310 150" width="310" height="150">
   <defs>
     <linearGradient id="wideBg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0f6cbd" />
-      <stop offset="100%" stop-color="#004c87" />
+      <stop offset="0%" stop-color="#7c3aed" />
+      <stop offset="100%" stop-color="#db2777" />
     </linearGradient>
   </defs>
   <rect width="310" height="150" fill="url(#wideBg)" />
@@ -100,7 +100,7 @@ function createWideSvg() {
     <!-- Icon mini -->
     <path d="M 130 90 L 300 90 L 382 172 L 382 422 A 16 16 0 0 1 366 438 L 146 438 A 16 16 0 0 1 130 422 Z" fill="#ffffff" />
     <path d="M 300 90 L 300 162 A 10 10 0 0 0 310 172 L 382 172 Z" fill="#b8c8d8" />
-    <rect x="180" y="210" width="150" height="20" rx="10" fill="#0f6cbd" />
+    <rect x="180" y="210" width="150" height="20" rx="10" fill="#7c3aed" />
     <rect x="180" y="255" width="130" height="20" rx="10" fill="#8da4be" />
     <g transform="translate(260, 270)">
       <path d="M 45 45 L 45 30 A 25 25 0 0 1 95 30 L 95 45" fill="none" stroke="#ffffff" stroke-width="16" stroke-linecap="round" />
@@ -108,7 +108,7 @@ function createWideSvg() {
     </g>
   </g>
   <text x="125" y="72" font-family="Segoe UI, system-ui, sans-serif" font-weight="600" font-size="20" fill="#ffffff">Offline PDF</text>
-  <text x="125" y="98" font-family="Segoe UI, system-ui, sans-serif" font-weight="400" font-size="16" fill="#d0e4f5">Toolbox</text>
+  <text x="125" y="98" font-family="Segoe UI, system-ui, sans-serif" font-weight="400" font-size="16" fill="#fce7f3">Toolbox</text>
 </svg>`;
 }
 
@@ -119,15 +119,15 @@ function createSplashSvg() {
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 300" width="620" height="300">
   <defs>
     <linearGradient id="splashBg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0f6cbd" />
-      <stop offset="100%" stop-color="#003e6d" />
+      <stop offset="0%" stop-color="#7c3aed" />
+      <stop offset="100%" stop-color="#be185d" />
     </linearGradient>
   </defs>
   <rect width="620" height="300" fill="url(#splashBg)" />
   <g transform="translate(250, 45) scale(0.24)">
     <path d="M 130 90 L 300 90 L 382 172 L 382 422 A 16 16 0 0 1 366 438 L 146 438 A 16 16 0 0 1 130 422 Z" fill="#ffffff" />
     <path d="M 300 90 L 300 162 A 10 10 0 0 0 310 172 L 382 172 Z" fill="#b8c8d8" />
-    <rect x="180" y="210" width="150" height="20" rx="10" fill="#0f6cbd" />
+    <rect x="180" y="210" width="150" height="20" rx="10" fill="#7c3aed" />
     <rect x="180" y="255" width="130" height="20" rx="10" fill="#8da4be" />
     <g transform="translate(260, 270)">
       <path d="M 45 45 L 45 30 A 25 25 0 0 1 95 30 L 95 45" fill="none" stroke="#ffffff" stroke-width="16" stroke-linecap="round" />
@@ -135,7 +135,37 @@ function createSplashSvg() {
     </g>
   </g>
   <text x="310" y="200" text-anchor="middle" font-family="Segoe UI, system-ui, sans-serif" font-weight="600" font-size="28" fill="#ffffff">Offline PDF Toolbox</text>
-  <text x="310" y="232" text-anchor="middle" font-family="Segoe UI, system-ui, sans-serif" font-weight="400" font-size="16" fill="#bed8f0">100% On-Device &amp; Private</text>
+  <text x="310" y="232" text-anchor="middle" font-family="Segoe UI, system-ui, sans-serif" font-weight="400" font-size="16" fill="#fbcfe8">100% On-Device &amp; Private</text>
+</svg>`;
+}
+
+/**
+ * Ảnh poster dọc 2:3 (720x1080) cho trang Store.
+ */
+function createPosterSvg() {
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 1080" width="720" height="1080">
+  <defs>
+    <linearGradient id="posterBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7c3aed" />
+      <stop offset="100%" stop-color="#db2777" />
+    </linearGradient>
+  </defs>
+  <rect width="720" height="1080" fill="url(#posterBg)" />
+  <g transform="translate(180, 190) scale(0.72)">
+    <path d="M 130 90 L 300 90 L 382 172 L 382 422 A 16 16 0 0 1 366 438 L 146 438 A 16 16 0 0 1 130 422 Z" fill="#ffffff" />
+    <path d="M 300 90 L 300 162 A 10 10 0 0 0 310 172 L 382 172 Z" fill="#e9d5ff" />
+    <rect x="180" y="210" width="150" height="20" rx="10" fill="#7c3aed" />
+    <rect x="180" y="255" width="130" height="20" rx="10" fill="#c4b5fd" />
+    <g transform="translate(260, 270)">
+      <path d="M 45 45 L 45 30 A 25 25 0 0 1 95 30 L 95 45" fill="none" stroke="#c4b5fd" stroke-width="16" stroke-linecap="round" />
+      <rect x="25" y="45" width="90" height="75" rx="16" fill="#ffb900" />
+      <circle cx="70" cy="78" r="9" fill="#7c2d12" />
+    </g>
+  </g>
+  <text x="360" y="640" text-anchor="middle" font-family="Segoe UI, system-ui, sans-serif" font-weight="700" font-size="56" fill="#ffffff">Offline</text>
+  <text x="360" y="705" text-anchor="middle" font-family="Segoe UI, system-ui, sans-serif" font-weight="700" font-size="56" fill="#ffffff">PDF Toolbox</text>
+  <text x="360" y="780" text-anchor="middle" font-family="Segoe UI, system-ui, sans-serif" font-weight="400" font-size="28" fill="#fce7f3">Merge, split, compress, rotate</text>
+  <text x="360" y="820" text-anchor="middle" font-family="Segoe UI, system-ui, sans-serif" font-weight="400" font-size="28" fill="#fce7f3">100% on your PC. No uploads.</text>
 </svg>`;
 }
 
@@ -223,6 +253,14 @@ async function main() {
   const icoData = createIco(icoBuffers, icoSizes);
   await writeFile(join(assetsDir, 'icon.ico'), icoData);
   console.log('  ✓ icon.ico (multi-res 16..256)');
+
+  // 10. Logo cho trang Store (xuất sang store-assets/logos, không nằm trong gói MSIX)
+  const logosDir = join(desktopRoot, 'store-assets', 'logos');
+  await mkdir(logosDir, { recursive: true });
+  await sharp(iconSvg).resize(300, 300).png().toFile(join(logosDir, 'Logo-1x1-300x300.png'));
+  await sharp(iconSvg).resize(1080, 1080).png().toFile(join(logosDir, 'BoxArt-1x1-1080x1080.png'));
+  await sharp(Buffer.from(createPosterSvg())).resize(720, 1080).png().toFile(join(logosDir, 'PosterArt-2x3-720x1080.png'));
+  console.log('  ✓ store-assets/logos: Logo 300x300, BoxArt 1080x1080, PosterArt 720x1080');
 
   console.log('\nHoàn tất sinh toàn bộ Visual Assets!');
 }

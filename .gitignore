@@ -40,3 +40,6 @@ apps/desktop/tests/fixtures/xoay-trang*.pdf
 apps/desktop/shot-*.png
 apps/desktop/thumb-*.png
 apps/desktop/row.png
+
+# PDF mẫu để chụp ảnh Store, tạo lại bằng scripts/make-demo-pdfs.mjs
+apps/desktop/store-assets/demo-pdfs/
